@@ -218,11 +218,11 @@ namespace DialogueDisplayFramework
 					{
 						if (npcName.scroll)
 						{
-							SpriteText.drawStringWithScrollCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, npcName.color, npcName.scrollType, npcName.layerDepth, npcName.junimo);
+							SpriteText.drawStringWithScrollCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, Utility.StringToColor(npcName.color), npcName.scrollType, npcName.layerDepth, npcName.junimo);
 						}
 						else
 						{
-							SpriteText.drawStringHorizontallyCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, npcName.color);
+							SpriteText.drawStringHorizontallyCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, Utility.StringToColor(npcName.color));
 						}
 
 					}
@@ -233,11 +233,11 @@ namespace DialogueDisplayFramework
 
 						if (npcName.scroll)
 						{
-							SpriteText.drawStringWithScrollBackground(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, npcName.color, npcName.alignment);
+							SpriteText.drawStringWithScrollBackground(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, Utility.StringToColor(npcName.color), npcName.alignment);
 						}
 						else
 						{
-							SpriteText.drawString(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, npcName.color);
+							SpriteText.drawString(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, color: Utility.StringToColor(npcName.color));
 						}
 					}
 				}
@@ -259,11 +259,11 @@ namespace DialogueDisplayFramework
 
 							if (text.scroll)
 							{
-								SpriteText.drawStringWithScrollCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, text.color, text.scrollType, text.layerDepth, text.junimo);
+								SpriteText.drawStringWithScrollCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, Utility.StringToColor(text.color), text.scrollType, text.layerDepth, text.junimo);
 							}
 							else
 							{
-								SpriteText.drawStringHorizontallyCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, text.color);
+								SpriteText.drawStringHorizontallyCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, Utility.StringToColor(text.color));
 							}
 
 						}
@@ -274,11 +274,11 @@ namespace DialogueDisplayFramework
 
 							if (text.scroll)
 							{
-								SpriteText.drawStringWithScrollBackground(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, text.color, text.alignment);
+								SpriteText.drawStringWithScrollBackground(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, Utility.StringToColor(text.color), text.alignment);
 							}
 							else
 							{
-								SpriteText.drawString(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, text.color);
+								SpriteText.drawString(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, color: Utility.StringToColor(text.color));
 							}
 						}
 					}
@@ -363,7 +363,7 @@ namespace DialogueDisplayFramework
 				var dialogue = data.dialogue is null ? dataDict[defaultKey].dialogue : data.dialogue;
 				var dialoguePos = GetDataVector(__instance, dialogue);
 				preventGetCurrentString = false;
-				SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", dialogue.color, dialogue.alignment);
+				SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
 
 
 				// Close Icon
