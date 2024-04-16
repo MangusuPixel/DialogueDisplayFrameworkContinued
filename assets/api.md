@@ -6,7 +6,7 @@ Dialogue Display Framework uses Content Patcher to load a dictionary from a fake
 
 "**aedenthorn.DialogueDisplayFramework/dictionary**"
 
-Dictionary keys should be either "default" for a global dialogue setup or the name ID of the NPC (e.g. "Emily").
+Dictionary keys should be either "default" for a global dialogue setup, the name ID of the NPC (e.g. "Emily") or a comma separated list of NPC names (e.g. "Emily, Abigail, etc...").
 
 So, an example CP shell would look like:
 

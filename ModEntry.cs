@@ -23,6 +23,7 @@ namespace DialogueDisplayFramework
 
         private static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
         private static string defaultKey = "default";
+        private static string listDelimiter = ", ";
         private static Dictionary<string, DialogueDisplayData> dataDict = new Dictionary<string, DialogueDisplayData>();
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
         private static List<string> loadedPacks = new List<string>();
@@ -69,25 +70,41 @@ namespace DialogueDisplayFramework
             //SMonitor.Log("Loading Data");
 
             loadedPacks.Clear();
-            dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+            dataDict.Clear();
+            var rawDataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
             //SMonitor.Log($"Loaded {dataDict.Count} data entries");
-            if (!dataDict.ContainsKey(defaultKey))
+            if (!rawDataDict.ContainsKey(defaultKey))
                 dataDict[defaultKey] = new DialogueDisplayData() { disabled = true };
 
             imageDict.Clear();
-            foreach(var key in dataDict.Keys)
+            foreach(var dataEntry in rawDataDict)
             {
-                if(dataDict[key].packName != null && !loadedPacks.Contains(dataDict[key].packName))
+                var packName = dataEntry.Value.packName;
+                var portraitData = dataEntry.Value.portrait;
+
+                if (packName != null && !loadedPacks.Contains(packName))
                 {
-                    loadedPacks.Add(dataDict[key].packName);
+                    loadedPacks.Add(packName);
                 }
-                foreach (var image in dataDict[key].images)
+                foreach (var image in dataEntry.Value.images)
                 {
                     if(!imageDict.ContainsKey(image.texturePath))
                         imageDict[image.texturePath] = Game1.content.Load<Texture2D>(image.texturePath);
                 }
-                if (dataDict[key].portrait?.texturePath != null && !imageDict.ContainsKey(dataDict[key].portrait.texturePath))
-                    imageDict[dataDict[key].portrait.texturePath] = Game1.content.Load<Texture2D>(dataDict[key].portrait.texturePath);
+                if (portraitData?.texturePath != null && !imageDict.ContainsKey(portraitData.texturePath))
+                {
+                    imageDict[portraitData.texturePath] = Game1.content.Load<Texture2D>(portraitData.texturePath);
+                }
+                foreach (var id in dataEntry.Key.Split(listDelimiter))
+                {
+                    if (!dataDict.ContainsKey(id))
+                    {
+                        dataDict[id] = dataEntry.Value;
+                    } else
+                    {
+                        SMonitor.Log(string.Format("Duplicate NPC '{0}' will be ignored in pack '{1}'.", id, packName), LogLevel.Warn);
+                    }
+                }
             }
         }
 
