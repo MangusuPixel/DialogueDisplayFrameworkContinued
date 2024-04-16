@@ -42,7 +42,7 @@ Dictionary values are objects with the following keys:
 - "name" - object for customizing name display (see below)
 - "jewel" - object for customizing friendship jewel display (see below)
 - "button" - object for customizing action button display (see below)
-- "sprite" - object relating to custom character sprite (see below)
+- "sprite" - (disabled) object relating to custom character sprite (see below)
 - "gifts" - object relating to custom gift display (see below)
 - "hearts" - object relating to custom hearts display (see below)
 - "images" - array of objects relating to custom images (see below)
@@ -103,7 +103,7 @@ Portrait data has the following additional keys available:
 
 ## Sprite Data
 
-Sprite data has the following additional keys available:
+<span style="color:red">**Sprite data is currently not available.**</span> Sprite data has the following additional keys available:
 
 - "background" - boolean, whether to show the day / night background behind the sprite
 - "frame" - integer, which frame on the character sprite sheet to show. Set to -1 to animate the sprite instead

@@ -13,7 +13,7 @@ namespace DialogueDisplayFramework
     public partial class ModEntry
     {
 		private static bool preventGetCurrentString;
-		private static ProfileMenu npcSpriteMenu;
+		//private static ProfileMenu npcSpriteMenu;
 
 		[HarmonyPatch(typeof(DialogueBox), new Type[] { typeof(Dialogue) })]
 		[HarmonyPatch(MethodType.Constructor)]
@@ -23,6 +23,7 @@ namespace DialogueDisplayFramework
 			{
 				if (!Config.EnableMod || dialogue?.speaker is null)
 					return;
+                /*
                 try
                 {
 					npcSpriteMenu = new ProfileMenu(dialogue.speaker);
@@ -31,6 +32,7 @@ namespace DialogueDisplayFramework
                 {
 
                 }
+				*/
 				LoadData();
 				if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
                 {
@@ -57,6 +59,7 @@ namespace DialogueDisplayFramework
 					data = dataDict[defaultKey];
 				if (data == null || data.disabled)
 					return true;
+				/*
 				var sprite = data.sprite is null ? dataDict[defaultKey].sprite : data.sprite;
 				if (sprite is not null && !sprite.disabled)
                 {
@@ -67,6 +70,7 @@ namespace DialogueDisplayFramework
 						return false;
 					}
 				}
+				*/
 				return true;
 			}
 		}
@@ -182,7 +186,7 @@ namespace DialogueDisplayFramework
 
 
 				// Sprite
-
+				/*
 				var sprite = data.sprite is null ? dataDict[defaultKey].sprite : data.sprite;
 
 				if (sprite is not null && !sprite.disabled && npcSpriteMenu is not null)
@@ -205,7 +209,7 @@ namespace DialogueDisplayFramework
 					}
 					AccessTools.FieldRefAccess<ProfileMenu, AnimatedSprite>(npcSpriteMenu, "_animatedSprite").draw(b, pos + new Vector2(32, 32), sprite.layerDepth, 0, 0, Color.White, false, sprite.scale, 0, false);
 				}
-
+				*/
 
 				// NPC Name
 
