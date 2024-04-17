@@ -1,22 +1,10 @@
 ﻿{
-  "Name": "Dialogue Display Framework",
-  "Author": "aedenthorn",
-  "Version": "0.4.0",
-  "Description": "Dialogue Display Framework.",
+  "Name": "Dialogue Display Framework Continued",
+  "Author": "Mangupix",
+  "Version": "0.5.0",
+  "Description": "Updated Dialogue Display Framework for 1.6.",
   "UniqueID": "aedenthorn.DialogueDisplayFramework",
   "EntryDll": "DialogueDisplayFramework.dll",
   "MinimumApiVersion": "3.13.0",
-  "ModUpdater": {
-    "Repository": "StardewValleyMods",
-    "User": "aedenthorn",
-    "Directory": "_releases",
-    "ModFolder": "DialogueDisplayFramework"
-  },
-  "UpdateKeys": [ "Nexus:11661" ],
-  "Dependencies": [
-    {
-      "UniqueID": "Platonymous.ModUpdater",
-      "IsRequired": false
-    }
-  ]
+  "UpdateKeys": [ "Nexus:22678" ]
 }
