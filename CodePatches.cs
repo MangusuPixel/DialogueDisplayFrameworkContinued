@@ -301,14 +301,14 @@ namespace DialogueDisplayFramework
                         int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(name);
                         int extraFriendshipPixels = Game1.player.getFriendshipLevelForNPC(name) % 250;
 
-                        var character = Game1.getCharacterFromName(name, true);
-                        bool datable = character.datable.Value;
+                        var speaker = __instance.characterDialogue.speaker;
+                        bool datable = speaker.datable.Value;
                         bool spouse = false;
                         if (Game1.player.friendshipData.TryGetValue(name, out Friendship friendship))
                         {
                             spouse = friendship.IsMarried();
                         }
-                        int maxHearts = Math.Max(Utility.GetMaximumHeartsForCharacter(character), 10);
+                        int maxHearts = Math.Max(Utility.GetMaximumHeartsForCharacter((Character) speaker), 10);
                         if (hearts.centered)
                         {
                             int maxDisplayedHearts = hearts.showEmptyHearts ? maxHearts : heartLevel;
