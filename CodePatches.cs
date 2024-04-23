@@ -6,7 +6,7 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.Characters;
 using StardewValley.Menus;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace DialogueDisplayFramework
 {
@@ -33,7 +33,7 @@ namespace DialogueDisplayFramework
 
                 }
                 */
-                LoadData();
+                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
                 if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
                 {
                     if (!dataDict.TryGetValue(defaultKey, out data))
@@ -55,6 +55,9 @@ namespace DialogueDisplayFramework
             {
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return true;
+
+                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+
                 if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
                     data = dataDict[defaultKey];
                 if (data == null || data.disabled)
@@ -82,6 +85,9 @@ namespace DialogueDisplayFramework
             {
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return;
+
+                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+
                 if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
                 {
                     if (!dataDict.TryGetValue(defaultKey, out data))
@@ -104,6 +110,8 @@ namespace DialogueDisplayFramework
                 if (!Config.EnableMod)
                     return true;
                 string name = __instance.characterDialogue.speaker.Name;
+
+                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
 
                 if (!dataDict.TryGetValue(name, out DialogueDisplayData data))
                     data = dataDict[defaultKey];

@@ -25,7 +25,7 @@ So, an example CP shell would look like:
         ]
     }
 
-When testing out your pack, you can press F5 in game to reload all registered entries, so you can make edits and see them reflected in-game in real time.
+When testing out your pack, you can use `patch reload <yourModID>` in the SMAPI console to reload all registered entries, so you can make edits and see them reflected in-game in real time.
 
 
 ## Dictionary Objects

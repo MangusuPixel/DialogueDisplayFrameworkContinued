@@ -3,12 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Locations;
-using StardewValley.Objects;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Object = StardewValley.Object;
 
 namespace DialogueDisplayFramework
 {
@@ -24,7 +19,6 @@ namespace DialogueDisplayFramework
         private static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
         private static string defaultKey = "default";
         private static string listDelimiter = ", ";
-        private static Dictionary<string, DialogueDisplayData> dataDict = new Dictionary<string, DialogueDisplayData>();
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
         private static List<string> loadedPacks = new List<string>();
 
@@ -40,10 +34,10 @@ namespace DialogueDisplayFramework
             SHelper = helper;
 
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-            helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
-            
+
             helper.Events.Content.AssetRequested += Content_AssetRequested;
-            
+            helper.Events.Content.AssetRequested += Content_AssetRequested_Post; // After CP edits
+
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.PatchAll();
         }
@@ -56,55 +50,69 @@ namespace DialogueDisplayFramework
             if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>(), AssetLoadPriority.Exclusive);
-
             }
         }
 
-        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        [EventPriority(EventPriority.Low)]
+        private void Content_AssetRequested_Post(object sender, AssetRequestedEventArgs e)
         {
-            LoadData();
-        }
+            if (!Config.EnableMod)
+                return;
 
-        private static void LoadData()
-        {
-            //SMonitor.Log("Loading Data");
-
-            loadedPacks.Clear();
-            dataDict.Clear();
-            var rawDataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
-            //SMonitor.Log($"Loaded {dataDict.Count} data entries");
-            if (!rawDataDict.ContainsKey(defaultKey))
-                dataDict[defaultKey] = new DialogueDisplayData() { disabled = true };
-
-            imageDict.Clear();
-            foreach(var dataEntry in rawDataDict)
+            if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
             {
-                var packName = dataEntry.Value.packName;
-                var portraitData = dataEntry.Value.portrait;
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, DialogueDisplayData>().Data;
+                    var keyGroups = new Dictionary<string, string>();
 
-                if (packName != null && !loadedPacks.Contains(packName))
-                {
-                    loadedPacks.Add(packName);
-                }
-                foreach (var image in dataEntry.Value.images)
-                {
-                    if(!imageDict.ContainsKey(image.texturePath))
-                        imageDict[image.texturePath] = Game1.content.Load<Texture2D>(image.texturePath);
-                }
-                if (portraitData?.texturePath != null && !imageDict.ContainsKey(portraitData.texturePath))
-                {
-                    imageDict[portraitData.texturePath] = Game1.content.Load<Texture2D>(portraitData.texturePath);
-                }
-                foreach (var id in dataEntry.Key.Split(listDelimiter))
-                {
-                    if (!dataDict.ContainsKey(id))
+                    //SMonitor.Log($"Loaded {data.Count} data entries");
+
+                    if (!data.ContainsKey(defaultKey))
+                        data[defaultKey] = new DialogueDisplayData() { disabled = true };
+
+                    loadedPacks.Clear();
+                    imageDict.Clear();
+                    foreach (var (key, entry) in data)
                     {
-                        dataDict[id] = dataEntry.Value;
-                    } else
-                    {
-                        SMonitor.Log(string.Format("Duplicate NPC '{0}' will be ignored in pack '{1}'.", id, packName), LogLevel.Warn);
+                        if (key.Contains(listDelimiter))
+                        {
+                            keyGroups.Add(entry.packName, key);
+                        }
+                        if (entry.packName != null && !loadedPacks.Contains(entry.packName))
+                        {
+                            loadedPacks.Add(entry.packName);
+                        }
+                        foreach (var image in entry.images)
+                        {
+                            if (!imageDict.ContainsKey(image.texturePath))
+                                imageDict[image.texturePath] = Game1.content.Load<Texture2D>(image.texturePath);
+                        }
+                        if (entry.portrait?.texturePath != null && !imageDict.ContainsKey(entry.portrait.texturePath))
+                        {
+                            imageDict[entry.portrait.texturePath] = Game1.content.Load<Texture2D>(entry.portrait.texturePath);
+                        }
                     }
-                }
+
+                    foreach (var (packName, originalKey) in keyGroups)
+                    {
+                        var refData = data[originalKey];
+
+                        foreach (var key in originalKey.Split(listDelimiter))
+                        {
+                            if (!data.ContainsKey(key))
+                            {
+                                data[key] = refData;
+                            }
+                            else
+                            {
+                                SMonitor.Log(string.Format("Duplicate NPC '{0}' will be ignored in pack '{1}'.", key, packName), LogLevel.Warn);
+                            }
+                        }
+
+                        data.Remove(originalKey);
+                    }
+                });
             }
         }
 
