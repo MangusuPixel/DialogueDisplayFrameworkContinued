@@ -20,7 +20,6 @@ namespace DialogueDisplayFramework
         private static string defaultKey = "default";
         private static string listDelimiter = ", ";
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
-        private static List<string> loadedPacks = new List<string>();
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -71,17 +70,12 @@ namespace DialogueDisplayFramework
                     if (!data.ContainsKey(defaultKey))
                         data[defaultKey] = new DialogueDisplayData() { disabled = true };
 
-                    loadedPacks.Clear();
                     imageDict.Clear();
                     foreach (var (key, entry) in data)
                     {
                         if (key.Contains(listDelimiter))
                         {
                             keyGroups.Add(entry.packName, key);
-                        }
-                        if (entry.packName != null && !loadedPacks.Contains(entry.packName))
-                        {
-                            loadedPacks.Add(entry.packName);
                         }
                         foreach (var image in entry.images)
                         {
