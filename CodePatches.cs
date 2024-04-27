@@ -109,15 +109,26 @@ namespace DialogueDisplayFramework
             {
                 if (!Config.EnableMod)
                     return true;
-                string name = __instance.characterDialogue.speaker.Name;
+                NPC speaker = __instance.characterDialogue.speaker;
 
                 var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
 
-                if (!dataDict.TryGetValue(name, out DialogueDisplayData data))
+                if (!dataDict.TryGetValue(speaker.Name, out DialogueDisplayData data))
                     data = dataDict[defaultKey];
 
                 if (data == null || data.disabled)
                     return true;
+
+                if (!Game1.IsMasterGame && !speaker.EventActor)
+                {
+                    var currentLocation = speaker.currentLocation;
+                    if (currentLocation == null || !currentLocation.IsActiveLocation())
+                    {
+                        NPC actualSpeaker = Game1.getCharacterFromName(speaker.Name, true, false);
+                        if (actualSpeaker != null && actualSpeaker.currentLocation.IsActiveLocation())
+                            speaker = actualSpeaker;
+                    }
+                }
 
                 // Dividers
 
@@ -297,7 +308,7 @@ namespace DialogueDisplayFramework
                 }
 
 
-                if (Game1.player.friendshipData.ContainsKey(name))
+                if (Game1.player.friendshipData.ContainsKey(speaker.Name))
                 {
 
                     // Hearts
@@ -306,17 +317,16 @@ namespace DialogueDisplayFramework
                     if (hearts is not null && !hearts.disabled)
                     {
                         var pos = GetDataVector(__instance, hearts);
-                        int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(name);
-                        int extraFriendshipPixels = Game1.player.getFriendshipLevelForNPC(name) % 250;
+                        int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
+                        int extraFriendshipPixels = Game1.player.getFriendshipLevelForNPC(speaker.Name) % 250;
 
-                        var speaker = __instance.characterDialogue.speaker;
                         bool datable = speaker.datable.Value;
                         bool spouse = false;
-                        if (Game1.player.friendshipData.TryGetValue(name, out Friendship friendship))
+                        if (Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship))
                         {
                             spouse = friendship.IsMarried();
                         }
-                        int maxHearts = Math.Max(Utility.GetMaximumHeartsForCharacter((Character) speaker), 10);
+                        int maxHearts = Math.Max(Utility.GetMaximumHeartsForCharacter(speaker), 10);
                         if (hearts.centered)
                         {
                             int maxDisplayedHearts = hearts.showEmptyHearts ? maxHearts : heartLevel;
@@ -348,12 +358,12 @@ namespace DialogueDisplayFramework
                     // Gifts
 
                     var gifts = data.gifts is null ? dataDict[defaultKey].gifts : data.gifts;
-                    if (gifts is not null && !gifts.disabled && !Game1.player.friendshipData[name].IsMarried() && Game1.getCharacterFromName(name) is not Child)
+                    if (gifts is not null && !gifts.disabled && !Game1.player.friendshipData[speaker.Name].IsMarried() && Game1.getCharacterFromName(speaker.Name) is not Child)
                     {
                         var pos = GetDataVector(__instance, gifts);
                         Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
-                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(64, 8) : new Vector2(0, 56)), new Rectangle?(new Rectangle(227 + ((Game1.player.friendshipData[name].GiftsThisWeek >= 2) ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(64, 8) : new Vector2(0, 56)), new Rectangle?(new Rectangle(227 + ((Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 2) ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
                     }
 
                     // Jewel
