@@ -14,11 +14,15 @@ namespace DialogueDisplayFramework
     public partial class ModEntry
     {
         private static bool preventGetCurrentString;
+        private static DialogueDisplayData cachedDialogueData;
         //private static ProfileMenu npcSpriteMenu;
 
         // Get the correct data based on context
         public static DialogueDisplayData GetDialogueDisplayData(Dialogue characterDialogue)
         {
+            if (!dirtyDialogueData)
+                return cachedDialogueData;
+
             var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
             DialogueDisplayData dataFound = null;
 
@@ -41,6 +45,9 @@ namespace DialogueDisplayFramework
             if (dataFound == null || dataFound.disabled)
                 dataDict.TryGetValue(defaultKey, out dataFound);
 
+            cachedDialogueData = dataFound;
+            dirtyDialogueData = false;
+
             return dataFound;
         }
 
@@ -62,6 +69,7 @@ namespace DialogueDisplayFramework
 
                 }
                 */
+                dirtyDialogueData = true;
                 var data = GetDialogueDisplayData(__instance.characterDialogue);
                 if (data == null)
                     return;

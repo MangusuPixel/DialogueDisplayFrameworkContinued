@@ -20,6 +20,7 @@ namespace DialogueDisplayFramework
         private static string defaultKey = "default";
         private static string listDelimiter = ", ";
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
+        private static bool dirtyDialogueData = false;
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -107,6 +108,8 @@ namespace DialogueDisplayFramework
                         data.Remove(originalKey);
                     }
                 });
+
+                dirtyDialogueData = true;
             }
         }
 
