@@ -7,6 +7,7 @@ using StardewValley.Characters;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DialogueDisplayFramework
 {
@@ -14,6 +15,34 @@ namespace DialogueDisplayFramework
     {
         private static bool preventGetCurrentString;
         //private static ProfileMenu npcSpriteMenu;
+
+        // Get the correct data based on context
+        public static DialogueDisplayData GetDialogueDisplayData(Dialogue characterDialogue)
+        {
+            var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+            DialogueDisplayData dataFound = null;
+
+            NPC speaker = characterDialogue.speaker;
+            var location = speaker.currentLocation;
+
+            // Legacy location portrait values
+            if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(speaker.Name))
+                dataDict.TryGetValue(speaker.Name + "_" + location.Name, out dataFound);
+
+            // Beach portrait values
+            if ((dataFound == null || dataFound.disabled) && SHelper.Reflection.GetField<bool>(speaker, "isWearingIslandAttire").GetValue())
+                dataDict.TryGetValue(speaker.Name + "_Beach", out dataFound);
+
+            // Regular entry values
+            if (dataFound == null || dataFound.disabled)
+                dataDict.TryGetValue(speaker.Name, out dataFound);
+
+            // Default values
+            if (dataFound == null || dataFound.disabled)
+                dataDict.TryGetValue(defaultKey, out dataFound);
+
+            return dataFound;
+        }
 
         [HarmonyPatch(typeof(DialogueBox), new Type[] { typeof(Dialogue) })]
         [HarmonyPatch(MethodType.Constructor)]
@@ -33,12 +62,10 @@ namespace DialogueDisplayFramework
 
                 }
                 */
-                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
-                if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
-                {
-                    if (!dataDict.TryGetValue(defaultKey, out data))
-                        return;
-                }
+                var data = GetDialogueDisplayData(__instance.characterDialogue);
+                if (data == null)
+                    return;
+
                 __instance.x += data.xOffset;
                 __instance.y += data.yOffset;
                 if(data.width > 0)
@@ -56,11 +83,8 @@ namespace DialogueDisplayFramework
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return true;
 
-                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
-
-                if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
-                    data = dataDict[defaultKey];
-                if (data == null || data.disabled)
+                var data = GetDialogueDisplayData(__instance.characterDialogue);
+                if (data == null)
                     return true;
                 /*
                 var sprite = data.sprite is null ? dataDict[defaultKey].sprite : data.sprite;
@@ -86,13 +110,10 @@ namespace DialogueDisplayFramework
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return;
 
-                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+                var data = GetDialogueDisplayData(__instance.characterDialogue);
+                if (data == null)
+                    return;
 
-                if (!dataDict.TryGetValue(__instance.characterDialogue.speaker.Name, out DialogueDisplayData data))
-                {
-                    if (!dataDict.TryGetValue(defaultKey, out data))
-                        return;
-                }
                 __instance.x += data.xOffset;
                 __instance.y += data.yOffset;
                 if (data.width > 0)
@@ -111,12 +132,9 @@ namespace DialogueDisplayFramework
                     return true;
                 NPC speaker = __instance.characterDialogue.speaker;
 
-                var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
-
-                if (!dataDict.TryGetValue(speaker.Name, out DialogueDisplayData data))
-                    data = dataDict[defaultKey];
-
-                if (data == null || data.disabled)
+                var defaultData = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath)[defaultKey];
+                var data = GetDialogueDisplayData(__instance.characterDialogue);
+                if (defaultData == null && data == null)
                     return true;
 
                 if (!Game1.IsMasterGame && !speaker.EventActor)
@@ -132,7 +150,7 @@ namespace DialogueDisplayFramework
 
                 // Dividers
 
-                var dividers = data.dividers is null ? dataDict[defaultKey].dividers : data.dividers;
+                var dividers = data.dividers is null ? defaultData.dividers : data.dividers;
 
                 if (dividers != null)
                 {
@@ -153,7 +171,7 @@ namespace DialogueDisplayFramework
 
                 // Images
 
-                var images = data.images is null ? dataDict[defaultKey].images : data.images;
+                var images = data.images is null ? defaultData.images : data.images;
 
                 if (images != null)
                 {
@@ -166,7 +184,7 @@ namespace DialogueDisplayFramework
 
                 // NPC Portrait
 
-                var portrait = data.portrait is null ? dataDict[defaultKey].portrait : data.portrait;
+                var portrait = data.portrait is null ? defaultData.portrait : data.portrait;
 
                 if (portrait is not null && !portrait.disabled)
                 {
@@ -182,7 +200,7 @@ namespace DialogueDisplayFramework
                         if (__instance.characterDialogue.overridePortrait != null)
                             portraitTexture = __instance.characterDialogue.overridePortrait;
                         else
-                            portraitTexture = __instance.characterDialogue.speaker.Portrait;
+                            portraitTexture = speaker.Portrait;
                     }
                     if (!portrait.tileSheet)
                     {
@@ -232,11 +250,11 @@ namespace DialogueDisplayFramework
 
                 // NPC Name
 
-                var npcName = data.name != null ? data.name : dataDict[defaultKey].name;
+                var npcName = data.name != null ? data.name : defaultData.name;
                 if (npcName is not null && !npcName.disabled)
                 {
                     var namePos = GetDataVector(__instance, npcName);
-                    var realName = __instance.characterDialogue.speaker.getName();
+                    var realName = speaker.getName();
                     if (npcName.centered)
                     {
                         if (npcName.scroll)
@@ -268,7 +286,7 @@ namespace DialogueDisplayFramework
 
                 // Texts
 
-                var texts = data.texts is null ? dataDict[defaultKey].texts : data.texts;
+                var texts = data.texts is null ? defaultData.texts : data.texts;
 
                 if (texts != null)
                 {
@@ -313,7 +331,7 @@ namespace DialogueDisplayFramework
 
                     // Hearts
 
-                    var hearts = data.hearts is null ? dataDict[defaultKey].hearts : data.hearts;
+                    var hearts = data.hearts is null ? defaultData.hearts : data.hearts;
                     if (hearts is not null && !hearts.disabled)
                     {
                         var pos = GetDataVector(__instance, hearts);
@@ -357,7 +375,7 @@ namespace DialogueDisplayFramework
 
                     // Gifts
 
-                    var gifts = data.gifts is null ? dataDict[defaultKey].gifts : data.gifts;
+                    var gifts = data.gifts is null ? defaultData.gifts : data.gifts;
                     if (gifts is not null && !gifts.disabled && !Game1.player.friendshipData[speaker.Name].IsMarried() && Game1.getCharacterFromName(speaker.Name) is not Child)
                     {
                         var pos = GetDataVector(__instance, gifts);
@@ -370,11 +388,11 @@ namespace DialogueDisplayFramework
 
                     if (__instance.shouldDrawFriendshipJewel())
                     {
-                        var jewel = data.jewel is null ? dataDict[defaultKey].jewel : data.jewel;
+                        var jewel = data.jewel is null ? defaultData.jewel : data.jewel;
                         if (jewel != null && !jewel.disabled)
                         {
                             var pos = GetDataVector(__instance, jewel);
-                            b.Draw(Game1.mouseCursors, pos, new Rectangle?((Game1.player.getFriendshipHeartLevelForNPC(__instance.characterDialogue.speaker.Name) >= 10) ? new Rectangle(269, 494, 11, 11) : new Rectangle(Math.Max(140, 140 + (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0) * 11), Math.Max(532, 532 + Game1.player.getFriendshipHeartLevelForNPC(__instance.characterDialogue.speaker.Name) / 2 * 11), 11, 11)), Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
+                            b.Draw(Game1.mouseCursors, pos, new Rectangle?((Game1.player.getFriendshipHeartLevelForNPC(speaker.Name) >= 10) ? new Rectangle(269, 494, 11, 11) : new Rectangle(Math.Max(140, 140 + (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0) * 11), Math.Max(532, 532 + Game1.player.getFriendshipHeartLevelForNPC(speaker.Name) / 2 * 11), 11, 11)), Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
                         }
                     }
                 }
@@ -383,7 +401,7 @@ namespace DialogueDisplayFramework
 
                 // Dialogue String
 
-                var dialogue = data.dialogue is null ? dataDict[defaultKey].dialogue : data.dialogue;
+                var dialogue = data.dialogue is null ? defaultData.dialogue : data.dialogue;
                 var dialoguePos = GetDataVector(__instance, dialogue);
                 preventGetCurrentString = false;
                 SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
@@ -393,7 +411,7 @@ namespace DialogueDisplayFramework
 
                 if(__instance.dialogueIcon != null)
                 {
-                    var button = data.button is null ? dataDict[defaultKey].button : data.button;
+                    var button = data.button is null ? defaultData.button : data.button;
 
                     if(button != null && !button.disabled)
                         __instance.dialogueIcon.position = GetDataVector(__instance, button);
