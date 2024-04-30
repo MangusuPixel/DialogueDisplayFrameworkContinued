@@ -34,6 +34,7 @@ Dictionary keys can take many forms:
 | Key                                  | Description |
 | ------------------------------------ | ----------- |
 | `<CharacterNameID>_<LocationNameID>` | ***Legacy support:** Edit NPC appearance data instead.*<br>Apply changes to a character listed in a location's `UniquePortrait` property
+| `<CharacterNameID>_<AppearanceID>`   | Apply changes to a character using a specified appearance ID. Might not match their current texture if they were manually overriden elsewhere
 | `<CharacterNameID>_Beach`            | Apply changes to a characters in beach attire
 | `<CharacterNameID>`                  | Apply changes to a specific character
 | `default`                            | Fallback option if no other data is specified or for a global dialogue setup

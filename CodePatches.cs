@@ -29,19 +29,23 @@ namespace DialogueDisplayFramework
             NPC speaker = characterDialogue.speaker;
             var location = speaker.currentLocation;
 
-            // Legacy location portrait values
+            // Location-specific attire key, for legacy support
             if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(speaker.Name))
                 dataDict.TryGetValue(speaker.Name + "_" + location.Name, out dataFound);
 
-            // Beach portrait values
+            // KeyCharacter appearance key
+            if ((dataFound == null || dataFound.disabled) && speaker.LastAppearanceId != null)
+                dataDict.TryGetValue(speaker.Name + "_" + speaker.LastAppearanceId, out dataFound);
+
+            // Beach attire key
             if ((dataFound == null || dataFound.disabled) && SHelper.Reflection.GetField<bool>(speaker, "isWearingIslandAttire").GetValue())
                 dataDict.TryGetValue(speaker.Name + "_Beach", out dataFound);
 
-            // Regular entry values
+            // Regular character key
             if (dataFound == null || dataFound.disabled)
                 dataDict.TryGetValue(speaker.Name, out dataFound);
 
-            // Default values
+            // Default key
             if (dataFound == null || dataFound.disabled)
                 dataDict.TryGetValue(defaultKey, out dataFound);
 
