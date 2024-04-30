@@ -76,7 +76,7 @@ namespace DialogueDisplayFramework
 
                 __instance.x += data.xOffset;
                 __instance.y += data.yOffset;
-                if(data.width > 0)
+                if (data.width > 0)
                     __instance.width = data.width;
                 if (data.height > 0)
                     __instance.height = data.height;
@@ -109,7 +109,7 @@ namespace DialogueDisplayFramework
                 return true;
             }
         }
-    
+
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged))]
         public class DialogueBox_gameWindowSizeChanged_Patch
         {
@@ -130,7 +130,7 @@ namespace DialogueDisplayFramework
                     __instance.height = data.height;
             }
         }
-    
+
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.drawPortrait))]
         public class DialogueBox_drawPortrait_Patch
         {
@@ -176,7 +176,6 @@ namespace DialogueDisplayFramework
                     }
                 }
 
-
                 // Images
 
                 var images = data.images is null ? defaultData.images : data.images;
@@ -188,7 +187,6 @@ namespace DialogueDisplayFramework
                         b.Draw(imageDict[image.texturePath], GetDataVector(__instance, image), new Rectangle(image.x, image.y, image.w, image.h), Color.White * image.alpha, 0, Vector2.Zero, image.scale, SpriteEffects.None, image.layerDepth);
                     }
                 }
-
 
                 // NPC Portrait
 
@@ -223,12 +221,9 @@ namespace DialogueDisplayFramework
                         }
                     }
 
-
                     int xOffset = (bool)AccessTools.Method(typeof(DialogueBox), "shouldPortraitShake").Invoke(__instance, new object[] { __instance.characterDialogue }) ? Game1.random.Next(-1, 2) : 0;
                     b.Draw(portraitTexture, GetDataVector(__instance, portrait) + new Vector2(xOffset, 0), new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
                 }
-
-
 
                 // Sprite
                 /*
@@ -291,7 +286,6 @@ namespace DialogueDisplayFramework
                     }
                 }
 
-
                 // Texts
 
                 var texts = data.texts is null ? defaultData.texts : data.texts;
@@ -314,7 +308,6 @@ namespace DialogueDisplayFramework
                             {
                                 SpriteText.drawStringHorizontallyCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, Utility.StringToColor(text.color));
                             }
-
                         }
                         else
                         {
@@ -336,7 +329,6 @@ namespace DialogueDisplayFramework
 
                 if (Game1.player.friendshipData.ContainsKey(speaker.Name))
                 {
-
                     // Hearts
 
                     var hearts = data.hearts is null ? defaultData.hearts : data.hearts;
@@ -357,7 +349,7 @@ namespace DialogueDisplayFramework
                         {
                             int maxDisplayedHearts = hearts.showEmptyHearts ? maxHearts : heartLevel;
                             if (extraFriendshipPixels > 0) maxDisplayedHearts++;
-                             pos -= new Vector2(Math.Min(hearts.heartsPerRow, maxDisplayedHearts) * 32 / 2, 0);
+                            pos -= new Vector2(Math.Min(hearts.heartsPerRow, maxDisplayedHearts) * 32 / 2, 0);
                         }
                         for (int h = 0; h < maxHearts; h++)
                         {
@@ -379,7 +371,6 @@ namespace DialogueDisplayFramework
                             }
                         }
                     }
-
 
                     // Gifts
 
@@ -405,8 +396,6 @@ namespace DialogueDisplayFramework
                     }
                 }
 
-
-
                 // Dialogue String
 
                 var dialogue = data.dialogue is null ? defaultData.dialogue : data.dialogue;
@@ -414,25 +403,21 @@ namespace DialogueDisplayFramework
                 preventGetCurrentString = false;
                 SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
 
-
                 // Close Icon
 
-                if(__instance.dialogueIcon != null)
+                if (__instance.dialogueIcon != null)
                 {
                     var button = data.button is null ? defaultData.button : data.button;
 
-                    if(button != null && !button.disabled)
+                    if (button != null && !button.disabled)
                         __instance.dialogueIcon.position = GetDataVector(__instance, button);
                 }
-
-
                 preventGetCurrentString = true;
                 return false;
             }
 
             private static void DrawHorizontalPartition(SpriteBatch b, DialogueBox box, DividerData divider)
             {
-
                 Color tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
                 Texture2D texture = (divider.red == -1) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
                 b.Draw(texture, new Rectangle(box.x + divider.xOffset, box.y + divider.yOffset, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), tint);
@@ -441,7 +426,6 @@ namespace DialogueDisplayFramework
             {
                 Color tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
                 b.Draw(Game1.mouseCursors, new Rectangle(instance.x + divider.xOffset, instance.y + divider.yOffset, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
-
             }
         }
 
@@ -449,7 +433,6 @@ namespace DialogueDisplayFramework
         {
             return new Vector2(box.x + (data.right ? box.width : 0) + data.xOffset, box.y + (data.bottom ? box.height : 0) + data.yOffset);
         }
-
 
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.getCurrentString))]
         public class DialogueBox_getCurrentString_Patch
@@ -461,8 +444,8 @@ namespace DialogueDisplayFramework
                 __result = "";
                 return false;
             }
-
         }
+
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.draw))]
         public class DialogueBox_draw_Patch
         {
@@ -473,7 +456,6 @@ namespace DialogueDisplayFramework
 
                 preventGetCurrentString = false;
             }
-
         }
     }
 }
