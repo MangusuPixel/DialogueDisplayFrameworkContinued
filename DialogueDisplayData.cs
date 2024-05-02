@@ -1,6 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley.BellsAndWhistles;
+﻿using StardewValley.BellsAndWhistles;
+using System.Collections.Generic;
 
 namespace DialogueDisplayFramework
 {
@@ -19,9 +18,9 @@ namespace DialogueDisplayFramework
         public SpriteData sprite;
         public GiftsData gifts;
         public HeartsData hearts;
-        public ImageData[] images = new ImageData[0];
-        public TextData[] texts = new TextData[0];
-        public DividerData[] dividers = new DividerData[0];
+        public List<ImageData> images = new();
+        public List<TextData> texts = new();
+        public List<DividerData> dividers = new();
         public bool disabled;
     }
     public class BaseData
