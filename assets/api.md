@@ -173,6 +173,7 @@ The images field is an array of Image Data objects. Image data has the following
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
+| `id`          | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `unnamed.image` by default
 | `texturePath` | string  | The fake or real game path relative to the Content folder of the texture file used to draw 
 | `x`           | integer | X position in the source texture file
 | `y`           | integer | Y position in the source texture file
@@ -186,6 +187,7 @@ The texts field is an array of Text Data objects. Text data has the following ad
 
 | Key               | Type    | Description |
 | ----------------- | ------- | ----------- |
+| `id`              | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `unnamed.text` by default
 | `color`           | string  | Supports color name, hex and RGB formats
 | `text`            | string  | The text to display
 | `scroll`          | boolean | Whether to draw a scroll behind the text
@@ -201,6 +203,7 @@ The dividers field is an array of Divider Data objects. Divider data has the fol
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
+| `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `unnamed.divider` by default
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical)
 | `small`      | boolean | Show teeny divider, default false
 | `red`        | byte    | Red tint of divider, default -1

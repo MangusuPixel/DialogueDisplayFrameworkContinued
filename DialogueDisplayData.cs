@@ -87,6 +87,7 @@ namespace DialogueDisplayFramework
     }
     public class ImageData : BaseData
     {
+        public string ID = "unnamed.image";
         public string texturePath;
         public int x;
         public int y;
@@ -95,6 +96,7 @@ namespace DialogueDisplayFramework
     }
     public class TextData : BaseData
     {
+        public string ID = "unnamed.text";
         public string color;
         public string text;
         public bool centered;
@@ -106,6 +108,7 @@ namespace DialogueDisplayFramework
     }
     public class DividerData : BaseData
     {
+        public string ID = "unnamed.divider";
         public bool horizontal;
         public bool small;
         public int red = -1;
