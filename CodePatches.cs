@@ -183,10 +183,10 @@ namespace DialogueDisplayFramework
 
                             b.Draw(Game1.mouseCursors, new Rectangle(xPosition, yPosition, 36, divHeight), new Rectangle?(new Rectangle(278, 324, 9, 1)), color);
 
-                            if (divider.bolts?.top == true)
+                            if (divider.connectors?.top == true)
                                 b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
 
-                            if (divider.bolts?.bottom == true)
+                            if (divider.connectors?.bottom == true)
                                 b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition + divHeight - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
                         }
                     }

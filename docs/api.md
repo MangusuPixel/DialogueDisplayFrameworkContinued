@@ -206,14 +206,14 @@ The dividers field is an array of Divider Data objects. Divider data has the fol
 | `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `unnamed.divider` by default
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical)
 | `small`      | boolean | Show teeny divider, default false
-| `bolts`      | string  | Displays bolts at the ends of the divider, default `both`<br>Accepted values are `top`, `bottom`, `both` or `none`<br>No effect if `horizontal` is true
+| `connectors` | object  | Divider connector data (see below)
 | `color`      | string  | Supports color name, hex and RGB formats<br>If specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`
 
-## Divider Bolt Data
+## Divider Connector Data
 
 The divider's bolts field is an object with the following keys available:
 
 | Key      | Type    | Description |
 | ---------| ------- | ----------- |
-| `top`    | boolean | Whether or not to display the top bolt
-| `bottom` | boolean | Whether or not to display the bottom bolt
+| `top`    | boolean | Whether or not to display the top connector, default true
+| `bottom` | boolean | Whether or not to display the bottom connector, default true

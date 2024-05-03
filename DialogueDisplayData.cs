@@ -122,11 +122,11 @@ namespace DialogueDisplayFramework
         public string ID = "unnamed.divider";
         public bool horizontal;
         public bool small;
-        public DividerBoltData bolts = new() { top = true, bottom = true };
+        public DividerConnectorData connectors = new() { top = true, bottom = true };
         public string color;
     }
 
-    public class DividerBoltData
+    public class DividerConnectorData
     {
         public bool top;
         public bool bottom;
