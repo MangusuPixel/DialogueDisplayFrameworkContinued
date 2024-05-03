@@ -207,6 +207,13 @@ The dividers field is an array of Divider Data objects. Divider data has the fol
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical)
 | `small`      | boolean | Show teeny divider, default false
 | `bolts`      | string  | Displays bolts at the ends of the divider, default `both`<br>Accepted values are `top`, `bottom`, `both` or `none`<br>No effect if `horizontal` is true
-| `red`        | byte    | Red tint of divider, default -1
-| `green`      | byte    | Blue tint of divider, default -1
-| `blue`       | byte    | Green tint of divider, default -1
+| `color`      | string  | Supports color name, hex and RGB formats<br>If specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`
+
+## Divider Bolt Data
+
+The divider's bolts field is an object with the following keys available:
+
+| Key      | Type    | Description |
+| ---------| ------- | ----------- |
+| `top`    | boolean | Whether or not to display the top bolt
+| `bottom` | boolean | Whether or not to display the bottom bolt

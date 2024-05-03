@@ -166,33 +166,28 @@ namespace DialogueDisplayFramework
 
                 if (dividers != null)
                 {
-                    Color tint;
-
                     foreach (var divider in dividers)
                     {
-                        tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
+                        var color = Utility.StringToColor(divider.color) ?? Color.White;
 
                         if (divider.horizontal)
                         {
-                            Texture2D texture = (divider.red == -1) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
-                            b.Draw(texture, new Rectangle(__instance.x + divider.xOffset, __instance.y + divider.yOffset, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), tint);
+                            Texture2D texture = (divider.color is null) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
+                            b.Draw(texture, new Rectangle(__instance.x + divider.xOffset, __instance.y + divider.yOffset, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), color);
                         }
                         else
                         {
                             var xPosition = __instance.x + divider.xOffset;
                             var yPosition = __instance.y + divider.yOffset;
+                            var divHeight = (divider.height < 1) ? __instance.height + 4 : divider.height;
 
-                            b.Draw(Game1.mouseCursors, new Rectangle(xPosition, yPosition, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
+                            b.Draw(Game1.mouseCursors, new Rectangle(xPosition, yPosition, 36, divHeight), new Rectangle?(new Rectangle(278, 324, 9, 1)), color);
 
                             if (divider.bolts?.top == true)
-                            {
-                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), tint, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                            }
+                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
 
                             if (divider.bolts?.bottom == true)
-                            {
-                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition + divider.height - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), tint, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                            }
+                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition + divHeight - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
                         }
                     }
                 }

@@ -123,9 +123,7 @@ namespace DialogueDisplayFramework
         public bool horizontal;
         public bool small;
         public DividerBoltData bolts = new() { top = true, bottom = true };
-        public int red = -1;
-        public int green = -1;
-        public int blue = -1;
+        public string color;
     }
 
     public class DividerBoltData
