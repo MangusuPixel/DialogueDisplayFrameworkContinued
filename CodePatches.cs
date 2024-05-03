@@ -166,17 +166,21 @@ namespace DialogueDisplayFramework
 
                 if (dividers != null)
                 {
+                    Color tint;
+
                     foreach (var divider in dividers)
                     {
+                        tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
+
                         if (divider.horizontal)
                         {
-                            DrawHorizontalPartition(b, __instance, divider);
+                            Texture2D texture = (divider.red == -1) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
+                            b.Draw(texture, new Rectangle(__instance.x + divider.xOffset, __instance.y + divider.yOffset, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), tint);
                         }
                         else
                         {
-                            DrawVerticalPartition(b, __instance, divider);
+                            b.Draw(Game1.mouseCursors, new Rectangle(__instance.x + divider.xOffset, __instance.y + divider.yOffset, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
                         }
-
                     }
                 }
 
@@ -330,7 +334,6 @@ namespace DialogueDisplayFramework
                     }
                 }
 
-
                 if (Game1.player.friendshipData.ContainsKey(speaker.Name))
                 {
                     // Hearts
@@ -418,18 +421,6 @@ namespace DialogueDisplayFramework
                 }
                 preventGetCurrentString = true;
                 return false;
-            }
-
-            private static void DrawHorizontalPartition(SpriteBatch b, DialogueBox box, DividerData divider)
-            {
-                Color tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
-                Texture2D texture = (divider.red == -1) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
-                b.Draw(texture, new Rectangle(box.x + divider.xOffset, box.y + divider.yOffset, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), tint);
-            }
-            private static void DrawVerticalPartition(SpriteBatch b, DialogueBox instance, DividerData divider)
-            {
-                Color tint = (divider.red == -1) ? Color.White : new Color(divider.red, divider.green, divider.blue);
-                b.Draw(Game1.mouseCursors, new Rectangle(instance.x + divider.xOffset, instance.y + divider.yOffset, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
             }
         }
 
