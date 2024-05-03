@@ -179,7 +179,20 @@ namespace DialogueDisplayFramework
                         }
                         else
                         {
-                            b.Draw(Game1.mouseCursors, new Rectangle(__instance.x + divider.xOffset, __instance.y + divider.yOffset, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
+                            var xPosition = __instance.x + divider.xOffset;
+                            var yPosition = __instance.y + divider.yOffset;
+
+                            b.Draw(Game1.mouseCursors, new Rectangle(xPosition, yPosition, 36, divider.height), new Rectangle?(new Rectangle(278, 324, 9, 1)), tint);
+
+                            if (divider.bolts?.top == true)
+                            {
+                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), tint, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                            }
+
+                            if (divider.bolts?.bottom == true)
+                            {
+                                b.Draw(Game1.mouseCursors, new Vector2(xPosition, yPosition + divider.height - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), tint, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                            }
                         }
                     }
                 }

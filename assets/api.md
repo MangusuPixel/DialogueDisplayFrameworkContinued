@@ -206,6 +206,7 @@ The dividers field is an array of Divider Data objects. Divider data has the fol
 | `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `unnamed.divider` by default
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical)
 | `small`      | boolean | Show teeny divider, default false
+| `bolts`      | string  | Displays bolts at the ends of the divider, default `both`<br>Accepted values are `top`, `bottom`, `both` or `none`<br>No effect if `horizontal` is true
 | `red`        | byte    | Red tint of divider, default -1
 | `green`      | byte    | Blue tint of divider, default -1
 | `blue`       | byte    | Green tint of divider, default -1

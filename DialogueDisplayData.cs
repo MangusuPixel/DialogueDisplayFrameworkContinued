@@ -23,6 +23,7 @@ namespace DialogueDisplayFramework
         public List<DividerData> dividers = new();
         public bool disabled;
     }
+
     public class BaseData
     {
         public int xOffset;
@@ -37,6 +38,7 @@ namespace DialogueDisplayFramework
         public bool variable;
         public bool disabled;
     }
+
     public class NameData : BaseData
     {
         public string color;
@@ -47,11 +49,13 @@ namespace DialogueDisplayFramework
         public bool scroll;
         public SpriteText.ScrollTextAlignment alignment; // left, center, right
     }
+
     public class DialogueData : BaseData
     {
         public string color;
         public SpriteText.ScrollTextAlignment alignment; // left, center, right
     }
+
     public class PortraitData : BaseData
     {
         public string texturePath;
@@ -61,29 +65,35 @@ namespace DialogueDisplayFramework
         public int h = 64;
         public bool tileSheet = true;
     }
+
     public class JewelData : BaseData
     {
         public bool animate = true;
     }
+
     public class ButtonData : BaseData
     {
     }
+
     public class HeartsData : BaseData
     {
         public int heartsPerRow = 14;
         public bool showEmptyHearts = true;
         public bool centered;
     }
+
     public class GiftsData : BaseData
     {
         public bool showGiftIcon = true;
         public bool inline = false;
     }
+
     public class SpriteData : BaseData
     {
         public bool background;
         public int frame;
     }
+
     public class ImageData : BaseData
     {
         public string ID = "unnamed.image";
@@ -93,6 +103,7 @@ namespace DialogueDisplayFramework
         public int w;
         public int h;
     }
+
     public class TextData : BaseData
     {
         public string ID = "unnamed.text";
@@ -105,13 +116,21 @@ namespace DialogueDisplayFramework
         public int scrollType = 0;
         public SpriteText.ScrollTextAlignment alignment; // left, center, right
     }
+
     public class DividerData : BaseData
     {
         public string ID = "unnamed.divider";
         public bool horizontal;
         public bool small;
+        public DividerBoltData bolts = new() { top = true, bottom = true };
         public int red = -1;
         public int green = -1;
         public int blue = -1;
+    }
+
+    public class DividerBoltData
+    {
+        public bool top;
+        public bool bottom;
     }
 }
