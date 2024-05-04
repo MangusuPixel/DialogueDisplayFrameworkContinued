@@ -274,34 +274,8 @@ namespace DialogueDisplayFramework
                 var npcName = data.name != null ? data.name : defaultData.name;
                 if (npcName is not null && !npcName.disabled)
                 {
-                    var namePos = GetDataVector(__instance, npcName);
-                    var realName = speaker.getName();
-                    if (npcName.centered)
-                    {
-                        if (npcName.scroll)
-                        {
-                            SpriteText.drawStringWithScrollCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, Utility.StringToColor(npcName.color), npcName.scrollType, npcName.layerDepth, npcName.junimo);
-                        }
-                        else
-                        {
-                            SpriteText.drawStringHorizontallyCenteredAt(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, Utility.StringToColor(npcName.color));
-                        }
-
-                    }
-                    else
-                    {
-                        if (npcName.right)
-                            namePos.X -= SpriteText.getWidthOfString(realName);
-
-                        if (npcName.scroll)
-                        {
-                            SpriteText.drawStringWithScrollBackground(b, realName, (int)namePos.X, (int)namePos.Y, npcName.placeholderText is null ? realName : npcName.placeholderText, npcName.alpha, Utility.StringToColor(npcName.color), npcName.alignment);
-                        }
-                        else
-                        {
-                            SpriteText.drawString(b, realName, (int)namePos.X, (int)namePos.Y, 999999, npcName.width, 999999, npcName.alpha, npcName.layerDepth, npcName.junimo, color: Utility.StringToColor(npcName.color));
-                        }
-                    }
+                    npcName.text = speaker.getName();
+                    DrawTextComponent(b, __instance, npcName);
                 }
 
                 // Texts
@@ -310,37 +284,9 @@ namespace DialogueDisplayFramework
 
                 if (texts != null)
                 {
-                    foreach (var text in texts)
+                    foreach (var textData in texts)
                     {
-                        var pos = GetDataVector(__instance, text);
-                        if (text.centered)
-                        {
-                            if (text.variable && text.right)
-                                pos.X -= SpriteText.getWidthOfString(text.text) / 2;
-
-                            if (text.scroll)
-                            {
-                                SpriteText.drawStringWithScrollCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, Utility.StringToColor(text.color), text.scrollType, text.layerDepth, text.junimo);
-                            }
-                            else
-                            {
-                                SpriteText.drawStringHorizontallyCenteredAt(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, Utility.StringToColor(text.color));
-                            }
-                        }
-                        else
-                        {
-                            if (text.variable && text.right)
-                                pos.X -= SpriteText.getWidthOfString(text.text);
-
-                            if (text.scroll)
-                            {
-                                SpriteText.drawStringWithScrollBackground(b, text.text, (int)pos.X, (int)pos.Y, text.placeholderText, text.alpha, Utility.StringToColor(text.color), text.alignment);
-                            }
-                            else
-                            {
-                                SpriteText.drawString(b, text.text, (int)pos.X, (int)pos.Y, 999999, text.width, 999999, text.alpha, text.layerDepth, text.junimo, color: Utility.StringToColor(text.color));
-                            }
-                        }
+                        DrawTextComponent(b, __instance, textData);
                     }
                 }
 
@@ -437,6 +383,18 @@ namespace DialogueDisplayFramework
         private static Vector2 GetDataVector(DialogueBox box, BaseData data)
         {
             return new Vector2(box.x + (data.right ? box.width : 0) + data.xOffset, box.y + (data.bottom ? box.height : 0) + data.yOffset);
+        }
+
+        private static void DrawTextComponent(SpriteBatch b, DialogueBox box, TextData data)
+        {
+            var pos = GetDataVector(box, data);
+
+            if (data.centered || data.alignment == SpriteText.ScrollTextAlignment.Center)
+                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text) / 2;
+            else if (data.alignment == SpriteText.ScrollTextAlignment.Right)
+                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text);
+
+            SpriteText.drawString(b, data.text, (int)pos.X, (int)pos.Y, 999999, data.width, 999999, data.alpha, data.layerDepth, data.junimo, data.scrollType, data.placeholderText ?? "", Utility.StringToColor(data.color), data.alignment);
         }
 
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.getCurrentString))]

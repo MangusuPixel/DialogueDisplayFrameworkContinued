@@ -12,7 +12,7 @@ namespace DialogueDisplayFramework
         public int height;
         public DialogueData dialogue;
         public PortraitData portrait;
-        public NameData name;
+        public TextData name;
         public JewelData jewel;
         public ButtonData button;
         public SpriteData sprite;
@@ -35,19 +35,7 @@ namespace DialogueDisplayFramework
         public float alpha = 1;
         public float scale = 4;
         public float layerDepth = 0.88f;
-        public bool variable;
         public bool disabled;
-    }
-
-    public class NameData : BaseData
-    {
-        public string color;
-        public string placeholderText;
-        public bool centered;
-        public int scrollType = 0;
-        public bool junimo;
-        public bool scroll;
-        public SpriteText.ScrollTextAlignment alignment; // left, center, right
     }
 
     public class DialogueData : BaseData
@@ -109,12 +97,12 @@ namespace DialogueDisplayFramework
         public string ID = "unnamed.text";
         public string color;
         public string text;
-        public bool centered;
         public bool junimo;
         public bool scroll;
         public string placeholderText;
-        public int scrollType = 0;
-        public SpriteText.ScrollTextAlignment alignment; // left, center, right
+        public int scrollType = -1;
+        public SpriteText.ScrollTextAlignment alignment = SpriteText.ScrollTextAlignment.Center; // left, center, right
+        public bool centered; // Deprecated
     }
 
     public class DividerData : BaseData
