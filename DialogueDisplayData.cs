@@ -59,8 +59,8 @@ namespace DialogueDisplayFramework
     public class PortraitData : BaseData
     {
         public string texturePath;
-        public int x;
-        public int y;
+        public int x = -1;
+        public int y = -1;
         public int w = 64;
         public int h = 64;
         public bool tileSheet = true;

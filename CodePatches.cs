@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Characters;
@@ -16,6 +17,9 @@ namespace DialogueDisplayFramework
         private static bool preventGetCurrentString;
         private static DialogueDisplayData cachedDialogueData;
         //private static ProfileMenu npcSpriteMenu;
+
+        // Reflection
+        private static IReflectedMethod shouldPortraitShake;
 
         // Get the correct data based on context
         public static DialogueDisplayData GetDialogueDisplayData(Dialogue characterDialogue)
@@ -84,6 +88,8 @@ namespace DialogueDisplayFramework
                     __instance.width = data.width;
                 if (data.height > 0)
                     __instance.height = data.height;
+
+                shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
         }
 
@@ -209,35 +215,32 @@ namespace DialogueDisplayFramework
 
                 if (portrait is not null && !portrait.disabled)
                 {
-                    Texture2D portraitTexture;
+                    Texture2D portraitTexture = __instance.characterDialogue.overridePortrait ?? speaker.Portrait;
                     Rectangle portraitSource;
 
                     if (portrait.texturePath != null)
                     {
                         portraitTexture = imageDict[portrait.texturePath];
                     }
-                    else
-                    {
-                        if (__instance.characterDialogue.overridePortrait != null)
-                            portraitTexture = __instance.characterDialogue.overridePortrait;
-                        else
-                            portraitTexture = speaker.Portrait;
-                    }
-                    if (!portrait.tileSheet)
+
+                    if (portrait.x >= 0 && portrait.y >= 0)
                     {
                         portraitSource = new Rectangle(portrait.x, portrait.y, portrait.w, portrait.h);
                     }
                     else
                     {
                         portraitSource = Game1.getSourceRectForStandardTileSheet(portraitTexture, __instance.characterDialogue.getPortraitIndex(), portrait.w, portrait.h);
-                        if (!portraitTexture.Bounds.Contains(portraitSource))
-                        {
-                            portraitSource = new Rectangle(0, 0, portrait.w, portrait.h);
-                        }
                     }
 
-                    int xOffset = (bool)AccessTools.Method(typeof(DialogueBox), "shouldPortraitShake").Invoke(__instance, new object[] { __instance.characterDialogue }) ? Game1.random.Next(-1, 2) : 0;
-                    b.Draw(portraitTexture, GetDataVector(__instance, portrait) + new Vector2(xOffset, 0), new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
+                    if (!portraitTexture.Bounds.Contains(portraitSource))
+                    {
+                        portraitSource.X = 0;
+                        portraitSource.Y = 0;
+                    }
+
+                    var offset = new Vector2(shouldPortraitShake.Invoke<bool>(__instance.characterDialogue) ? Game1.random.Next(-1, 2) : 0, 0);
+
+                    b.Draw(portraitTexture, GetDataVector(__instance, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
                 }
 
                 // Sprite
