@@ -1,10 +1,10 @@
 ﻿{
   "Name": "Dialogue Display Framework Continued",
   "Author": "Mangupix",
-  "Version": "0.5.2",
-  "Description": "Updated Dialogue Display Framework for 1.6.",
-  "UniqueID": "aedenthorn.DialogueDisplayFramework",
+  "Version": "0.5.3",
+  "Description": "Framework allowing mods to edit the dialogue box.",
+  "UniqueID": "Mangupix.DialogueDisplayFrameworkContinued",
   "EntryDll": "DialogueDisplayFramework.dll",
-  "MinimumApiVersion": "3.13.0",
-  "UpdateKeys": [ "Nexus:22678" ]
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [ "Nexus:22678@DDFC" ]
 }
