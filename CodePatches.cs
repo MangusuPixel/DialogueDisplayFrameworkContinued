@@ -353,8 +353,18 @@ namespace DialogueDisplayFramework
                         var jewel = data.jewel is null ? defaultData.jewel : data.jewel;
                         if (jewel != null && !jewel.disabled)
                         {
-                            var pos = GetDataVector(__instance, jewel);
-                            b.Draw(Game1.mouseCursors, pos, new Rectangle?((Game1.player.getFriendshipHeartLevelForNPC(speaker.Name) >= 10) ? new Rectangle(269, 494, 11, 11) : new Rectangle(Math.Max(140, 140 + (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0) * 11), Math.Max(532, 532 + Game1.player.getFriendshipHeartLevelForNPC(speaker.Name) / 2 * 11), 11, 11)), Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
+                            var friendshipHeartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
+                            Rectangle sourceRect;
+
+                            if (friendshipHeartLevel >= 10)
+                                sourceRect = new Rectangle(269, 494, 11, 11);
+                            else
+                            {
+                                var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
+                                sourceRect = new Rectangle(140 + animationFrame * 11, 532 + friendshipHeartLevel / 2 * 11, 11, 11);
+                            }
+
+                            b.Draw(Game1.mouseCursors, GetDataVector(__instance, jewel), sourceRect, Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
                         }
                     }
                 }
