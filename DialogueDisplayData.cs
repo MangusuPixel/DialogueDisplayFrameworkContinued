@@ -13,8 +13,8 @@ namespace DialogueDisplayFramework
         public DialogueData dialogue;
         public PortraitData portrait;
         public TextData name;
-        public JewelData jewel;
-        public ButtonData button;
+        public BaseData jewel;
+        public BaseData button;
         public SpriteData sprite;
         public GiftsData gifts;
         public HeartsData hearts;
@@ -54,15 +54,6 @@ namespace DialogueDisplayFramework
         public bool tileSheet = true;
     }
 
-    public class JewelData : BaseData
-    {
-        public bool animate = true;
-    }
-
-    public class ButtonData : BaseData
-    {
-    }
-
     public class HeartsData : BaseData
     {
         public int heartsPerRow = 14;
@@ -84,7 +75,7 @@ namespace DialogueDisplayFramework
 
     public class ImageData : BaseData
     {
-        public string ID = "unnamed.image";
+        public string ID = "image.unnamed";
         public string texturePath;
         public int x;
         public int y;
@@ -94,7 +85,7 @@ namespace DialogueDisplayFramework
 
     public class TextData : BaseData
     {
-        public string ID = "unnamed.text";
+        public string ID = "text.unnamed";
         public string color;
         public string text;
         public bool junimo;
@@ -107,7 +98,7 @@ namespace DialogueDisplayFramework
 
     public class DividerData : BaseData
     {
-        public string ID = "unnamed.divider";
+        public string ID = "divider.unnamed";
         public bool horizontal;
         public bool small;
         public DividerConnectorData connectors = new() { top = true, bottom = true };
