@@ -316,7 +316,7 @@ namespace DialogueDisplayFramework
                     }
                 }
 
-                if (Game1.player.friendshipData.ContainsKey(speaker.Name))
+                if (Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship))
                 {
                     // Hearts
 
@@ -324,7 +324,7 @@ namespace DialogueDisplayFramework
                     if (hearts is not null && !hearts.disabled)
                     {
                         int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
-                        bool isRomanceLocked = speaker.datable.Value && Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship) && !friendship.IsDating() && !friendship.IsMarried();
+                        bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried();
                         int heartLevel = friendshipLevel / 250;
                         int maxHearts = Utility.GetMaximumHeartsForCharacter(speaker);
                         int heartsToDisplay = hearts.showEmptyHearts ? maxHearts + (isRomanceLocked ? 2 : 0) : heartLevel + (hearts.showPartialhearts && heartLevel < maxHearts ? 1 : 0);
@@ -384,7 +384,7 @@ namespace DialogueDisplayFramework
                     // Gifts
 
                     var gifts = data.gifts is null ? defaultData.gifts : data.gifts;
-                    if (gifts is not null && !gifts.disabled && !Game1.player.friendshipData[speaker.Name].IsMarried() && Game1.getCharacterFromName(speaker.Name) is not Child)
+                    if (gifts is not null && !gifts.disabled && !friendship.IsMarried() && speaker is not Child)
                     {
                         var pos = GetDataVector(__instance, gifts);
                         Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
