@@ -297,41 +297,61 @@ namespace DialogueDisplayFramework
                     var hearts = data.hearts is null ? defaultData.hearts : data.hearts;
                     if (hearts is not null && !hearts.disabled)
                     {
-                        var pos = GetDataVector(__instance, hearts);
-                        int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
-                        int extraFriendshipPixels = Game1.player.getFriendshipLevelForNPC(speaker.Name) % 250;
+                        int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
+                        bool isRomanceLocked = speaker.datable.Value && Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship) && !friendship.IsDating() && !friendship.IsMarried();
+                        int heartLevel = friendshipLevel / 250;
+                        int maxHearts = Utility.GetMaximumHeartsForCharacter(speaker);
+                        int heartsToDisplay = hearts.showEmptyHearts ? maxHearts + (isRomanceLocked ? 2 : 0) : heartLevel + (hearts.showPartialhearts && heartLevel < maxHearts ? 1 : 0);
 
-                        bool datable = speaker.datable.Value;
-                        bool spouse = false;
-                        if (Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship))
-                        {
-                            spouse = friendship.IsMarried();
-                        }
-                        int maxHearts = Math.Max(Utility.GetMaximumHeartsForCharacter(speaker), 10);
+                        var heartsWidth = 7;
+                        var heartsHeight = 6;
+                        var heartsXSpacing = 1;
+                        var heartsYSpacing = 1;
+
+                        var pos = GetDataVector(__instance, hearts);
+
                         if (hearts.centered)
                         {
-                            int maxDisplayedHearts = hearts.showEmptyHearts ? maxHearts : heartLevel;
-                            if (extraFriendshipPixels > 0) maxDisplayedHearts++;
-                            pos -= new Vector2(Math.Min(hearts.heartsPerRow, maxDisplayedHearts) * 32 / 2, 0);
+                            pos.X -= (Math.Min(heartsToDisplay, hearts.heartsPerRow) * (heartsWidth + heartsXSpacing) - heartsXSpacing) / 2 * hearts.scale;
                         }
-                        for (int h = 0; h < maxHearts; h++)
+
+                        var drawingPos = new Vector2(pos.X, pos.Y);
+                        var drawingColIndex = 0;
+                        var drawingRowIndex = 0;
+                        var remainingFriendshipLevel = friendshipLevel;
+
+                        for (int i = 0; i < heartsToDisplay; i++)
                         {
-                            if (h > heartLevel && !hearts.showEmptyHearts)
-                                break;
-                            if (h == heartLevel && extraFriendshipPixels == 0)
-                                break;
-                            int xSource = (h < heartLevel) ? 211 : 218;
-                            if (datable && !friendship.IsDating() && !spouse && h >= 8)
+                            int xSource = ((i < heartLevel) || (isRomanceLocked && i >= 8)) ? 211 : 218;
+                            var color = (isRomanceLocked && i >= 8) ? (Color.Black * 0.35f) : Color.White;
+
+                            b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(xSource, 428, 7, 6), color, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
+
+                            if (hearts.showPartialhearts && remainingFriendshipLevel < 250)
                             {
-                                xSource = 211;
+                                float heartFullness = remainingFriendshipLevel / 250f;
+                                b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(211, 428, (int) (7 * heartFullness), 6), Color.White, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
                             }
-                            int x = h % hearts.heartsPerRow;
-                            int y = h / hearts.heartsPerRow;
-                            b.Draw(Game1.mouseCursors, pos + new Vector2(x * 32, y * 32), new Rectangle?(new Rectangle(xSource, 428, 7, 6)), (datable && !friendship.IsDating() && !spouse && h >= 8) ? (Color.Black * 0.35f) : Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                            if (h == heartLevel && extraFriendshipPixels > 0)
+
+                            if (++drawingColIndex < hearts.heartsPerRow)
                             {
-                                b.Draw(Game1.mouseCursors, pos + new Vector2(x * 32, y * 32), new Rectangle?(new Rectangle(211, 428, (int)Math.Round(7 * (extraFriendshipPixels / 250f)), 6)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                                drawingPos.X += (heartsWidth + heartsXSpacing) * hearts.scale;
                             }
+                            else
+                            {
+                                drawingColIndex = 0;
+                                drawingRowIndex++;
+
+                                drawingPos.X = pos.X;
+                                drawingPos.Y += (heartsHeight + heartsYSpacing) * hearts.scale;
+
+                                if (hearts.centered && i > (heartsToDisplay - hearts.heartsPerRow) && heartsToDisplay % hearts.heartsPerRow > 0)
+                                {
+                                    drawingPos.X += ((hearts.heartsPerRow - heartsToDisplay % hearts.heartsPerRow) * (heartsWidth + heartsXSpacing)) / 2 * hearts.scale;
+                                }
+                            }
+
+                            remainingFriendshipLevel -= 250;
                         }
                     }
 

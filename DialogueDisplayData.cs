@@ -58,6 +58,7 @@ namespace DialogueDisplayFramework
     {
         public int heartsPerRow = 14;
         public bool showEmptyHearts = true;
+        public bool showPartialhearts = true;
         public bool centered;
     }
 
