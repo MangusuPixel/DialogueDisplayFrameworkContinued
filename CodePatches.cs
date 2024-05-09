@@ -191,6 +191,9 @@ namespace DialogueDisplayFramework
                 {
                     foreach (var divider in dividers)
                     {
+                        if (divider.disabled)
+                            continue;
+
                         var pos = GetDataVector(__instance, divider);
                         var color = Utility.StringToColor(divider.color) ?? Color.White;
 
@@ -222,6 +225,9 @@ namespace DialogueDisplayFramework
                 {
                     foreach (var image in images)
                     {
+                        if (image.disabled)
+                            continue;
+
                         b.Draw(imageDict[image.texturePath], GetDataVector(__instance, image), new Rectangle(image.x, image.y, image.w, image.h), Color.White * image.alpha, 0, Vector2.Zero, image.scale, SpriteEffects.None, image.layerDepth);
                     }
                 }
@@ -303,6 +309,9 @@ namespace DialogueDisplayFramework
                 {
                     foreach (var textData in texts)
                     {
+                        if (textData.disabled)
+                            continue;
+
                         DrawTextComponent(b, __instance, textData);
                     }
                 }
