@@ -59,6 +59,23 @@ namespace DialogueDisplayFramework
             return dataFound;
         }
 
+        private static Vector2 GetDataVector(DialogueBox box, BaseData data)
+        {
+            return new Vector2(box.x + (data.right ? box.width : 0) + data.xOffset, box.y + (data.bottom ? box.height : 0) + data.yOffset);
+        }
+
+        private static void DrawTextComponent(SpriteBatch b, DialogueBox box, TextData data)
+        {
+            var pos = GetDataVector(box, data);
+
+            if (data.centered || data.alignment == SpriteText.ScrollTextAlignment.Center)
+                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text) / 2;
+            else if (data.alignment == SpriteText.ScrollTextAlignment.Right)
+                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text);
+
+            SpriteText.drawString(b, data.text, (int)pos.X, (int)pos.Y, 999999, data.width, 999999, data.alpha, data.layerDepth, data.junimo, data.scrollType, data.placeholderText ?? "", Utility.StringToColor(data.color), data.alignment);
+        }
+
         [HarmonyPatch(typeof(DialogueBox), new Type[] { typeof(Dialogue) })]
         [HarmonyPatch(MethodType.Constructor)]
         public class DialogueBox_Patch
@@ -408,23 +425,6 @@ namespace DialogueDisplayFramework
                 preventGetCurrentString = true;
                 return false;
             }
-        }
-
-        private static Vector2 GetDataVector(DialogueBox box, BaseData data)
-        {
-            return new Vector2(box.x + (data.right ? box.width : 0) + data.xOffset, box.y + (data.bottom ? box.height : 0) + data.yOffset);
-        }
-
-        private static void DrawTextComponent(SpriteBatch b, DialogueBox box, TextData data)
-        {
-            var pos = GetDataVector(box, data);
-
-            if (data.centered || data.alignment == SpriteText.ScrollTextAlignment.Center)
-                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text) / 2;
-            else if (data.alignment == SpriteText.ScrollTextAlignment.Right)
-                pos.X -= SpriteText.getWidthOfString(data.placeholderText ?? data.text);
-
-            SpriteText.drawString(b, data.text, (int)pos.X, (int)pos.Y, 999999, data.width, 999999, data.alpha, data.layerDepth, data.junimo, data.scrollType, data.placeholderText ?? "", Utility.StringToColor(data.color), data.alignment);
         }
 
         [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.getCurrentString))]
