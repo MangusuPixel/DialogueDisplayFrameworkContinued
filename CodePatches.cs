@@ -14,6 +14,8 @@ namespace DialogueDisplayFramework
 {
     public partial class ModEntry
     {
+        public static bool dirtyDialogueData = true;
+
         private static bool preventGetCurrentString;
         private static DialogueDisplayData cachedDialogueData;
         //private static ProfileMenu npcSpriteMenu;
@@ -24,12 +26,13 @@ namespace DialogueDisplayFramework
         // Get the correct data based on context
         public static DialogueDisplayData GetDialogueDisplayData(Dialogue characterDialogue)
         {
+            // Cached object is reset when a new dialogue box is opened or the asset cache is invalidated
             if (!dirtyDialogueData)
                 return cachedDialogueData;
 
             DialogueDisplayData displayData = null;
 
-            var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+            var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictAssetName);
             NPC speaker = characterDialogue.speaker;
 
             // Location-specific attire key, for legacy support

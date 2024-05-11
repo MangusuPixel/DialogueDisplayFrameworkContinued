@@ -20,7 +20,8 @@ namespace DialogueDisplayFramework
         private static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
         private static string defaultKey = "default";
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
-        private static bool dirtyDialogueData = false;
+
+        private static IAssetName dictAssetName;
 
         private static int validationDelay = 5;
 
@@ -35,11 +36,14 @@ namespace DialogueDisplayFramework
             SMonitor = Monitor;
             SHelper = helper;
 
+            dictAssetName = helper.GameContent.ParseAssetName(dictPath);
+
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked_PostCP;
 
             helper.Events.Content.AssetRequested += Content_AssetRequested;
             helper.Events.Content.AssetRequested += Content_AssetRequested_Post; // After CP edits
+            helper.Events.Content.AssetsInvalidated += Content_AssetInvalidated;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.PatchAll();
@@ -50,7 +54,7 @@ namespace DialogueDisplayFramework
             if (!Config.EnableMod)
                 return;
 
-            if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
+            if (e.NameWithoutLocale.IsEquivalentTo(dictAssetName))
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
                 {
@@ -65,7 +69,7 @@ namespace DialogueDisplayFramework
             if (!Config.EnableMod)
                 return;
 
-            if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
+            if (e.NameWithoutLocale.IsEquivalentTo(dictAssetName))
             {
                 e.Edit(asset =>
                 {
@@ -137,8 +141,17 @@ namespace DialogueDisplayFramework
                         SMonitor.Log($"Please make sure to include a unique ID on each image, text and divider entries for better support.", LogLevel.Warn);
                 });
             }
+        }
 
-            dirtyDialogueData = true;
+        private void Content_AssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
+        {
+            if (!Config.EnableMod)
+                return;
+
+            if (e.NamesWithoutLocale.Contains(dictAssetName))
+            {
+                dirtyDialogueData = true;
+            }
         }
 
         private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
@@ -168,7 +181,7 @@ namespace DialogueDisplayFramework
             if (validationDelay-- == 0)
             {
                 // Load our data to trigger validation
-                SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+                SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictAssetName);
                 SHelper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked_PostCP;
             }
         }
