@@ -39,7 +39,7 @@ Dictionary keys can take many forms:
 | `<CharacterNameID>`                  | Apply changes to a specific character
 | `default`                            | Fallback option if no other data is specified or for a global dialogue setup
 
-It's important to note that patches will be overridden in the order given above, not in the order they appear. For example, patches with beach keys will take precedence over those with standard keys but will be replaced by location keys.
+It's important to note that patches will be overridden in the order given above, not in the order they appear. For example, beach keys will take precedence over those with standard keys but will be replaced by appearance keys and location keys.
 
 Entry keys can also contain a list of keys separated by a comma and space (e.g. "Emily, Abigail_Beach, etc"), in which case, each element in the list will count as keys, sharing the same patch data.
 
@@ -49,7 +49,8 @@ Dictionary values are objects with the following keys:
 
 | Key        | Type    | Description |
 | ---------- | ------- | ----------- |
-| `packName` | string  | Manifest ID of the content pack containing this entry, used for reloading the data in-game.
+| `packName` | string  | Manifest ID of the content pack containing this entry, used for logging.
+| `copyFrom` | string  | Key to a data entry to copy data from. Any following data will override the copied data.
 | `xOffset`  | integer | X offset of the dialogue box relative to its normal position on the screen.
 | `yOffset`  | integer | Y offset of the dialogue box relative to its normal position on the screen.
 | `width`    | integer | Width of the dialogue box, default 1200.
@@ -62,10 +63,10 @@ Dictionary values are objects with the following keys:
 | `sprite`   | [SpriteData](#sprite-data)           | **(Disabled)** Customizes a character sprite display.
 | `gifts`    | [GiftsData](#gifts-data)             | Customizes a custom gift display.
 | `hearts`   | [HeartsData](#hearts-data)           | Customizes a friendship hearts display.
-| `images`   | List of [ImageData](#image-data)     | Custom images to draw.
-| `texts`    | List of [TextData](#text-data)       | Custom texts to draw.
-| `dividers` | List of [DividerData](#divider-data) | Custom dividers to draw.
-| `disabled` | boolean | Disable this entry entirely, i.e. if this is for an NPC for which you don't want a default element added, default false.
+| `images`   | List of [ImageData](#image-data)     | Custom images to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `texts`    | List of [TextData](#text-data)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `dividers` | List of [DividerData](#divider-data) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `disabled` | boolean | Disable this entry entirely, default false.<br>Ignored if the `copyFrom` entry is disabled.
 
 If any field is missing in an NPC entry, the field from the "default" entry will be used instead.
 
@@ -125,11 +126,12 @@ Along the [base data](#base-data) keys, portrait data has the following keys ava
 
 Along the [base data](#base-data) keys, hearts data has the following keys available:
 
-| Key               | Type    | Description |
-| ----------------- | ------- | ----------- |
-| `heartsPerRow`    | integer | Number of hearts per row, default 14.
-| `showEmptyHearts` | boolean | Include empty hearts, default true.
-| `centered`        | boolean | If true, xOffset will point to the center of the row of hearts.
+| Key                 | Type    | Description |
+| ------------------- | ------- | ----------- |
+| `heartsPerRow`      | integer | Number of hearts per row, default 14.
+| `showEmptyHearts`   | boolean | Display empty hearts, default true.
+| `showPartialHearts` | boolean | Display partial hearts, default true.
+| `centered`          | boolean | If true, `xOffset` will point to the center of the row of hearts.
 
 
 ## Gift Data
