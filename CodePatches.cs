@@ -27,36 +27,49 @@ namespace DialogueDisplayFramework
             if (!dirtyDialogueData)
                 return cachedDialogueData;
 
-            var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
-            DialogueDisplayData dataFound = null;
+            DialogueDisplayData displayData = null;
 
+            var dataDict = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
             NPC speaker = characterDialogue.speaker;
-            var location = speaker.currentLocation;
 
             // Location-specific attire key, for legacy support
+            var location = speaker.currentLocation;
             if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(speaker.Name))
-                dataDict.TryGetValue(speaker.Name + "_" + location.Name, out dataFound);
+                dataDict.TryGetValue(speaker.Name + "_" + location.Name, out displayData);
 
             // KeyCharacter appearance key
-            if ((dataFound == null || dataFound.disabled) && speaker.LastAppearanceId != null)
-                dataDict.TryGetValue(speaker.Name + "_" + speaker.LastAppearanceId, out dataFound);
+            if ((displayData == null || displayData.disabled) && speaker.LastAppearanceId != null)
+                dataDict.TryGetValue(speaker.Name + "_" + speaker.LastAppearanceId, out displayData);
 
             // Beach attire key
-            if ((dataFound == null || dataFound.disabled) && SHelper.Reflection.GetField<bool>(speaker, "isWearingIslandAttire").GetValue())
-                dataDict.TryGetValue(speaker.Name + "_Beach", out dataFound);
+            if ((displayData == null || displayData.disabled) && SHelper.Reflection.GetField<bool>(speaker, "isWearingIslandAttire").GetValue())
+                dataDict.TryGetValue(speaker.Name + "_Beach", out displayData);
 
             // Regular character key
-            if (dataFound == null || dataFound.disabled)
-                dataDict.TryGetValue(speaker.Name, out dataFound);
+            if (displayData == null || displayData.disabled)
+                dataDict.TryGetValue(speaker.Name, out displayData);
 
             // Default key
-            if (dataFound == null || dataFound.disabled)
-                dataDict.TryGetValue(defaultKey, out dataFound);
+            if (displayData == null || displayData.disabled)
+                dataDict.TryGetValue(defaultKey, out displayData);
 
-            cachedDialogueData = dataFound;
+            // Load templates
+            var copyFromKey = displayData.copyFrom;
+
+            while (copyFromKey != null)
+            {
+                if (dataDict.TryGetValue(copyFromKey, out var copyFromData))
+                {
+                    displayData.FillEmptyValuesFrom(copyFromData);
+                }
+
+                copyFromKey = copyFromData?.copyFrom;
+            }
+
+            cachedDialogueData = displayData;
             dirtyDialogueData = false;
 
-            return dataFound;
+            return displayData;
         }
 
         private static Vector2 GetDataVector(DialogueBox box, BaseData data)
@@ -99,12 +112,12 @@ namespace DialogueDisplayFramework
                 if (data == null)
                     return;
 
-                __instance.x += data.xOffset;
-                __instance.y += data.yOffset;
+                __instance.x += data.xOffset ?? 0;
+                __instance.y += data.yOffset ?? 0;
                 if (data.width > 0)
-                    __instance.width = data.width;
+                    __instance.width = (int)data.width;
                 if (data.height > 0)
-                    __instance.height = data.height;
+                    __instance.height = (int)data.height;
 
                 shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
@@ -149,12 +162,12 @@ namespace DialogueDisplayFramework
                 if (data == null)
                     return;
 
-                __instance.x += data.xOffset;
-                __instance.y += data.yOffset;
+                __instance.x += data.xOffset ?? 0;
+                __instance.y += data.yOffset ?? 0;
                 if (data.width > 0)
-                    __instance.width = data.width;
+                    __instance.width = (int)data.width;
                 if (data.height > 0)
-                    __instance.height = data.height;
+                    __instance.height = (int)data.height;
             }
         }
 

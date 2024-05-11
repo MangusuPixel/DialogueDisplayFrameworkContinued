@@ -6,17 +6,20 @@ namespace DialogueDisplayFramework
 {
     public class DialogueDisplayData
     {
+        public static readonly string MISSING_ID_STR = "MISSING_ID";
+
+        public string copyFrom;
         public string packName;
-        public int xOffset;
-        public int yOffset;
-        public int width;
-        public int height;
+        public int? xOffset;
+        public int? yOffset;
+        public int? width;
+        public int? height;
         public DialogueData dialogue;
         public PortraitData portrait;
         public TextData name;
         public BaseData jewel;
         public BaseData button;
-        public SpriteData sprite;
+        //public SpriteData sprite;
         public GiftsData gifts;
         public HeartsData hearts;
         public List<ImageData> images = new();
@@ -82,6 +85,37 @@ namespace DialogueDisplayFramework
                 }
             }
         };
+
+        public DialogueDisplayData FillEmptyValuesFrom(DialogueDisplayData data)
+        {
+            if (data == null)
+                return this;
+
+            xOffset ??= data.xOffset;
+            yOffset ??= data.yOffset;
+            width ??= data.width;
+            height ??= data.height;
+            dialogue ??= data.dialogue;
+            portrait ??= data.portrait;
+            name ??= data.name;
+            jewel ??= data.jewel;
+            button ??= data.button;
+            //sprite ??= data.sprite;
+            gifts ??= data.gifts;
+            hearts ??= data.hearts;
+            disabled = data.disabled;
+
+            if (data.images != null)
+                images = images != null ? data.images.Concat(images).ToList() : data.images;
+
+            if (data.texts != null)
+                texts = texts != null ? data.texts.Concat(texts).ToList() : data.texts;
+
+            if (data.dividers != null)
+                dividers = dividers != null ? data.dividers.Concat(dividers).ToList() : data.dividers;
+
+            return this;
+        }
     }
 
     public class BaseData
@@ -136,7 +170,7 @@ namespace DialogueDisplayFramework
 
     public class ImageData : BaseData
     {
-        public string ID = "image.unnamed";
+        public string ID = DialogueDisplayData.MISSING_ID_STR;
         public string texturePath;
         public int x;
         public int y;
@@ -146,7 +180,7 @@ namespace DialogueDisplayFramework
 
     public class TextData : BaseData
     {
-        public string ID = "text.unnamed";
+        public string ID = DialogueDisplayData.MISSING_ID_STR;
         public string color;
         public string text;
         public bool junimo;
@@ -159,7 +193,7 @@ namespace DialogueDisplayFramework
 
     public class DividerData : BaseData
     {
-        public string ID = "divider.unnamed";
+        public string ID = DialogueDisplayData.MISSING_ID_STR;
         public bool horizontal;
         public bool small;
         public DividerConnectorData connectors = new() { top = true, bottom = true };

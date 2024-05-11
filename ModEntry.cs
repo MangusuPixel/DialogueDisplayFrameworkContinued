@@ -3,7 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DialogueDisplayFramework
 {
@@ -17,9 +19,10 @@ namespace DialogueDisplayFramework
 
         private static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
         private static string defaultKey = "default";
-        private static string listDelimiter = ", ";
         private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
         private static bool dirtyDialogueData = false;
+
+        private static int validationDelay = 5;
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -33,6 +36,7 @@ namespace DialogueDisplayFramework
             SHelper = helper;
 
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+            helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked_PostCP;
 
             helper.Events.Content.AssetRequested += Content_AssetRequested;
             helper.Events.Content.AssetRequested += Content_AssetRequested_Post; // After CP edits
@@ -66,54 +70,79 @@ namespace DialogueDisplayFramework
                 e.Edit(asset =>
                 {
                     var data = asset.AsDictionary<string, DialogueDisplayData>().Data;
-                    var keyGroups = new Dictionary<string, string>();
+                    var hasModsWithMissingID = false;
 
                     imageDict.Clear();
 
                     foreach (var (key, entry) in data)
                     {
-                        if (key.Contains(listDelimiter))
+                        if (entry.disabled)
+                            continue;
+
+                        // Validate copy references
+
+                        if (entry.copyFrom != null)
                         {
-                            keyGroups.Add(entry.packName, key);
+                            var target = entry;
+                            var traceStack = new List<DialogueDisplayData>() { target };
+
+                            while (data.TryGetValue(target.copyFrom, out target))
+                            {
+                                traceStack.Add(target);
+
+                                if (target.copyFrom == key)
+                                {
+                                    SMonitor.Log($"{String.Join(" > ", traceStack.Select(d => d.copyFrom))} > {entry.copyFrom} : Cyclic reference detected. Disabling.", LogLevel.Error);
+
+                                    foreach (var k in traceStack)
+                                        k.disabled = true;
+
+                                    break;
+                                }
+                            }
+
+                            if (!data.ContainsKey(entry.copyFrom))
+                            {
+                                SMonitor.Log($"{key} : CopyFrom key points to a non-existant entry: {entry.copyFrom}", LogLevel.Warn);
+                            }
                         }
+
                         foreach (var image in entry.images)
                         {
                             if (!imageDict.ContainsKey(image.texturePath))
                                 imageDict[image.texturePath] = Game1.content.Load<Texture2D>(image.texturePath);
                         }
+
                         if (entry.portrait?.texturePath != null && !imageDict.ContainsKey(entry.portrait.texturePath))
                         {
                             imageDict[entry.portrait.texturePath] = Game1.content.Load<Texture2D>(entry.portrait.texturePath);
                         }
+
+                        var imagesWithMissingID = entry.images.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        if (imagesWithMissingID > 0)
+                            SMonitor.Log($"{key} : References {imagesWithMissingID} divider{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
+
+                        var textsWithMissingID = entry.texts.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        if (textsWithMissingID > 0)
+                            SMonitor.Log($"{key} : References {textsWithMissingID} divider{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
+
+                        var dividersWithMissingID = entry.dividers.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        if (dividersWithMissingID > 0)
+                            SMonitor.Log($"{key} : References {dividersWithMissingID} divider{(dividersWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
+
+                        hasModsWithMissingID = hasModsWithMissingID || (imagesWithMissingID + textsWithMissingID + dividersWithMissingID > 0);
                     }
 
-                    foreach (var (packName, originalKey) in keyGroups)
-                    {
-                        var refData = data[originalKey];
-
-                        foreach (var key in originalKey.Split(listDelimiter))
-                        {
-                            if (!data.ContainsKey(key))
-                            {
-                                data[key] = refData;
-                            }
-                            else
-                            {
-                                SMonitor.Log(string.Format("Duplicate NPC '{0}' will be ignored in pack '{1}'.", key, packName), LogLevel.Warn);
-                            }
-                        }
-
-                        data.Remove(originalKey);
-                    }
+                    if (hasModsWithMissingID)
+                        SMonitor.Log($"Please make sure to include a unique ID on each image, text and divider entries for better support.", LogLevel.Warn);
                 });
-
-                dirtyDialogueData = true;
             }
+
+            dirtyDialogueData = true;
         }
 
         private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
         {
-
             // get Generic Mod Config Menu's API (if it's installed)
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
@@ -134,5 +163,14 @@ namespace DialogueDisplayFramework
             );
         }
 
+        private void GameLoop_UpdateTicked_PostCP(object sender, UpdateTickedEventArgs e)
+        {
+            if (validationDelay-- == 0)
+            {
+                // Load our data to trigger validation
+                SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath);
+                SHelper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked_PostCP;
+            }
+        }
     }
 }
