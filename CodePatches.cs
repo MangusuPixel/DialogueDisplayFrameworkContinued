@@ -167,11 +167,6 @@ namespace DialogueDisplayFramework
                     return true;
                 NPC speaker = __instance.characterDialogue.speaker;
 
-                var defaultData = SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(dictPath)[defaultKey];
-                var data = GetDialogueDisplayData(__instance.characterDialogue);
-                if (defaultData == null && data == null)
-                    return true;
-
                 if (!Game1.IsMasterGame && !speaker.EventActor)
                 {
                     var currentLocation = speaker.currentLocation;
@@ -183,13 +178,13 @@ namespace DialogueDisplayFramework
                     }
                 }
 
+                var data = GetDialogueDisplayData(__instance.characterDialogue);
+
                 // Dividers
 
-                var dividers = data.dividers is null ? defaultData.dividers : data.dividers;
-
-                if (dividers != null)
+                if (data.dividers != null)
                 {
-                    foreach (var divider in dividers)
+                    foreach (var divider in data.dividers)
                     {
                         if (divider.disabled)
                             continue;
@@ -219,11 +214,9 @@ namespace DialogueDisplayFramework
 
                 // Images
 
-                var images = data.images is null ? defaultData.images : data.images;
-
-                if (images != null)
+                if (data.images != null)
                 {
-                    foreach (var image in images)
+                    foreach (var image in data.images)
                     {
                         if (image.disabled)
                             continue;
@@ -234,9 +227,8 @@ namespace DialogueDisplayFramework
 
                 // NPC Portrait
 
-                var portrait = data.portrait is null ? defaultData.portrait : data.portrait;
-
-                if (portrait is not null && !portrait.disabled)
+                var portrait = data.portrait;
+                if (portrait != null && !portrait.disabled)
                 {
                     Texture2D portraitTexture = __instance.characterDialogue.overridePortrait ?? speaker.Portrait;
                     Rectangle portraitSource;
@@ -294,21 +286,17 @@ namespace DialogueDisplayFramework
 
                 // NPC Name
 
-                var npcName = data.name != null ? data.name : defaultData.name;
-                if (npcName is not null && !npcName.disabled)
+                if (data.name != null && !data.name.disabled)
                 {
-                    npcName.text = speaker.getName();
-                    DrawTextComponent(b, __instance, npcName);
+                    data.name.text = speaker.getName();
+                    DrawTextComponent(b, __instance, data.name);
                 }
 
                 // Texts
 
-                var texts = data.texts is null ? defaultData.texts : data.texts;
-
-                if (texts != null)
+                if (data.texts != null)
                 {
-                    foreach (var textData in texts)
-                    {
+                    foreach (var textData in data.texts) {
                         if (textData.disabled)
                             continue;
 
@@ -320,8 +308,8 @@ namespace DialogueDisplayFramework
                 {
                     // Hearts
 
-                    var hearts = data.hearts is null ? defaultData.hearts : data.hearts;
-                    if (hearts is not null && !hearts.disabled)
+                    var hearts = data.hearts;
+                    if (hearts != null && !hearts.disabled)
                     {
                         int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
                         bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried();
@@ -383,8 +371,8 @@ namespace DialogueDisplayFramework
 
                     // Gifts
 
-                    var gifts = data.gifts is null ? defaultData.gifts : data.gifts;
-                    if (gifts is not null && !gifts.disabled && !friendship.IsMarried() && speaker is not Child)
+                    var gifts = data.gifts;
+                    if (gifts != null && !gifts.disabled && !friendship.IsMarried() && speaker is not Child)
                     {
                         var pos = GetDataVector(__instance, gifts);
                         Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
@@ -396,7 +384,7 @@ namespace DialogueDisplayFramework
 
                     if (__instance.shouldDrawFriendshipJewel())
                     {
-                        var jewel = data.jewel is null ? defaultData.jewel : data.jewel;
+                        var jewel = data.jewel;
                         if (jewel != null && !jewel.disabled)
                         {
                             var friendshipHeartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
@@ -417,21 +405,25 @@ namespace DialogueDisplayFramework
 
                 // Dialogue String
 
-                var dialogue = data.dialogue is null ? defaultData.dialogue : data.dialogue;
+                var dialogue = data.dialogue ?? (data.dialogue.disabled ? DialogueDisplayData.DefaultValues.dialogue : data.dialogue);
                 var dialoguePos = GetDataVector(__instance, dialogue);
+
                 preventGetCurrentString = false;
+
                 SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
 
                 // Close Icon
 
                 if (__instance.dialogueIcon != null)
                 {
-                    var button = data.button is null ? defaultData.button : data.button;
+                    var button = data.button;
 
                     if (button != null && !button.disabled)
                         __instance.dialogueIcon.position = GetDataVector(__instance, button);
                 }
+
                 preventGetCurrentString = true;
+                
                 return false;
             }
         }

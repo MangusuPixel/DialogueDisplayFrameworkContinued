@@ -1,5 +1,6 @@
 ﻿using StardewValley.BellsAndWhistles;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DialogueDisplayFramework
 {
@@ -22,6 +23,65 @@ namespace DialogueDisplayFramework
         public List<TextData> texts = new();
         public List<DividerData> dividers = new();
         public bool disabled;
+
+        public static DialogueDisplayData DefaultValues => new()
+        {
+            width = 1200,
+            height = 384,
+            dialogue = new()
+            {
+                xOffset = 8,
+                yOffset = 8,
+                width = 716
+            },
+            portrait = new()
+            {
+                xOffset = -352,
+                yOffset = 32,
+                right = true
+            },
+            name = new()
+            {
+                xOffset = -222,
+                yOffset = 320,
+                right = true
+            },
+            jewel = new()
+            {
+                xOffset = -64,
+                yOffset = 256,
+                right = true,
+            },
+            button = new()
+            {
+                xOffset = -532,
+                yOffset = -44,
+                right = true,
+                bottom = true
+            },
+            images = new()
+            {
+                new()
+                {
+                    ID = "DialogueDisplayFramework.Images.PortraitBackground",
+                    texturePath = "LooseSprites/Cursors",
+                    xOffset = -452,
+                    right = true,
+                    x = 583,
+                    y = 411,
+                    w = 115,
+                    h = 97
+                }
+            },
+            dividers = new()
+            {
+                new() {
+                    ID = "DialogueDisplayFramework.Dividers.PortraitDivider",
+                    xOffset = -484,
+                    right = true
+                }
+            }
+        };
     }
 
     public class BaseData

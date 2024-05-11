@@ -48,7 +48,10 @@ namespace DialogueDisplayFramework
 
             if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
             {
-                e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>(), AssetLoadPriority.Exclusive);
+                e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
+                {
+                    { defaultKey, DialogueDisplayData.DefaultValues }
+                }, AssetLoadPriority.Exclusive);
             }
         }
 
@@ -65,12 +68,8 @@ namespace DialogueDisplayFramework
                     var data = asset.AsDictionary<string, DialogueDisplayData>().Data;
                     var keyGroups = new Dictionary<string, string>();
 
-                    //SMonitor.Log($"Loaded {data.Count} data entries");
-
-                    if (!data.ContainsKey(defaultKey))
-                        data[defaultKey] = new DialogueDisplayData() { disabled = true };
-
                     imageDict.Clear();
+
                     foreach (var (key, entry) in data)
                     {
                         if (key.Contains(listDelimiter))
