@@ -88,21 +88,25 @@ namespace DialogueDisplayFramework
                         if (entry.copyFrom != null)
                         {
                             var target = entry;
-                            var traceStack = new List<DialogueDisplayData>() { target };
+                            var traceStack = new List<DialogueDisplayData>() { entry };
+                            var cyclicRef = false;
 
-                            while (data.TryGetValue(target.copyFrom, out target))
+                            while (!cyclicRef && target.copyFrom != null && data.TryGetValue(target.copyFrom, out target))
                             {
-                                traceStack.Add(target);
-
-                                if (target.copyFrom == key)
+                                foreach (var traceStep in traceStack)
                                 {
-                                    SMonitor.Log($"{String.Join(" > ", traceStack.Select(d => d.copyFrom))} > {entry.copyFrom} : Cyclic reference detected. Disabling.", LogLevel.Error);
+                                    if (traceStep == target)
+                                    {
+                                        SMonitor.Log($"{key} > {traceStack.Select(d => d.copyFrom).Join(delimiter: " > ")} : Cyclic reference detected. Disabling.", LogLevel.Error);
 
-                                    foreach (var k in traceStack)
-                                        k.disabled = true;
+                                        foreach (var d in traceStack)
+                                            d.disabled = true;
 
-                                    break;
+                                        cyclicRef = true;
+                                        break;
+                                    }
                                 }
+                                traceStack.Add(target);
                             }
 
                             if (!data.ContainsKey(entry.copyFrom))
