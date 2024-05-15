@@ -128,11 +128,11 @@ namespace DialogueDisplayFramework
 
                         var imagesWithMissingID = entry.images.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (imagesWithMissingID > 0)
-                            SMonitor.Log($"{key} : References {imagesWithMissingID} divider{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
+                            SMonitor.Log($"{key} : References {imagesWithMissingID} image{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
                         var textsWithMissingID = entry.texts.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (textsWithMissingID > 0)
-                            SMonitor.Log($"{key} : References {textsWithMissingID} divider{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
+                            SMonitor.Log($"{key} : References {textsWithMissingID} text{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
                         var dividersWithMissingID = entry.dividers.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (dividersWithMissingID > 0)
