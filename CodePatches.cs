@@ -421,7 +421,7 @@ namespace DialogueDisplayFramework
 
                 // Dialogue String
 
-                var dialogue = data.dialogue ?? (data.dialogue.disabled ? DialogueDisplayData.DefaultValues.dialogue : data.dialogue);
+                var dialogue = data.dialogue ?? DialogueDisplayData.DefaultValues.dialogue;
                 var dialoguePos = GetDataVector(__instance, dialogue);
 
                 preventGetCurrentString = false;
