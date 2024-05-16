@@ -1,35 +1,223 @@
-# Dialogue Display Framework Continued API
+This document is intended to help mod authors create content packs using Dialogue Display Framework Continued.
 
-## Usage
+## Contents
+- [Intro](#intro)
+  - [What is DDFC](#what-is-ddfc)
+  - [Why use DDFC?](#why-use-ddfc)
+- [Getting started](#getting-started)
+  - [Creating a content pack](#creating-a-content-pack)
+  - [Adding changes](#adding-changes)
+  - [Testing changes](#testing-changes)
+- [Compatibility support](#compatibility-support)
+  - [Fields vs Entries](#fields-vs-entries)
+  - [Target field](#target-field)
+  - [Load order](#load-order)
+- [Entry keys](#entry-keys)
+- [Entry fields](#entry-fields)
+  - [Base fields](#base-fields)
+  - [Common data fields](#common-data-fields)
+  - [Dialogue fields](#dialogue-fields)
+  - [Portrait fields](#portrait-fields)
+  - [Hearts fields](#hearts-fields)
+  - [Gift fields](#gift-fields)
+  - [Image fields](#image-fields)
+  - [Text fields](#text-fields)
+  - [Divider fields](#divider-fields)
+  - [Connectors fields](#connectors-fields)
+- [Examples](#examples)
+- [Advanced examples](#advanced-examples)
 
-Dialogue Display Framework Continued uses Content Patcher to load a dictionary from a fake path. Your content pack should be a pack for Content Patcher and target the following path:
+## Intro
 
-"**aedenthorn.DialogueDisplayFramework/dictionary**"
+### What is DDFC
 
-Dictionary keys generally consist of the name of the speaker in the dialogue. See more details below.
+Dialogue Display Framework Continued (DDFC) is the continuation of aedenthorn's [Dialogue Display Framework](https://www.nexusmods.com/stardewvalley/mods/11661) (DDF) to support the 1.6 updates, but also to improve its features and implementation. The framework is a valuable tool for any mod authors looking to edit the dialogue box's user interface.
 
-So, an example CP shell would look like:
+### Why use DDFC?
 
+Dialogue boxes are hard-coded into the game, making editing parts of the interface, while keeping compatibility between mods, not easily feasible without a common framework. Thankfully, not only does DDFC offer such common grounds for compatibility, but it also does so without needing any knowledge of game code. With a few content patches made with JSON, mod authors can change the dialogue box's UI in creative ways while keeping compatibility with other mods doing the same.
+
+## Getting started
+
+### Creating a content pack
+
+If you've never created a Content Patcher pack before, I strongly advise reading [this guide](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide.md#create-the-content-pack) first.
+
+Adding the framework as a dependency is not a requirement, but it'll make it more obvious when users forget to install it along your mod. Creating the dependency is as simple as adding the following lines to your `manifest.json`:
+```json
+"Dependencies": [
     {
-        "Format": "1.23.0",
-        "Changes": [
-            {
-                "Action": "EditData",
-                "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
-                "Entries": {
-                    "Emily": {
-                        (your data goes here)
-                    }
+        "UniqueID": "Mangupix.DialogueDisplayFrameworkContinued",
+        "IsRequired": true
+    },
+]   
+```
+
+### Adding changes
+
+All changes to the interface are made by targetting the same dictionary object and usually have the following structure:
+
+```json
+{
+    "Format": "2.0.0",
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+            "Fields": {
+                "default": {
+                    (your changes go here)
                 }
             }
-        ]
+        }
+    ]
+}
+```
+
+In most cases, the only targetted entry will be `default`, which means the changes apply to all game characters (with a portrait frame). Other supported keys include character names, for when changes only apply to some characters. For more details, see [entry keys](#entry-keys).
+
+Each entry uses the same [data model](#data-fields), described in later sections, and can be modified using Content Patcher's `EditData` action. You can apply multiple patches to the same entries, and it's sometimes even encouraged. See Content Patcher's [`Action: EditData` documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md) for more info. 
+
+When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/default.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
+
+For example, the following entry changes the jewel's position when talking to Emily while keeping the rest of the UI unchanged:
+
+```json
+"Emily": {
+    "copyFrom": "default",
+    "jewel": {
+        "xOffset": -60,
+        "yOffset": 60,
+        "right": true
     }
+}
+```
 
-When testing out your pack, you can use `patch reload <yourModID>` in the SMAPI console to reload all registered entries, so you can make edits and see them reflected in-game in real-time.
+### Testing changes
 
-## Dictionary Keys
+When testing for changes in-game, you can use the following command to open a dialogue anywhere: 
 
-Dictionary keys can take many forms:
+```
+debug dialogue maru <>
+```
+
+To refresh any changes without re-opening the game (or dialogue), you can use the following command:
+
+```
+patch reload <yourModID>
+```
+
+## Compatibility support
+
+While true that mods can increase compatibility with patches using `HasMod` conditions, this isn't always necessary. In fact, patches with the highest compatibility will change as few values as possible and thus reducing its interference with other mods. Thankfully, several options are available.
+
+### Fields vs Entries
+
+When creating a patch, at least one of the following fields must be used:
+
+<table>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+<td>
+
+`Fields`
+
+</td>
+<td>
+
+Assigns some fields while leaving the rest unchanged. Recommended if your mod needs full control over specific elements.
+
+**Caveat:** supplied objects and lists replace the entire field values. It does *not* just change the given fields in those objects!
+
+For example, despite the name element being previously positioned, the following patch replaces *all* data, repositioning it to a default `(0,0)` offset.
+
+```json
+"Fields": {
+    "default": {
+        "name": { "color": "black" }
+    }
+}
+```
+
+Similarly with lists, assigning a new entry will erase all other list entries.
+
+For this reason, you should use [`TargetField`](#target-field) when adding or editing list entries and when you only modify a few fields. Avoid copying default values, as this reduces compatibility.
+
+</td>
+</tr>
+<tr><td>
+
+`Entries`
+
+</td><td>
+
+Replaces entire entries to be the supplied object, potentially erasing changes made by other mods. Not recommended to use on the `default` entry.
+
+For example, the following patch creates a new entry for Emily based on the data from default. However, this will overwrite any previous changes that happened earlier in the load order. See [load order](#load-order) for 
+```json
+"Entries": {
+    "Emily": {
+        "copyFrom": "default",
+        "portrait": { ... }
+    }
+}
+```
+
+Must be used if a `TargetField` is specified.
+
+</td></tr>
+<tr>
+<td>
+
+`MoveEntries`
+
+</td>
+<td>
+
+Moves image, text and divider entries to be drawn before or after other mod's assets.
+
+Objects lower in the list will be drawn last.
+
+See also the `layerDepth` field for a similar effect.
+
+</td></tr></table>
+
+### Target field
+
+Using `TargetField` is ideal when changing a few fields or editing entries in lists (images, texts, dividers). See [target field documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md#target-field) for more info.
+
+For example, the following patch re-aligns the name text vertically while leaving the horizontal position unchanged:
+```json
+"TargetField": [ "default", "name" ],
+"Entries": {
+    "yOffset": -100,
+    "bottom": true
+}
+```
+
+When adding or editing images, texts or dividers, you **must** use `TargetField` to maintain the integrity of those lists. For example, this is how to add a new image entry:
+
+```json
+"TargetField": [ "default", "images" ],
+"Entries": {
+    "YourModID.NewImage": {
+        "ID": "YourModID.NewImage",
+        (your data here)
+    }
+}
+```
+
+### Load order
+
+Changing the load order is another good way to support compatibility. If you're aware of changes another mod does, you can tweak the appearance to better match your mod by using a [optional dependency](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Manifest#Dependencies) to make sure their changes are already applied when your patches are loaded.
+
+Content Patcher also has a `Priority` field that allows you to change when your mod should be applied, but this can be unreliable and cause issues. As a rule of thumb, only set a `Priority: Low` to initialize empty entries (e.g. for character keys) then later edit them as normal. This way, no data is lost.
+
+## Entry keys
+
+Entry keys must be one of the following:
 
 | Key                                  | Description |
 | ------------------------------------ | ----------- |
@@ -39,17 +227,17 @@ Dictionary keys can take many forms:
 | `<CharacterNameID>`                  | Apply changes to a specific character
 | `default`                            | Fallback option if no other data is specified or for a global dialogue setup
 
-It's important to note that patches will be overridden in the order given above, not in the order they appear. For example, beach keys will take precedence over those with standard keys but will be replaced by appearance keys and location keys.
+**Note:** Patches will be overridden in the order given above, top being checked first and bottom being checked last. For example, beach keys will take precedence over those with standard keys but will be replaced by appearance keys and location keys.
 
-Entry keys can also contain a list of keys separated by a comma and space (e.g. "Emily, Abigail_Beach, etc"), in which case, each element in the list will count as keys, sharing the same patch data.
+## Entry fields
 
-## Dictionary Objects
+### Base fields
 
-Dictionary values are objects with the following keys:
+Dictionary entries have the following optional fields:
 
 | Key        | Type    | Description |
 | ---------- | ------- | ----------- |
-| `packName` | string  | Manifest ID of the content pack containing this entry, used for logging.
+| `packName` | string  | (Optional) Manifest ID of the content pack containing this entry.
 | `copyFrom` | string  | Key to a data entry to copy data from. Any following data will override the copied data.
 | `xOffset`  | integer | X offset of the dialogue box relative to its normal position on the screen.
 | `yOffset`  | integer | Y offset of the dialogue box relative to its normal position on the screen.
@@ -68,11 +256,11 @@ Dictionary values are objects with the following keys:
 | `dividers` | List of [DividerData](#divider-data) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Disable this entry entirely, default false.<br>Ignored if the `copyFrom` entry is disabled.
 
-If any field is missing in an NPC entry, the field from the "default" entry will be used instead.
+If any of the above fields are missing, the value will be taken from the [defaults](/docs/default.json) preset matching the unmodded game's dialogue.
 
-## Base Data
+### Common data fields
 
-For all of the above entries that are objects (or lists of objects), the objects have the following common keys available (though they may not all use them):
+Must objects in the base fields also have the following common fields available (although, some objects might not use them all):
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
@@ -87,10 +275,9 @@ For all of the above entries that are objects (or lists of objects), the objects
 | `layerDepth` | decimal | Z-index of the element, default 0.88.
 | `disabled`   | boolean | Whether to disable this element, i.e. if this is for an NPC for which you don't want a default element added, default false.
 
+## `Dialogue` fields
 
-## Dialogue Data
-
-Along the [base data](#base-data) keys, dialogue data has the following keys available:
+Along the [common data fields](#common-data-fields), dialogue data includes the following fields:
 
 | Key         | Type    | Description |
 | ----------- | ------- | ----------- |
@@ -98,9 +285,9 @@ Along the [base data](#base-data) keys, dialogue data has the following keys ava
 | `alignment` | enum   | Text alignment: 0 = left, 1 = center, 2 = right.
 
 
-## Portrait Data
+## `Portrait` fields
 
-Along the [base data](#base-data) keys, portrait data has the following keys available:
+Along the [common data fields](#common-data-fields), portrait data includes the following fields:
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
@@ -110,21 +297,9 @@ Along the [base data](#base-data) keys, portrait data has the following keys ava
 | `w`           | integer | Width in the source texture file, default 64.
 | `h`           | integer | Height in the source texture file, default 64.
 
+## `Hearts` fields
 
-## Sprite Data
-
-**Sprite data is currently unavailable:** PR or code fixes are greatly welcomed.
-~~Along the [base data](#base-data) keys, sprite data has the following keys available:~~
-
-| Key          | Type    | Description |
-| ------------ | ------- | ----------- |
-| `background` | boolean | Whether to show the day / night background behind the sprite.
-| `frame`      | integer | Which frame on the character sprite sheet to show. Set to -1 to animate the sprite instead.
-
-
-## Hearts Data
-
-Along the [base data](#base-data) keys, hearts data has the following keys available:
+Along the [common data fields](#common-data-fields), hearts data includes the following fields:
 
 | Key                 | Type    | Description |
 | ------------------- | ------- | ----------- |
@@ -134,9 +309,9 @@ Along the [base data](#base-data) keys, hearts data has the following keys avail
 | `centered`          | boolean | If true, `xOffset` will point to the center of the row of hearts.
 
 
-## Gift Data
+## `Gift` fields
 
-Along the [base data](#base-data) keys, gift data has the following keys available:
+Along the [common data fields](#common-data-fields), gift data includes the following fields:
 
 | Key            | Type    | Description |
 | -------------- | ------- | ----------- |
@@ -144,9 +319,9 @@ Along the [base data](#base-data) keys, gift data has the following keys availab
 | `inline`       | boolean | Show the check boxes to the right of the icon, default false.
 
 
-## Image Data
+## `Image` fields
 
-The `images` field is an array of Image Data objects. Along the [base data](#base-data) keys, image data has the following keys available:
+The `images` field is a list of objects with [common data fields](#common-data-fields) and the following fields:
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
@@ -158,9 +333,9 @@ The `images` field is an array of Image Data objects. Along the [base data](#bas
 | `h`           | integer | Height in the source texture file.
 
 
-## Text Data
+## `Text` fields
 
-The `texts` field is an array of Text Data objects. Along the [base data](#base-data) keys, text data has the following keys available:
+The `texts` field is a list of objects with [common data fields](#common-data-fields) and the following fields:
 
 | Key               | Type    | Description |
 | ----------------- | ------- | ----------- |
@@ -168,15 +343,15 @@ The `texts` field is an array of Text Data objects. Along the [base data](#base-
 | `text`            | string  | The text to display. Unused with the `name` field.
 | `placeholderText` | string  | If using scroll background, this affects the size of the scroll while keeping it centered.
 | `color`           | string  | Supports color name, hex and RGB formats.
-| `scrollType`      | integer | Possible values:<br>`-1` = No scroll (default),<br>`0` = Sizeable scroll,<br>`1` = Speech bubble,<br>`2` = ???,<br>`3` = ???
+| `scrollType`      | integer | Possible values:<br>`-1` = No scroll (default),<br>`0` = Sizeable scroll,<br>`1` = Speech bubble,<br>`2` = Cave depth plate,<br>`3` = Mastery text plate
 | `junimo`          | boolean | Whether the name should be displayed in Junimo characters, because why not.
 | `alignment`       | enum    | Possible values:<br>`0` = Left,<br>`1` = Center (default),<br>`2` = Right
 | `centered`        | boolean | **Legacy support:** Use `alignment: 1`.<br>Whether to center the text at the given position.
 
 
-## Divider Data
+## `Divider` fields
 
-The `dividers` field is an array of Divider Data objects. Along the [base data](#base-data) keys, divider data has the following keys available:
+The `dividers` field is a list of objects with [common data fields](#common-data-fields) and the following fields:
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
@@ -185,11 +360,184 @@ The `dividers` field is an array of Divider Data objects. Along the [base data](
 | `connectors` | [ConnectorData](#connector-data)  | Divider connector data (see below).
 | `color`      | string  | Supports color name, hex and RGB formats<br>If specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
 
-## Connector Data
+## `Connectors` fields
 
-The `connectors` field refers to an object with the following keys available:
+The `connectors` field refers to an object with the following fields:
 
 | Key      | Type    | Description |
 | ---------| ------- | ----------- |
 | `top`    | boolean | Whether or not to display the top connector, default true.
 | `bottom` | boolean | Whether or not to display the bottom connector, default true.
+
+## Examples
+
+### Higher portrait resolution
+
+Increases the portrait's resolution by 8x. 
+
+```json
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "Fields": {
+        "default": {
+            "portrait": { "h": 512, "w": 512, "scale": 0.5 }
+        }
+    }
+}
+```
+
+### Floating portrait
+
+Moves the name and portrait above the dialogue box
+
+```json
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "Entries": {
+        "default": {
+            "dialogue": { "width": 1000 },
+            "name": {
+                "xOffset": 20,
+                "yOffset": -100,
+                "alignment": 0
+            },
+            "portrait": {
+                "xOffset": 60,
+                "yOffset": -360
+            },
+            "jewel": {
+                "xOffset": -64,
+                "yOffset": -52,
+                "right": true,
+                "bottom": true
+            },
+            "button": {
+                "xOffset": -40,
+                "yOffset": -40,
+                "right": true,
+                "bottom": true
+            }
+        }
+    }
+},
+```
+
+### Speech bubble
+
+Adds a speed bubble above a character.
+
+```json
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "Entries": {
+        "Abigail": { "CopyFrom": "default" }
+    },
+    "Priority": "Early"
+},
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "TargetField": [ "Abigail", "texts" ],
+    "Entries": {
+        "ExampleMod.AbigailSpeech": {
+            "ID": "ExampleMod.AbigailSpeech",
+            "text": "Yummy amethysts...",
+            "xOffset": -280, "yOffset": -24, "right": true
+            "scrollType": 1,
+        }
+    }
+}
+```
+
+## Advanced examples
+
+### Multi-Character patching
+
+Gives a pink name color to all bachelors and bachelorettes.
+
+```json
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "Entries": {
+        "Sebastian": { "CopyFrom": "default" },
+        "Abigail": { "CopyFrom": "Sebastian" },
+        "Harvey": { "CopyFrom": "Sebastian" },
+        "Eliott": { "CopyFrom": "Sebastian" },
+        "Shane": { "CopyFrom": "Sebastian" },
+        "Emily": { "CopyFrom": "Sebastian" },
+        "Haley": { "CopyFrom": "Sebastian" },
+        "Penny": { "CopyFrom": "Sebastian" },
+        "Alex": { "CopyFrom": "Sebastian" },
+        "Leah": { "CopyFrom": "Sebastian" },
+        "Maru": { "CopyFrom": "Sebastian" },
+        "Sam": { "CopyFrom": "Sebastian" }
+    },
+    "Priority": "Early"
+},
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "TargetField": [ "Sebastian", "name" ],
+    "Entries": {
+        "color": "pink"
+    }
+}
+```
+
+### Swap portrait and name
+
+```json
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "Fields": {
+        "default": {
+            "name": {
+                "xOffset": -222,
+                "yOffset": 20,
+                "right": true
+            },
+            "portrait": {
+                "xOffset": -352,
+                "yOffset": 104,
+                "right": true
+            },
+            "jewel": {
+                "xOffset": -64,
+                "yOffset": -52,
+                "right": true,
+                "bottom": true
+            }
+        }
+    },
+},
+{
+    "Action": "EditData",
+    "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
+    "TargetField": [ "default", "images" ],
+    "Entries": {
+        "ExampleMod.UpperPortrait": {
+            "ID": "ExampleMod.UpperPortrait",
+            "texturePath": "LooseSprites/Cursors",
+            "xOffset": -428,
+            "yOffset": 12,
+            "right": true,
+            "x": 589, "y": 489,
+            "w": 102, "h": 18
+        },
+        "ExampleMod.LowerPortrait": {
+            "ID": "ExampleMod.LowerPortrait",
+            "texturePath": "LooseSprites/Cursors",
+            "xOffset": -380,
+            "yOffset": 84,
+            "right": true,
+            "x": 601, "y": 414,
+            "w": 76, "h": 74
+        }
+    }
+}
+```
