@@ -55,7 +55,7 @@ Adding the framework as a dependency is not a requirement, but it'll make it mor
 
 ### Adding changes
 
-All changes to the interface are made by targetting the same dictionary object and usually have the following structure:
+All changes to the interface are made by targeting the same dictionary object and usually have the following structure:
 
 ```json
 {
@@ -129,7 +129,7 @@ When creating a patch, at least one of the following fields must be used:
 
 Assigns some fields while leaving the rest unchanged. Recommended if your mod needs full control over specific elements.
 
-**Caveat:** supplied objects and lists replace the entire field values. It does *not* just change the given fields in those objects!
+**Caveat:** Supplied objects and lists replace the entire field values. It does *not* just change the given fields in those objects!
 
 For example, despite the name element being previously positioned, the following patch replaces *all* data, repositioning it to a default `(0,0)` offset.
 
@@ -222,7 +222,7 @@ Entry keys must be one of the following:
 | Key                                  | Description |
 | ------------------------------------ | ----------- |
 | `<CharacterNameID>_<LocationNameID>` | ***Legacy support:** Edit NPC appearance data instead.*<br>Apply changes to a character listed in a location's `UniquePortrait` property
-| `<CharacterNameID>_<AppearanceID>`   | Apply changes to a character using a specified appearance ID. Might not match their current texture if they were manually overriden elsewhere
+| `<CharacterNameID>_<AppearanceID>`   | Apply changes to a character using a specified appearance ID. Might not match their current texture if they were manually overridden elsewhere
 | `<CharacterNameID>_Beach`            | Apply changes to a characters in beach attire
 | `<CharacterNameID>`                  | Apply changes to a specific character
 | `default`                            | Fallback option if no other data is specified or for a global dialogue setup
@@ -325,7 +325,7 @@ The `images` field is a list of objects with [common data fields](#common-data-f
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
-| `id`          | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `image.unnamed` by default.
+| `id`          | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
 | `texturePath` | string  | The fake or real game path relative to the Content folder of the texture file used to draw.
 | `x`           | integer | X position in the source texture file.
 | `y`           | integer | Y position in the source texture file.
@@ -339,7 +339,7 @@ The `texts` field is a list of objects with [common data fields](#common-data-fi
 
 | Key               | Type    | Description |
 | ----------------- | ------- | ----------- |
-| `id`              | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `text.unnamed` by default<br>Unused with the `name` field.
+| `id`              | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default<br>Unused with the `name` field.
 | `text`            | string  | The text to display. Unused with the `name` field.
 | `placeholderText` | string  | If using scroll background, this affects the size of the scroll while keeping it centered.
 | `color`           | string  | Supports color name, hex and RGB formats.
@@ -355,7 +355,7 @@ The `dividers` field is a list of objects with [common data fields](#common-data
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
-| `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `divider.unnamed` by default.
+| `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical).
 | `connectors` | [ConnectorData](#connector-data)  | Divider connector data (see below).
 | `color`      | string  | Supports color name, hex and RGB formats<br>If specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
