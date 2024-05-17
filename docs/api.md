@@ -245,17 +245,16 @@ Dictionary entries have the following optional fields:
 | `yOffset`  | integer | Y offset of the dialogue box relative to its normal position on the screen.
 | `width`    | integer | Width of the dialogue box, default 1200.
 | `height`   | integer | Height of the dialogue box, default 384.
-| `dialogue` | [DialogueData](#dialogue-data)       | Customizes the dialogue string  display.
-| `portrait` | [PortraitData](#portrait-data)       | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
-| `name`     | [TextData](#text-data)               | Customizes the name display which normally appears under the portrait frame.
-| `jewel`    | [BaseData](#base-data)               | Customizes the friendship jewel display.
-| `button`   | [BaseData](#base-data)               | Customizes the action button display.
-| `sprite`   | [SpriteData](#sprite-data)           | **(Disabled)** Customizes a character sprite display.
-| `gifts`    | [GiftsData](#gifts-data)             | Customizes a custom gift display.
-| `hearts`   | [HeartsData](#hearts-data)           | Customizes a friendship hearts display.
-| `images`   | List of [ImageData](#image-data)     | Custom images to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
-| `texts`    | List of [TextData](#text-data)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
-| `dividers` | List of [DividerData](#divider-data) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `dialogue` | [Dialogue](#dialogue-fields)       | Customizes the dialogue string  display.
+| `portrait` | [Portrait](#portrait-fields)       | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
+| `name`     | [Text](#text-fields)               | Customizes the name display which normally appears under the portrait frame.
+| `jewel`    | [Commond data](#common-data-fields)               | Customizes the friendship jewel display.
+| `button`   | [Common data](#common-data-fields)               | Customizes the action button display.
+| `gifts`    | [Gifts](#gifts-fields)             | Customizes a custom gift display.
+| `hearts`   | [Hearts](#hearts-fields)           | Customizes a friendship hearts display.
+| `images`   | List of [Images](#image-fields)     | Custom images to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `texts`    | List of [Texts](#text-fields)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
+| `dividers` | List of [Dividers](#divider-fields) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
 
 If any of the above fields are missing, the value will be taken from the [defaults](/docs/default.json) preset matching the unmodded game's dialogue.
@@ -358,7 +357,7 @@ The `dividers` field is a list of objects with [common data fields](#common-data
 | ------------ | ------- | ----------- |
 | `id`         | string  | (Required) A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical).
-| `connectors` | [ConnectorData](#connector-data)  | Customize the connector image at the ends of the divider. When `horizontal` is false, both connectors are enabled by default.
+| `connectors` | [Connectors](#connector-fields)  | Customize the connector image at the ends of the divider. When `horizontal` is false, both connectors are enabled by default.
 | `color`      | string  | Supports color name, hex and RGB formats<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.<br><br>**Note:** When specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
 
 ## `Connectors` fields
