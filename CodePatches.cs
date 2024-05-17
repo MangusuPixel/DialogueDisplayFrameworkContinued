@@ -92,11 +92,9 @@ namespace DialogueDisplayFramework
             SpriteText.drawString(b, data.text, (int)pos.X, (int)pos.Y, 999999, data.width, 999999, data.alpha, data.layerDepth, data.junimo, data.scrollType, data.placeholderText ?? "", Utility.StringToColor(data.color), data.alignment);
         }
 
-        [HarmonyPatch(typeof(DialogueBox), new Type[] { typeof(Dialogue) })]
-        [HarmonyPatch(MethodType.Constructor)]
-        public class DialogueBox_Patch
+        public class DialogueBoxPatches
         {
-            public static void Postfix(DialogueBox __instance, Dialogue dialogue)
+            public static void Dialogue_Postfix(DialogueBox __instance, Dialogue dialogue)
             {
                 if (!Config.EnableMod || dialogue?.speaker is null)
                     return;
@@ -124,12 +122,8 @@ namespace DialogueDisplayFramework
 
                 shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
-        }
 
-        [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.receiveLeftClick))]
-        public class DialogueBox_receiveLeftClick_Patch
-        {
-            public static bool Prefix(DialogueBox __instance, int x, int y, bool playSound)
+            public static bool ReceiveLeftClick_Prefix(DialogueBox __instance, int x, int y, bool playSound)
             {
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return true;
@@ -151,12 +145,8 @@ namespace DialogueDisplayFramework
                 */
                 return true;
             }
-        }
 
-        [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged))]
-        public class DialogueBox_gameWindowSizeChanged_Patch
-        {
-            public static void Postfix(DialogueBox __instance)
+            public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
             {
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return;
@@ -172,12 +162,8 @@ namespace DialogueDisplayFramework
                 if (data.height > 0)
                     __instance.height = (int)data.height;
             }
-        }
 
-        [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.drawPortrait))]
-        public class DialogueBox_drawPortrait_Patch
-        {
-            public static bool Prefix(DialogueBox __instance, SpriteBatch b)
+            public static bool DrawPortrait_Prefix(DialogueBox __instance, SpriteBatch b)
             {
                 if (!Config.EnableMod)
                     return true;
@@ -442,24 +428,16 @@ namespace DialogueDisplayFramework
                 
                 return false;
             }
-        }
 
-        [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.getCurrentString))]
-        public class DialogueBox_getCurrentString_Patch
-        {
-            public static bool Prefix(DialogueBox __instance, ref string __result)
+            public static bool GetCurrentString_Prefix(DialogueBox __instance, ref string __result)
             {
                 if (!Config.EnableMod || !preventGetCurrentString)
                     return true;
                 __result = "";
                 return false;
             }
-        }
 
-        [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.draw))]
-        public class DialogueBox_draw_Patch
-        {
-            public static void Postfix(DialogueBox __instance, SpriteBatch b)
+            public static void Draw_Postfix(DialogueBox __instance, SpriteBatch b)
             {
                 if (!Config.EnableMod)
                     return;
