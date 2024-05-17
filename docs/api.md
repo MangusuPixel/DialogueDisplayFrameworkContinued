@@ -2,7 +2,7 @@ This document is intended to help mod authors create content packs using Dialogu
 
 ## Contents
 - [Intro](#intro)
-  - [What is DDFC](#what-is-ddfc)
+  - [What is DDFC?](#what-is-ddfc)
   - [Why use DDFC?](#why-use-ddfc)
 - [Getting started](#getting-started)
   - [Creating a content pack](#creating-a-content-pack)
@@ -29,7 +29,7 @@ This document is intended to help mod authors create content packs using Dialogu
 
 ## Intro
 
-### What is DDFC
+### What is DDFC?
 
 Dialogue Display Framework Continued (DDFC) is the continuation of aedenthorn's [Dialogue Display Framework](https://www.nexusmods.com/stardewvalley/mods/11661) (DDF) to support the 1.6 updates, but also to improve its features and implementation. The framework is a valuable tool for any mod authors looking to edit the dialogue box's user interface.
 
@@ -76,7 +76,7 @@ All changes to the interface are made by targeting the same dictionary object an
 
 In most cases, the only targetted entry will be `default`, which means the changes apply to all game characters (with a portrait frame). Other supported keys include character names, for when changes only apply to some characters. For more details, see [entry keys](#entry-keys).
 
-Each entry uses the same [data model](#data-fields), described in later sections, and can be modified using Content Patcher's `EditData` action. You can apply multiple patches to the same entries, and it's sometimes even encouraged. See Content Patcher's [`Action: EditData` documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md) for more info. 
+Each entry uses the same [data model](#data-fields), described in later sections, and can be modified using Content Patcher's `EditData` action. You can apply multiple patches to the same entries, and it's sometimes even encouraged (e.g. when using `TargetField` or `HasMod`). See Content Patcher's [`Action: EditData` documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md) for more info. 
 
 When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/default.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
 
@@ -95,11 +95,13 @@ For example, the following entry changes the jewel's position when talking to Em
 
 ### Testing changes
 
-When testing for changes in-game, you can use the following command to open a dialogue anywhere: 
+When testing for changes in-game, you can use the following command to open unlimited dialogues anywhere: 
 
 ```
-debug dialogue maru <>
+debug dialogue <npcName> <dialogueString>
 ```
+
+See [debug commands](https://stardewcommunitywiki.com/Modding:Debug_commands#Dialogue) for more info.
 
 To refresh any changes without re-opening the game (or dialogue), you can use the following command:
 
@@ -109,7 +111,7 @@ patch reload <yourModID>
 
 ## Compatibility support
 
-While true that mods can increase compatibility with patches using `HasMod` conditions, this isn't always necessary. In fact, patches with the highest compatibility will change as few values as possible and thus reducing its interference with other mods. Thankfully, several options are available.
+While true that mods can increase compatibility with patches using `HasMod` conditions, this isn't always necessary. In fact, patches with high compatibility will change as few values as possible, reducing the chance of conflicting changes with other mods. Thankfully, several options are available.
 
 ### Fields vs Entries
 
@@ -155,7 +157,7 @@ For this reason, you should use [`TargetField`](#target-field) when adding or ed
 
 Replaces entire entries to be the supplied object, potentially erasing changes made by other mods. Not recommended to use on the `default` entry.
 
-For example, the following patch creates a new entry for Emily based on the data from default. However, this will overwrite any previous changes that happened earlier in the load order. See [load order](#load-order) for 
+For example, the following patch creates a new entry for Emily based on the data from `default`. However, this will overwrite any previous changes that happened earlier in the [load order](#load-order).
 ```json
 "Entries": {
     "Emily": {
@@ -211,7 +213,7 @@ When adding or editing images, texts or dividers, you **must** use `TargetField`
 
 ### Load order
 
-Changing the load order is another good way to support compatibility. If you're aware of changes another mod does, you can tweak the appearance to better match your mod by using a [optional dependency](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Manifest#Dependencies) to make sure their changes are already applied when your patches are loaded.
+Changing the load order is another good way to support compatibility. If you're aware of changes another mod does, you can tweak the appearance to better match your mod by using an [optional dependency](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Manifest#Dependencies) to make sure their changes are already applied when your patches are loaded.
 
 Content Patcher also has a `Priority` field that allows you to change when your mod should be applied, but this can be unreliable and cause issues. As a rule of thumb, only set a `Priority: Low` to initialize empty entries (e.g. for character keys) then later edit them as normal. This way, no data is lost.
 
@@ -223,7 +225,7 @@ Entry keys must be one of the following:
 | ------------------------------------ | ----------- |
 | `<CharacterNameID>_<LocationNameID>` | ***Legacy support:** Edit NPC appearance data instead.*<br>Apply changes to a character listed in a location's `UniquePortrait` property
 | `<CharacterNameID>_<AppearanceID>`   | Apply changes to a character using a specified appearance ID. Might not match their current texture if they were manually overridden elsewhere
-| `<CharacterNameID>_Beach`            | Apply changes to a characters in beach attire
+| `<CharacterNameID>_Beach`            | Apply changes to a character in beach attire
 | `<CharacterNameID>`                  | Apply changes to a specific character
 | `default`                            | Fallback option if no other data is specified or for a global dialogue setup
 
@@ -243,7 +245,7 @@ Dictionary entries have the following optional fields:
 | `yOffset`  | integer | Y offset of the dialogue box relative to its normal position on the screen.
 | `width`    | integer | Width of the dialogue box, default 1200.
 | `height`   | integer | Height of the dialogue box, default 384.
-| `dialogue` | [DialogueData](#dialogue-data)       | Customizes the dialogue text display.
+| `dialogue` | [DialogueData](#dialogue-data)       | Customizes the dialogue string  display.
 | `portrait` | [PortraitData](#portrait-data)       | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
 | `name`     | [TextData](#text-data)               | Customizes the name display which normally appears under the portrait frame.
 | `jewel`    | [BaseData](#base-data)               | Customizes the friendship jewel display.
@@ -254,13 +256,13 @@ Dictionary entries have the following optional fields:
 | `images`   | List of [ImageData](#image-data)     | Custom images to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `texts`    | List of [TextData](#text-data)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `dividers` | List of [DividerData](#divider-data) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
-| `disabled` | boolean | Disable this entry entirely, default false.<br>Ignored if the `copyFrom` entry is disabled.
+| `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
 
 If any of the above fields are missing, the value will be taken from the [defaults](/docs/default.json) preset matching the unmodded game's dialogue.
 
 ### Common data fields
 
-Must objects in the base fields also have the following common fields available (although, some objects might not use them all):
+Most objects in the base fields also have the following common fields available (although, some objects might not use them all):
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
@@ -272,8 +274,8 @@ Must objects in the base fields also have the following common fields available 
 | `height`     | integer | Height of elements that need it.
 | `alpha`      | decimal | Opacity, default 1 (full opacity).
 | `scale`      | decimal | Size scale, default 4 (most things in the game are displayed at 4x).
-| `layerDepth` | decimal | Z-index of the element, default 0.88.
-| `disabled`   | boolean | Whether to disable this element, i.e. if this is for an NPC for which you don't want a default element added, default false.
+| `layerDepth` | decimal | A higher value will be drawn "on top" of elements with lower values, similar to the `z-index` property of CSS, default 0.88.
+| `disabled`   | boolean | Whether to disable the element entirely and use any values from `copyFrom`, default false.<br>Similar to setting the field to `null` but with the option of enabling it in later patches.
 
 ## `Dialogue` fields
 
@@ -281,7 +283,7 @@ Along the [common data fields](#common-data-fields), dialogue data includes the 
 
 | Key         | Type    | Description |
 | ----------- | ------- | ----------- |
-| `color`     | string | Supports color name, hex and RGB formats.
+| `color`     | string | Supports color name, hex and RGB formats.<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.
 | `alignment` | enum   | Text alignment: 0 = left, 1 = center, 2 = right.
 
 
@@ -291,7 +293,7 @@ Along the [common data fields](#common-data-fields), portrait data includes the 
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
-| `texturePath` | string  | The fake or real game path relative to the Content folder of the texture file used to draw (if omitted, use the character's default portrait sheet).
+| `texturePath` | string  | The asset name for the portrait sheet texture to display, using the character's default portrait sheet by default.<br><br>**Note:** Make sure to load any custom textures first!<br><br>**Warning:** This may overwrite any portrait sheet change, both through normal interaction (e.g. beach attire, appearance change, etc.) and during events.
 | `x`           | integer | X position in the source texture file, default -1 (disabled).
 | `y`           | integer | Y position in the source texture file, default -1 (disabled).
 | `w`           | integer | Width in the source texture file, default 64.
@@ -315,8 +317,7 @@ Along the [common data fields](#common-data-fields), gift data includes the foll
 
 | Key            | Type    | Description |
 | -------------- | ------- | ----------- |
-| `showGiftIcon` | boolean | Show the gift icon, default true.
-| `inline`       | boolean | Show the check boxes to the right of the icon, default false.
+| `inline`       | boolean | If true, the check boxes are placed to the right of the gift icon, otherwise it's placed underneath, default false.
 
 
 ## `Image` fields
@@ -325,8 +326,8 @@ The `images` field is a list of objects with [common data fields](#common-data-f
 
 | Key           | Type    | Description |
 | ------------- | ------- | ----------- |
-| `id`          | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
-| `texturePath` | string  | The fake or real game path relative to the Content folder of the texture file used to draw.
+| `id`          | string  | (Required) A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
+| `texturePath` | string  | (Required) The asset name of the texture to display.<br><br>**Note:** Make sure to load any custom textures first!
 | `x`           | integer | X position in the source texture file.
 | `y`           | integer | Y position in the source texture file.
 | `w`           | integer | Width in the source texture file.
@@ -339,10 +340,10 @@ The `texts` field is a list of objects with [common data fields](#common-data-fi
 
 | Key               | Type    | Description |
 | ----------------- | ------- | ----------- |
-| `id`              | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default<br>Unused with the `name` field.
+| `id`              | string  | (Required) A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default<br>Unused with the `name` field.
 | `text`            | string  | The text to display. Unused with the `name` field.
 | `placeholderText` | string  | If using scroll background, this affects the size of the scroll while keeping it centered.
-| `color`           | string  | Supports color name, hex and RGB formats.
+| `color`           | string  | Supports color name, hex and RGB formats.<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.
 | `scrollType`      | integer | Possible values:<br>`-1` = No scroll (default),<br>`0` = Sizeable scroll,<br>`1` = Speech bubble,<br>`2` = Cave depth plate,<br>`3` = Mastery text plate
 | `junimo`          | boolean | Whether the name should be displayed in Junimo characters, because why not.
 | `alignment`       | enum    | Possible values:<br>`0` = Left,<br>`1` = Center (default),<br>`2` = Right
@@ -355,10 +356,10 @@ The `dividers` field is a list of objects with [common data fields](#common-data
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
-| `id`         | string  | A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
+| `id`         | string  | (Required) A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical).
-| `connectors` | [ConnectorData](#connector-data)  | Divider connector data (see below).
-| `color`      | string  | Supports color name, hex and RGB formats<br>If specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
+| `connectors` | [ConnectorData](#connector-data)  | Customize the connector image at the ends of the divider. When `horizontal` is false, both connectors are enabled by default.
+| `color`      | string  | Supports color name, hex and RGB formats<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.<br><br>**Note:** When specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
 
 ## `Connectors` fields
 
@@ -371,7 +372,7 @@ The `connectors` field refers to an object with the following fields:
 
 ## Examples
 
-### Higher portrait resolution
+### HD portraits
 
 Increases the portrait's resolution by 8x. 
 
@@ -426,7 +427,7 @@ Moves the name and portrait above the dialogue box
 
 ### Speech bubble
 
-Adds a speed bubble above a character.
+Adds a speech bubble above Abigail's portrait.
 
 ```json
 {
@@ -445,7 +446,7 @@ Adds a speed bubble above a character.
         "ExampleMod.AbigailSpeech": {
             "ID": "ExampleMod.AbigailSpeech",
             "text": "Yummy amethysts...",
-            "xOffset": -280, "yOffset": -24, "right": true
+            "xOffset": -280, "yOffset": -24, "right": true,
             "scrollType": 1,
         }
     }
