@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,36 @@ namespace DialogueDisplayFramework
             helper.Events.Content.AssetsInvalidated += Content_AssetInvalidated;
 
             var harmony = new Harmony(ModManifest.UniqueID);
-            harmony.PatchAll();
+
+            harmony.Patch(
+                original: AccessTools.Constructor(typeof(DialogueBox), new Type[] { typeof(Dialogue) }),
+                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.Dialogue_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.receiveLeftClick)),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.ReceiveLeftClick_Prefix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
+                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.GameWindowSizeChanged_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawPortrait)),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.DrawPortrait_Prefix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.getCurrentString)),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.GetCurrentString_Prefix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
+                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.Draw_Postfix))
+            );
         }
 
         private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
