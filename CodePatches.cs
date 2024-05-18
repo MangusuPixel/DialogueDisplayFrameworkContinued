@@ -98,19 +98,27 @@ namespace DialogueDisplayFramework
                 if (!Config.EnableMod || dialogue?.speaker is null)
                     return;
 
-                dirtyDialogueData = true;
-                var data = GetDialogueDisplayData(__instance.characterDialogue);
-                if (data == null)
+                try
+                {
+                    dirtyDialogueData = true;
+                    var data = GetDialogueDisplayData(__instance.characterDialogue);
+                    if (data == null)
+                        return;
+
+                    __instance.x += data.xOffset ?? 0;
+                    __instance.y += data.yOffset ?? 0;
+                    if (data.width > 0)
+                        __instance.width = (int)data.width;
+                    if (data.height > 0)
+                        __instance.height = (int)data.height;
+
+                    shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
+                }
+                catch (Exception ex)
+                {
+                    SMonitor.Log($"Failed in {nameof(Dialogue_Postfix)}:\n{ex}", LogLevel.Error);
                     return;
-
-                __instance.x += data.xOffset ?? 0;
-                __instance.y += data.yOffset ?? 0;
-                if (data.width > 0)
-                    __instance.width = (int)data.width;
-                if (data.height > 0)
-                    __instance.height = (int)data.height;
-
-                shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
+                }
             }
 
             public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
@@ -118,256 +126,273 @@ namespace DialogueDisplayFramework
                 if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                     return;
 
-                var data = GetDialogueDisplayData(__instance.characterDialogue);
-                if (data == null)
-                    return;
+                try
+                {
+                    var data = GetDialogueDisplayData(__instance.characterDialogue);
+                    if (data == null)
+                        return;
 
-                __instance.x += data.xOffset ?? 0;
-                __instance.y += data.yOffset ?? 0;
-                if (data.width > 0)
-                    __instance.width = (int)data.width;
-                if (data.height > 0)
-                    __instance.height = (int)data.height;
+                    __instance.x += data.xOffset ?? 0;
+                    __instance.y += data.yOffset ?? 0;
+                    if (data.width > 0)
+                        __instance.width = (int)data.width;
+                    if (data.height > 0)
+                        __instance.height = (int)data.height;
+                }
+                catch (Exception ex)
+                {
+                    SMonitor.Log($"Failed in {nameof(GameWindowSizeChanged_Postfix)}:\n{ex}", LogLevel.Error);
+                    return;
+                }
             }
 
             public static bool DrawPortrait_Prefix(DialogueBox __instance, SpriteBatch b)
             {
                 if (!Config.EnableMod)
                     return true;
-                NPC speaker = __instance.characterDialogue.speaker;
 
-                if (!Game1.IsMasterGame && !speaker.EventActor)
+                try
                 {
-                    var currentLocation = speaker.currentLocation;
-                    if (currentLocation == null || !currentLocation.IsActiveLocation())
+                    NPC speaker = __instance.characterDialogue.speaker;
+
+                    if (!Game1.IsMasterGame && !speaker.EventActor)
                     {
-                        NPC actualSpeaker = Game1.getCharacterFromName(speaker.Name, true, false);
-                        if (actualSpeaker != null && actualSpeaker.currentLocation.IsActiveLocation())
-                            speaker = actualSpeaker;
-                    }
-                }
-
-                var data = GetDialogueDisplayData(__instance.characterDialogue);
-
-                // Dividers
-
-                if (data.dividers != null)
-                {
-                    foreach (var divider in data.dividers)
-                    {
-                        if (divider.disabled)
-                            continue;
-
-                        var pos = GetDataVector(__instance, divider);
-                        var color = Utility.StringToColor(divider.color) ?? Color.White;
-
-                        if (divider.horizontal)
+                        var currentLocation = speaker.currentLocation;
+                        if (currentLocation == null || !currentLocation.IsActiveLocation())
                         {
-                            Texture2D texture = (divider.color is null) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
-                            b.Draw(texture, new Rectangle((int)pos.X, (int)pos.Y, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), color);
+                            NPC actualSpeaker = Game1.getCharacterFromName(speaker.Name, true, false);
+                            if (actualSpeaker != null && actualSpeaker.currentLocation.IsActiveLocation())
+                                speaker = actualSpeaker;
+                        }
+                    }
+
+                    var data = GetDialogueDisplayData(__instance.characterDialogue);
+
+                    // Dividers
+
+                    if (data.dividers != null)
+                    {
+                        foreach (var divider in data.dividers)
+                        {
+                            if (divider.disabled)
+                                continue;
+
+                            var pos = GetDataVector(__instance, divider);
+                            var color = Utility.StringToColor(divider.color) ?? Color.White;
+
+                            if (divider.horizontal)
+                            {
+                                Texture2D texture = (divider.color is null) ? Game1.menuTexture : Game1.uncoloredMenuTexture;
+                                b.Draw(texture, new Rectangle((int)pos.X, (int)pos.Y, divider.width, 64), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 6, -1, -1)), color);
+                            }
+                            else
+                            {
+                                var divHeight = (divider.height < 1) ? __instance.height + 4 : divider.height;
+
+                                b.Draw(Game1.mouseCursors, new Rectangle((int)pos.X, (int)pos.Y, 36, divHeight), new Rectangle?(new Rectangle(278, 324, 9, 1)), color);
+
+                                if (divider.connectors?.top == true)
+                                    b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
+
+                                if (divider.connectors?.bottom == true)
+                                    b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y + divHeight - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
+                            }
+                        }
+                    }
+
+                    // Images
+
+                    if (data.images != null)
+                    {
+                        foreach (var image in data.images)
+                        {
+                            if (image.disabled)
+                                continue;
+
+                            b.Draw(imageDict[image.texturePath], GetDataVector(__instance, image), new Rectangle(image.x, image.y, image.w, image.h), Color.White * image.alpha, 0, Vector2.Zero, image.scale, SpriteEffects.None, image.layerDepth);
+                        }
+                    }
+
+                    // NPC Portrait
+
+                    var portrait = data.portrait;
+                    if (portrait != null && !portrait.disabled)
+                    {
+                        Texture2D portraitTexture = __instance.characterDialogue.overridePortrait ?? speaker.Portrait;
+                        Rectangle portraitSource;
+
+                        if (portrait.texturePath != null)
+                        {
+                            portraitTexture = imageDict[portrait.texturePath];
+                        }
+
+                        if (portrait.x >= 0 && portrait.y >= 0)
+                        {
+                            portraitSource = new Rectangle(portrait.x, portrait.y, portrait.w, portrait.h);
                         }
                         else
                         {
-                            var divHeight = (divider.height < 1) ? __instance.height + 4 : divider.height;
-
-                            b.Draw(Game1.mouseCursors, new Rectangle((int)pos.X, (int)pos.Y, 36, divHeight), new Rectangle?(new Rectangle(278, 324, 9, 1)), color);
-
-                            if (divider.connectors?.top == true)
-                                b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
-
-                            if (divider.connectors?.bottom == true)
-                                b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y + divHeight - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), color, 0f, Vector2.Zero, divider.scale, SpriteEffects.None, divider.layerDepth);
-                        }
-                    }
-                }
-
-                // Images
-
-                if (data.images != null)
-                {
-                    foreach (var image in data.images)
-                    {
-                        if (image.disabled)
-                            continue;
-
-                        b.Draw(imageDict[image.texturePath], GetDataVector(__instance, image), new Rectangle(image.x, image.y, image.w, image.h), Color.White * image.alpha, 0, Vector2.Zero, image.scale, SpriteEffects.None, image.layerDepth);
-                    }
-                }
-
-                // NPC Portrait
-
-                var portrait = data.portrait;
-                if (portrait != null && !portrait.disabled)
-                {
-                    Texture2D portraitTexture = __instance.characterDialogue.overridePortrait ?? speaker.Portrait;
-                    Rectangle portraitSource;
-
-                    if (portrait.texturePath != null)
-                    {
-                        portraitTexture = imageDict[portrait.texturePath];
-                    }
-
-                    if (portrait.x >= 0 && portrait.y >= 0)
-                    {
-                        portraitSource = new Rectangle(portrait.x, portrait.y, portrait.w, portrait.h);
-                    }
-                    else
-                    {
-                        portraitSource = Game1.getSourceRectForStandardTileSheet(portraitTexture, __instance.characterDialogue.getPortraitIndex(), portrait.w, portrait.h);
-                    }
-
-                    if (!portraitTexture.Bounds.Contains(portraitSource))
-                    {
-                        portraitSource.X = 0;
-                        portraitSource.Y = 0;
-                    }
-
-                    var offset = new Vector2(shouldPortraitShake.Invoke<bool>(__instance.characterDialogue) ? Game1.random.Next(-1, 2) : 0, 0);
-
-                    b.Draw(portraitTexture, GetDataVector(__instance, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
-                }
-
-                // NPC Name
-
-                if (data.name != null && !data.name.disabled)
-                {
-                    data.name.text = speaker.getName();
-                    DrawTextComponent(b, __instance, data.name);
-                }
-
-                // Texts
-
-                if (data.texts != null)
-                {
-                    foreach (var textData in data.texts) {
-                        if (textData.disabled)
-                            continue;
-
-                        DrawTextComponent(b, __instance, textData);
-                    }
-                }
-
-                if (Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship))
-                {
-                    // Hearts
-
-                    var hearts = data.hearts;
-                    if (hearts != null && !hearts.disabled)
-                    {
-                        int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
-                        bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried();
-                        int heartLevel = friendshipLevel / 250;
-                        int maxHearts = Utility.GetMaximumHeartsForCharacter(speaker);
-                        int heartsToDisplay = hearts.showEmptyHearts ? maxHearts + (isRomanceLocked ? 2 : 0) : heartLevel + (hearts.showPartialhearts && heartLevel < maxHearts ? 1 : 0);
-
-                        var heartsWidth = 7;
-                        var heartsHeight = 6;
-                        var heartsXSpacing = 1;
-                        var heartsYSpacing = 1;
-
-                        var pos = GetDataVector(__instance, hearts);
-
-                        if (hearts.centered)
-                        {
-                            pos.X -= (Math.Min(heartsToDisplay, hearts.heartsPerRow) * (heartsWidth + heartsXSpacing) - heartsXSpacing) / 2 * hearts.scale;
+                            portraitSource = Game1.getSourceRectForStandardTileSheet(portraitTexture, __instance.characterDialogue.getPortraitIndex(), portrait.w, portrait.h);
                         }
 
-                        var drawingPos = new Vector2(pos.X, pos.Y);
-                        var drawingColIndex = 0;
-                        var drawingRowIndex = 0;
-                        var remainingFriendshipLevel = friendshipLevel;
-
-                        for (int i = 0; i < heartsToDisplay; i++)
+                        if (!portraitTexture.Bounds.Contains(portraitSource))
                         {
-                            int xSource = ((i < heartLevel) || (isRomanceLocked && i >= 8)) ? 211 : 218;
-                            var color = (isRomanceLocked && i >= 8) ? (Color.Black * 0.35f) : Color.White;
+                            portraitSource.X = 0;
+                            portraitSource.Y = 0;
+                        }
 
-                            b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(xSource, 428, 7, 6), color, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
+                        var offset = new Vector2(shouldPortraitShake.Invoke<bool>(__instance.characterDialogue) ? Game1.random.Next(-1, 2) : 0, 0);
 
-                            if (hearts.showPartialhearts && remainingFriendshipLevel < 250)
+                        b.Draw(portraitTexture, GetDataVector(__instance, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
+                    }
+
+                    // NPC Name
+
+                    if (data.name != null && !data.name.disabled)
+                    {
+                        data.name.text = speaker.getName();
+                        DrawTextComponent(b, __instance, data.name);
+                    }
+
+                    // Texts
+
+                    if (data.texts != null)
+                    {
+                        foreach (var textData in data.texts) {
+                            if (textData.disabled)
+                                continue;
+
+                            DrawTextComponent(b, __instance, textData);
+                        }
+                    }
+
+                    if (Game1.player.friendshipData.TryGetValue(speaker.Name, out Friendship friendship))
+                    {
+                        // Hearts
+
+                        var hearts = data.hearts;
+                        if (hearts != null && !hearts.disabled)
+                        {
+                            int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
+                            bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried();
+                            int heartLevel = friendshipLevel / 250;
+                            int maxHearts = Utility.GetMaximumHeartsForCharacter(speaker);
+                            int heartsToDisplay = hearts.showEmptyHearts ? maxHearts + (isRomanceLocked ? 2 : 0) : heartLevel + (hearts.showPartialhearts && heartLevel < maxHearts ? 1 : 0);
+
+                            var heartsWidth = 7;
+                            var heartsHeight = 6;
+                            var heartsXSpacing = 1;
+                            var heartsYSpacing = 1;
+
+                            var pos = GetDataVector(__instance, hearts);
+
+                            if (hearts.centered)
                             {
-                                float heartFullness = remainingFriendshipLevel / 250f;
-                                b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(211, 428, (int) (7 * heartFullness), 6), Color.White, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
+                                pos.X -= (Math.Min(heartsToDisplay, hearts.heartsPerRow) * (heartsWidth + heartsXSpacing) - heartsXSpacing) / 2 * hearts.scale;
                             }
 
-                            if (++drawingColIndex < hearts.heartsPerRow)
-                            {
-                                drawingPos.X += (heartsWidth + heartsXSpacing) * hearts.scale;
-                            }
-                            else
-                            {
-                                drawingColIndex = 0;
-                                drawingRowIndex++;
+                            var drawingPos = new Vector2(pos.X, pos.Y);
+                            var drawingColIndex = 0;
+                            var drawingRowIndex = 0;
+                            var remainingFriendshipLevel = friendshipLevel;
 
-                                drawingPos.X = pos.X;
-                                drawingPos.Y += (heartsHeight + heartsYSpacing) * hearts.scale;
+                            for (int i = 0; i < heartsToDisplay; i++)
+                            {
+                                int xSource = ((i < heartLevel) || (isRomanceLocked && i >= 8)) ? 211 : 218;
+                                var color = (isRomanceLocked && i >= 8) ? (Color.Black * 0.35f) : Color.White;
 
-                                if (hearts.centered && i > (heartsToDisplay - hearts.heartsPerRow) && heartsToDisplay % hearts.heartsPerRow > 0)
+                                b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(xSource, 428, 7, 6), color, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
+
+                                if (hearts.showPartialhearts && remainingFriendshipLevel < 250)
                                 {
-                                    drawingPos.X += ((hearts.heartsPerRow - heartsToDisplay % hearts.heartsPerRow) * (heartsWidth + heartsXSpacing)) / 2 * hearts.scale;
+                                    float heartFullness = remainingFriendshipLevel / 250f;
+                                    b.Draw(Game1.mouseCursors, drawingPos, new Rectangle(211, 428, (int) (7 * heartFullness), 6), Color.White, 0, Vector2.Zero, hearts.scale, SpriteEffects.None, hearts.layerDepth);
                                 }
+
+                                if (++drawingColIndex < hearts.heartsPerRow)
+                                {
+                                    drawingPos.X += (heartsWidth + heartsXSpacing) * hearts.scale;
+                                }
+                                else
+                                {
+                                    drawingColIndex = 0;
+                                    drawingRowIndex++;
+
+                                    drawingPos.X = pos.X;
+                                    drawingPos.Y += (heartsHeight + heartsYSpacing) * hearts.scale;
+
+                                    if (hearts.centered && i > (heartsToDisplay - hearts.heartsPerRow) && heartsToDisplay % hearts.heartsPerRow > 0)
+                                    {
+                                        drawingPos.X += ((hearts.heartsPerRow - heartsToDisplay % hearts.heartsPerRow) * (heartsWidth + heartsXSpacing)) / 2 * hearts.scale;
+                                    }
+                                }
+
+                                remainingFriendshipLevel -= 250;
                             }
-
-                            remainingFriendshipLevel -= 250;
                         }
-                    }
 
-                    // Gifts
+                        // Gifts
 
-                    var gifts = data.gifts;
-                    if (gifts != null && !gifts.disabled && !friendship.IsMarried() && speaker is not Child)
-                    {
-                        var pos = GetDataVector(__instance, gifts);
-                        Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
-                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(64, 8) : new Vector2(0, 56)), new Rectangle?(new Rectangle(227 + ((Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 2) ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                        b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                    }
-
-                    // Jewel
-
-                    if (__instance.shouldDrawFriendshipJewel())
-                    {
-                        var jewel = data.jewel;
-                        if (jewel != null && !jewel.disabled)
+                        var gifts = data.gifts;
+                        if (gifts != null && !gifts.disabled && !friendship.IsMarried() && speaker is not Child)
                         {
-                            var friendshipHeartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
-                            Rectangle sourceRect;
+                            var pos = GetDataVector(__instance, gifts);
+                            Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
+                            b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(64, 8) : new Vector2(0, 56)), new Rectangle?(new Rectangle(227 + ((Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 2) ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                            b.Draw(Game1.mouseCursors, pos + (gifts.inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+                        }
 
-                            if (friendshipHeartLevel >= 10)
-                                sourceRect = new Rectangle(269, 494, 11, 11);
-                            else
+                        // Jewel
+
+                        if (__instance.shouldDrawFriendshipJewel())
+                        {
+                            var jewel = data.jewel;
+                            if (jewel != null && !jewel.disabled)
                             {
-                                var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
-                                sourceRect = new Rectangle(140 + animationFrame * 11, 532 + friendshipHeartLevel / 2 * 11, 11, 11);
-                            }
+                                var friendshipHeartLevel = Game1.player.getFriendshipHeartLevelForNPC(speaker.Name);
+                                Rectangle sourceRect;
 
-                            b.Draw(Game1.mouseCursors, GetDataVector(__instance, jewel), sourceRect, Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
+                                if (friendshipHeartLevel >= 10)
+                                    sourceRect = new Rectangle(269, 494, 11, 11);
+                                else
+                                {
+                                    var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
+                                    sourceRect = new Rectangle(140 + animationFrame * 11, 532 + friendshipHeartLevel / 2 * 11, 11, 11);
+                                }
+
+                                b.Draw(Game1.mouseCursors, GetDataVector(__instance, jewel), sourceRect, Color.White * jewel.alpha, 0f, Vector2.Zero, jewel.scale, SpriteEffects.None, jewel.layerDepth);
+                            }
                         }
                     }
-                }
 
-                // Dialogue String
+                    // Dialogue String
 
-                var dialogue = (data.dialogue != null && !data.dialogue.disabled) ? data.dialogue : DialogueDisplayData.DefaultValues.dialogue;
-                var dialoguePos = GetDataVector(__instance, dialogue);
+                    var dialogue = (data.dialogue != null && !data.dialogue.disabled) ? data.dialogue : DialogueDisplayData.DefaultValues.dialogue;
+                    var dialoguePos = GetDataVector(__instance, dialogue);
 
-                preventGetCurrentString = false;
+                    preventGetCurrentString = false;
 
-                SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
+                    SpriteText.drawString(b, __instance.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, __instance.characterIndexInDialogue, dialogue.width >= 0 ? dialogue.width : __instance.width - 8, 999999, dialogue.alpha, dialogue.layerDepth, false, -1, "", Utility.StringToColor(dialogue.color), dialogue.alignment);
 
-                // Close Icon
+                    // Close Icon
 
-                if (__instance.dialogueIcon != null)
-                {
-                    var button = data.button;
+                    if (__instance.dialogueIcon != null)
+                    {
+                        var button = data.button;
 
-                    if (button != null && !button.disabled)
-                        __instance.dialogueIcon.position = GetDataVector(__instance, button);
-                }
+                        if (button != null && !button.disabled)
+                            __instance.dialogueIcon.position = GetDataVector(__instance, button);
+                    }
 
-                preventGetCurrentString = true;
+                    preventGetCurrentString = true;
                 
-                return false;
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    SMonitor.Log($"Failed in {nameof(DrawPortrait_Prefix)}:\n{ex}", LogLevel.Error);
+                    return true;
+                }
             }
 
             public static bool GetCurrentString_Prefix(DialogueBox __instance, ref string __result)
