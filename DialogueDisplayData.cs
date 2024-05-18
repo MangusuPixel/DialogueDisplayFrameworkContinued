@@ -19,7 +19,6 @@ namespace DialogueDisplayFramework
         public TextData name;
         public BaseData jewel;
         public BaseData button;
-        //public SpriteData sprite;
         public GiftsData gifts;
         public HeartsData hearts;
         public List<ImageData> images = new();
@@ -160,12 +159,6 @@ namespace DialogueDisplayFramework
     {
         public bool showGiftIcon = true;
         public bool inline = false;
-    }
-
-    public class SpriteData : BaseData
-    {
-        public bool background;
-        public int frame;
     }
 
     public class ImageData : BaseData

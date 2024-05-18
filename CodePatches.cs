@@ -18,7 +18,6 @@ namespace DialogueDisplayFramework
 
         private static bool preventGetCurrentString;
         private static DialogueDisplayData cachedDialogueData;
-        //private static ProfileMenu npcSpriteMenu;
 
         // Reflection
         private static IReflectedMethod shouldPortraitShake;
@@ -98,16 +97,7 @@ namespace DialogueDisplayFramework
             {
                 if (!Config.EnableMod || dialogue?.speaker is null)
                     return;
-                /*
-                try
-                {
-                    npcSpriteMenu = new ProfileMenu(dialogue.speaker);
-                }
-                catch
-                {
 
-                }
-                */
                 dirtyDialogueData = true;
                 var data = GetDialogueDisplayData(__instance.characterDialogue);
                 if (data == null)
@@ -121,29 +111,6 @@ namespace DialogueDisplayFramework
                     __instance.height = (int)data.height;
 
                 shouldPortraitShake = SHelper.Reflection.GetMethod(__instance, "shouldPortraitShake");
-            }
-
-            public static bool ReceiveLeftClick_Prefix(DialogueBox __instance, int x, int y, bool playSound)
-            {
-                if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
-                    return true;
-
-                var data = GetDialogueDisplayData(__instance.characterDialogue);
-                if (data == null)
-                    return true;
-                /*
-                var sprite = data.sprite is null ? dataDict[defaultKey].sprite : data.sprite;
-                if (sprite is not null && !sprite.disabled)
-                {
-                    if(new Rectangle(Utility.Vector2ToPoint(GetDataVector(__instance, sprite)), new Point(128, 192)).Contains(new Point(x, y)))
-                    {
-                        ProfileMenu menu = new ProfileMenu(__instance.characterDialogue.speaker);
-                        Game1.activeClickableMenu = menu;
-                        return false;
-                    }
-                }
-                */
-                return true;
             }
 
             public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
@@ -259,32 +226,6 @@ namespace DialogueDisplayFramework
 
                     b.Draw(portraitTexture, GetDataVector(__instance, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.alpha, 0f, Vector2.Zero, portrait.scale, SpriteEffects.None, portrait.layerDepth);
                 }
-
-                // Sprite
-                /*
-                var sprite = data.sprite is null ? dataDict[defaultKey].sprite : data.sprite;
-
-                if (sprite is not null && !sprite.disabled && npcSpriteMenu is not null)
-                {
-                    var pos = GetDataVector(__instance, sprite);
-
-                    if (sprite.background)
-                    {
-                        b.Draw((Game1.timeOfDay >= 1900) ? Game1.nightbg : Game1.daybg, pos, Color.White);
-                    }
-
-                    if (sprite.frame >= 0)
-                    {
-                        AccessTools.FieldRefAccess<ProfileMenu, AnimatedSprite>(npcSpriteMenu, "_animatedSprite").CurrentFrame = sprite.frame;
-                    }
-                    else
-                    {
-                        npcSpriteMenu.update(Game1.currentGameTime);
-
-                    }
-                    AccessTools.FieldRefAccess<ProfileMenu, AnimatedSprite>(npcSpriteMenu, "_animatedSprite").draw(b, pos + new Vector2(32, 32), sprite.layerDepth, 0, 0, Color.White, false, sprite.scale, 0, false);
-                }
-                */
 
                 // NPC Name
 
