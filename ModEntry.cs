@@ -54,11 +54,6 @@ namespace DialogueDisplayFramework
             );
 
             harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.receiveLeftClick)),
-                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.ReceiveLeftClick_Prefix))
-            );
-
-            harmony.Patch(
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
                 postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.GameWindowSizeChanged_Postfix))
             );
@@ -77,6 +72,8 @@ namespace DialogueDisplayFramework
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
                 postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.Draw_Postfix))
             );
+
+
         }
 
         private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
