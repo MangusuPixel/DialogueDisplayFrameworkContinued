@@ -78,7 +78,7 @@ In most cases, the only targetted entry will be `default`, which means the chang
 
 Each entry uses the same [data model](#data-fields), described in later sections, and can be modified using Content Patcher's `EditData` action. You can apply multiple patches to the same entries, and it's sometimes even encouraged (e.g. when using `TargetField` or `HasMod`). See Content Patcher's [`Action: EditData` documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md) for more info. 
 
-When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/default.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
+When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/defaults.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
 
 For example, the following entry changes the jewel's position when talking to Emily while keeping the rest of the UI unchanged:
 
@@ -257,7 +257,7 @@ Dictionary entries have the following optional fields:
 | `dividers` | List of [Dividers](#divider-fields) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
 
-If any of the above fields are missing, the value will be taken from the [defaults](/docs/default.json) preset matching the unmodded game's dialogue.
+If any of the above fields are missing, the value will be taken from the [defaults](/docs/defaults.json) preset matching the unmodded game's dialogue.
 
 ### Common data fields
 
