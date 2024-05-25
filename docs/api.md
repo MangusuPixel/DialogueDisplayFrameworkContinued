@@ -373,17 +373,14 @@ The `connectors` field refers to an object with the following fields:
 
 ### HD portraits
 
-Increases the portrait's resolution by 8x. 
+Increases the portrait's resolution by 8x. Note that the default scale is 4, so making it 8 times smaller would use a scale of 0.5.
 
 ```json
 {
     "Action": "EditData",
     "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
-    "Fields": {
-        "default": {
-            "portrait": { "h": 512, "w": 512, "scale": 0.5 }
-        }
-    }
+    "TargetField": [ "default", "portrait" ],
+    "Entries": { "h": 512, "w": 512, "scale": 0.5 }
 }
 ```
 
