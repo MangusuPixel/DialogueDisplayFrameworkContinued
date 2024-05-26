@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using FarmerPortraits;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -7,6 +8,8 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DialogueDisplayFramework.Api;
+using DialogueDisplayFramework.Data;
 
 namespace DialogueDisplayFramework
 {
@@ -18,11 +21,11 @@ namespace DialogueDisplayFramework
         public static ModConfig Config;
         public static ModEntry context;
 
-        private static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
-        private static string defaultKey = "default";
-        private static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
+        public static string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
+        public static IAssetName dictAssetName;
+        public static string defaultKey = "default";
 
-        private static IAssetName dictAssetName;
+        public static Dictionary<string, Texture2D> imageDict = new Dictionary<string, Texture2D>();
 
         private static int validationDelay = 5;
 
@@ -75,6 +78,11 @@ namespace DialogueDisplayFramework
 
 
         }
+        
+        public override object GetApi()
+        {
+            return DialogueDisplayApi.Instance;
+        }
 
         private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
         {
@@ -85,7 +93,7 @@ namespace DialogueDisplayFramework
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
                 {
-                    { defaultKey, DialogueDisplayData.DefaultValues }
+                    { defaultKey, DisplayDataHelper.DefaultValues }
                 }, AssetLoadPriority.Exclusive);
             }
         }
@@ -107,27 +115,27 @@ namespace DialogueDisplayFramework
 
                     foreach (var (key, entry) in data)
                     {
-                        if (entry.disabled)
+                        if (entry.Disabled)
                             continue;
 
                         // Validate copy references
 
-                        if (entry.copyFrom != null)
+                        if (entry.CopyFrom != null)
                         {
                             var target = entry;
                             var traceStack = new List<DialogueDisplayData>() { entry };
                             var cyclicRef = false;
 
-                            while (!cyclicRef && target.copyFrom != null && data.TryGetValue(target.copyFrom, out target))
+                            while (!cyclicRef && target.CopyFrom != null && data.TryGetValue(target.CopyFrom, out target))
                             {
                                 foreach (var traceStep in traceStack)
                                 {
                                     if (traceStep == target)
                                     {
-                                        SMonitor.Log($"{key} > {traceStack.Select(d => d.copyFrom).Join(delimiter: " > ")} : Cyclic reference detected. Disabling.", LogLevel.Error);
+                                        SMonitor.Log($"{key} > {traceStack.Select(d => d.CopyFrom).Join(delimiter: " > ")} : Cyclic reference detected. Disabling.", LogLevel.Error);
 
                                         foreach (var d in traceStack)
-                                            d.disabled = true;
+                                            d.Disabled = true;
 
                                         cyclicRef = true;
                                         break;
@@ -136,32 +144,32 @@ namespace DialogueDisplayFramework
                                 traceStack.Add(target);
                             }
 
-                            if (!data.ContainsKey(entry.copyFrom))
+                            if (!data.ContainsKey(entry.CopyFrom))
                             {
-                                SMonitor.Log($"{key} : CopyFrom key points to a non-existant entry: {entry.copyFrom}", LogLevel.Warn);
+                                SMonitor.Log($"{key} : CopyFrom key points to a non-existant entry: {entry.CopyFrom}", LogLevel.Warn);
                             }
                         }
 
-                        foreach (var image in entry.images)
+                        foreach (var image in entry.Images)
                         {
-                            if (!imageDict.ContainsKey(image.texturePath))
-                                imageDict[image.texturePath] = Game1.content.Load<Texture2D>(image.texturePath);
+                            if (!imageDict.ContainsKey(image.TexturePath))
+                                imageDict[image.TexturePath] = Game1.content.Load<Texture2D>(image.TexturePath);
                         }
 
-                        if (entry.portrait?.texturePath != null && !imageDict.ContainsKey(entry.portrait.texturePath))
+                        if (entry.Portrait?.TexturePath != null && !imageDict.ContainsKey(entry.Portrait.TexturePath))
                         {
-                            imageDict[entry.portrait.texturePath] = Game1.content.Load<Texture2D>(entry.portrait.texturePath);
+                            imageDict[entry.Portrait.TexturePath] = Game1.content.Load<Texture2D>(entry.Portrait.TexturePath);
                         }
 
-                        var imagesWithMissingID = entry.images.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (imagesWithMissingID > 0)
                             SMonitor.Log($"{key} : References {imagesWithMissingID} image{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var textsWithMissingID = entry.texts.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (textsWithMissingID > 0)
                             SMonitor.Log($"{key} : References {textsWithMissingID} text{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var dividersWithMissingID = entry.dividers.Select(i => (!i.disabled && (i.ID == null || i.ID == DialogueDisplayData.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (dividersWithMissingID > 0)
                             SMonitor.Log($"{key} : References {dividersWithMissingID} divider{(dividersWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
@@ -181,7 +189,7 @@ namespace DialogueDisplayFramework
 
             if (e.NamesWithoutLocale.Contains(dictAssetName))
             {
-                dirtyDialogueData = true;
+                DialogueBoxInterface.dirtyDialogueData = true;
             }
         }
 
