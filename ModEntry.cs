@@ -47,7 +47,6 @@ namespace DialogueDisplayFramework
 
             helper.Events.Content.AssetRequested += Content_AssetRequested;
             helper.Events.Content.AssetRequested += Content_AssetRequested_Post; // After CP edits
-            helper.Events.Content.AssetsInvalidated += Content_AssetInvalidated;
 
             var harmony = new Harmony(ModManifest.UniqueID);
 
@@ -178,18 +177,10 @@ namespace DialogueDisplayFramework
 
                     if (hasModsWithMissingID)
                         SMonitor.Log($"Please make sure to include a unique ID on each image, text and divider entries for better support.", LogLevel.Warn);
-                });
-            }
         }
 
-        private void Content_AssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
-        {
-            if (!Config.EnableMod)
-                return;
-
-            if (e.NamesWithoutLocale.Contains(dictAssetName))
-            {
-                DialogueBoxInterface.dirtyDialogueData = true;
+                    DialogueBoxInterface.InvalidateCache();
+                });
             }
         }
 

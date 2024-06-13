@@ -18,10 +18,10 @@ namespace DialogueDisplayFramework
 
                 try
                 {
-                    DialogueBoxInterface.dirtyDialogueData = true;
+                    DialogueBoxInterface.InvalidateCache();
 
-                    var data = DialogueBoxInterface.GetDialogueDisplayData(__instance.characterDialogue);
                     DialogueDisplayApi.Instance.DisplayData = data;
+                    var data = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
 
                     if (data == null)
                         return;
@@ -49,7 +49,7 @@ namespace DialogueDisplayFramework
 
                 try
                 {
-                    var data = DialogueBoxInterface.GetDialogueDisplayData(__instance.characterDialogue);
+                    var data = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
                     if (data == null)
                         return;
 

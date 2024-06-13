@@ -9,64 +9,99 @@ namespace DialogueDisplayFramework
 {
     public class DialogueBoxInterface
     {
-        public static bool dirtyDialogueData = true;
-
         public static bool preventGetCurrentString;
-        private static DialogueDisplayData cachedDialogueData;
+        private static Dictionary<string, DialogueDisplayData> cachedDialogueData = new();
 
         // Reflection
         public static IReflectedMethod shouldPortraitShake;
 
-        // Get the correct data based on context
-        public static DialogueDisplayData GetDialogueDisplayData(Dialogue characterDialogue)
+        /// <summary>
+        /// Invalidates the display data cache.
+        /// </summary>
+        public static void InvalidateCache()
+        {
+            cachedDialogueData.Clear();
+        }
+
+        /// <summary>
+        /// Fetches the relevant dialogue display data to use when rendering an NPC's dialogue.
+        /// Can return null if no default data exists.
+        /// </summary>
+        /// <param name="npc">The relevant NPC data.</param>
+        /// <returns>A data dictionary entry.</returns>
+        public static DialogueDisplayData GetCharacterDisplay(NPC npc)
         {
             // Cached object is reset when a new dialogue box is opened or the asset cache is invalidated
-            if (!dirtyDialogueData)
-                return cachedDialogueData;
+            if (cachedDialogueData.TryGetValue(npc.Name, out var cachedResult))
+                return cachedResult;
 
-            DialogueDisplayData displayData = null;
+            DialogueDisplayData result = null;
 
-            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.dictAssetName);
-            NPC speaker = characterDialogue.speaker;
+            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
 
             // Location-specific attire key, for legacy support
-            var location = speaker.currentLocation;
-            if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(speaker.Name))
-                dataDict.TryGetValue(speaker.Name + "_" + location.Name, out displayData);
+            var location = npc.currentLocation;
+            if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(npc.Name))
+                dataDict.TryGetValue(npc.Name + "_" + location.Name, out result);
 
             // KeyCharacter appearance key
-            if ((displayData == null || displayData.Disabled) && speaker.LastAppearanceId != null)
-                dataDict.TryGetValue(speaker.Name + "_" + speaker.LastAppearanceId, out displayData);
+            if ((result == null || result.Disabled) && npc.LastAppearanceId != null)
+                dataDict.TryGetValue(npc.Name + "_" + npc.LastAppearanceId, out result);
 
             // Beach attire key
-            if ((displayData == null || displayData.Disabled) && ModEntry.SHelper.Reflection.GetField<bool>(speaker, "isWearingIslandAttire").GetValue())
-                dataDict.TryGetValue(speaker.Name + "_Beach", out displayData);
+            if ((result == null || result.Disabled) && ModEntry.SHelper.Reflection.GetField<bool>(npc, "isWearingIslandAttire").GetValue())
+                dataDict.TryGetValue(npc.Name + "_Beach", out result);
 
             // Regular character key
-            if (displayData == null || displayData.Disabled)
-                dataDict.TryGetValue(speaker.Name, out displayData);
+            if (result == null || result.Disabled)
+                dataDict.TryGetValue(npc.Name, out result);
 
             // Default key
-            if (displayData == null || displayData.Disabled)
-                dataDict.TryGetValue(ModEntry.defaultKey, out displayData);
+            if (result == null || result.Disabled)
+                dataDict.TryGetValue(ModEntry.DefaultKey, out result);
 
-            // Load templates
-            var copyFromKey = displayData.CopyFrom;
+            // Fill empty values from the copy
+            result = MergeResults(result, result.CopyFrom, dataDict);
 
-            while (copyFromKey != null)
-            {
-                if (dataDict.TryGetValue(copyFromKey, out var copyFromData))
-                {
-                    displayData = DisplayDataHelper.MergeEntries(displayData, copyFromData);
-                }
+            cachedDialogueData.Add(npc.Name, result);
 
-                copyFromKey = copyFromData?.CopyFrom;
-            }
+            return result;
+        }
 
-            cachedDialogueData = displayData;
-            dirtyDialogueData = false;
+        /// <summary>
+        /// Fetches relevant dialogue display data to use when rendering a special dialogue, for example: Farmer Portraits.
+        /// Can return null if no default data exists.
+        /// </summary>
+        /// <param name="name">The special key's name</param>
+        /// <returns>A data dictionary entry.</returns>
+        public static DialogueDisplayData GetSpecialDisplay(string name)
+        {
+            // Cached object is reset when a new dialogue box is opened or the asset cache is invalidated
+            if (cachedDialogueData.TryGetValue(name, out var cachedResult))
+                return cachedResult;
 
-            return displayData;
+            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
+            dataDict.TryGetValue(name, out var result);
+            
+            if (result == null || result.Disabled)
+                dataDict.TryGetValue(ModEntry.DefaultKey, out result);
+
+            // Fill empty values from the copy
+            result = MergeResults(result, result.CopyFrom, dataDict);
+
+            cachedDialogueData.Add(name, result);
+
+            return result;
+        }
+
+        private static DialogueDisplayData MergeResults(DialogueDisplayData result, string baseKey, Dictionary<string, DialogueDisplayData> dataDict)
+        {
+            if (baseKey is null or "" || !dataDict.TryGetValue(baseKey, out var baseData))
+                return result;
+
+            result = DisplayDataHelper.MergeEntries(result, baseData);
+
+            return MergeResults(result, baseData.CopyFrom, dataDict);
         }
     }
 }
