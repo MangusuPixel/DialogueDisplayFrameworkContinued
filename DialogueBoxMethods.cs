@@ -86,7 +86,7 @@ namespace DialogueDisplayFramework
 
             if (image?.Disabled == false)
             {
-                var texture = ModEntry.imageDict[image.TexturePath];
+                var texture = ModEntry.ImageDict[image.TexturePath];
                 var pos = DialogueBoxDrawUtils.GetDataVector(dialogueBox, image);
 
                 b.Draw(texture, pos, new Rectangle(image.X, image.Y, image.W, image.H), Color.White * image.Alpha, 0, Vector2.Zero, image.Scale, SpriteEffects.None, image.LayerDepth);
@@ -106,7 +106,7 @@ namespace DialogueDisplayFramework
 
                 if (portrait.TexturePath != null)
                 {
-                    portraitTexture = ModEntry.imageDict[portrait.TexturePath];
+                    portraitTexture = ModEntry.ImageDict[portrait.TexturePath];
                 }
 
                 if (portrait.X >= 0 && portrait.Y >= 0)
