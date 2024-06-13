@@ -1,5 +1,4 @@
-﻿using FarmerPortraits;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -48,34 +47,12 @@ namespace DialogueDisplayFramework
             helper.Events.Content.AssetRequested += Content_AssetRequested;
             helper.Events.Content.AssetRequested += Content_AssetRequested_Post; // After CP edits
 
+
+
+
+
             var harmony = new Harmony(ModManifest.UniqueID);
-
-            harmony.Patch(
-                original: AccessTools.Constructor(typeof(DialogueBox), new Type[] { typeof(Dialogue) }),
-                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.Dialogue_Postfix))
-            );
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
-                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.GameWindowSizeChanged_Postfix))
-            );
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawPortrait)),
-                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.DrawPortrait_Prefix))
-            );
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.getCurrentString)),
-                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.GetCurrentString_Prefix))
-            );
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
-                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DialogueBoxPatches.Draw_Postfix))
-            );
-
-
+            DialogueBoxPatches.Apply(harmony);
         }
         
         public override object GetApi()

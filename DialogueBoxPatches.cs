@@ -1,4 +1,5 @@
 ﻿using DialogueDisplayFramework.Api;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
@@ -11,6 +12,34 @@ namespace DialogueDisplayFramework
     {
         internal class DialogueBoxPatches
         {
+            public static void Apply(Harmony harmony)
+            {
+                harmony.Patch(
+                    original: AccessTools.Constructor(typeof(DialogueBox), new Type[] { typeof(Dialogue) }),
+                    postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Dialogue_Postfix))
+                );
+
+                harmony.Patch(
+                    original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
+                    postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(GameWindowSizeChanged_Postfix))
+                );
+
+                harmony.Patch(
+                    original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawPortrait)),
+                    prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawPortrait_Prefix))
+                );
+
+                harmony.Patch(
+                    original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.getCurrentString)),
+                    prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(GetCurrentString_Prefix))
+                );
+
+                harmony.Patch(
+                    original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
+                    postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Draw_Postfix))
+                );
+            }
+
             public static void Dialogue_Postfix(DialogueBox __instance, Dialogue dialogue)
             {
                 if (!Config.EnableMod || dialogue?.speaker == null)
