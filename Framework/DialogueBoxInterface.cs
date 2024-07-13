@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using StardewValley;
+﻿using DialogueDisplayFramework.Data;
 using StardewModdingAPI;
-using DialogueDisplayFramework.Data;
+using StardewValley;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace DialogueDisplayFramework
+namespace DialogueDisplayFramework.Framework
 {
     public class DialogueBoxInterface
     {
@@ -82,7 +82,7 @@ namespace DialogueDisplayFramework
 
             var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
             dataDict.TryGetValue(name, out var result);
-            
+
             if (result == null || result.Disabled)
                 dataDict.TryGetValue(ModEntry.DefaultKey, out result);
 
@@ -99,7 +99,7 @@ namespace DialogueDisplayFramework
             if (baseKey is null or "" || !dataDict.TryGetValue(baseKey, out var baseData))
                 return result;
 
-            result = DisplayDataHelper.MergeEntries(result, baseData);
+            result = DisplayDataUtils.MergeEntries(result, baseData);
 
             return MergeResults(result, baseData.CopyFrom, dataDict);
         }

@@ -16,7 +16,7 @@ namespace DialogueDisplayFramework.Data
 
         public TextData()
         {
-            ID = DisplayDataHelper.MISSING_ID_STR;
+            ID = DisplayDataUtils.MISSING_ID_STR;
             ScrollType = -1;
             Alignment = SpriteText.ScrollTextAlignment.Center;
         }

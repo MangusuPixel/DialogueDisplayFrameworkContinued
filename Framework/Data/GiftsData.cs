@@ -6,7 +6,7 @@
         public bool Inline { get; set; }
         public GiftsData()
         {
-            ShowGiftIcon = true;    
+            ShowGiftIcon = true;
         }
     }
 }

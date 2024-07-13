@@ -1,5 +1,11 @@
 # Changelogs
 
+## 0.7.0
+* Introduced an API that allows mods to access the framework's data and render methods.
+* Fixed a crash when the `dialogue` field was set to null, for good this time.
+* Fixed potential issues relating to Harmony on other OS.
+* Fixed a typo in a warning message.
+
 ## 0.6.0
 * The `default` entry now starts with preset values instead of being empty. This allows mods to make single-value changes instead of requiring the entire dialogue.
 * Added a `copyFrom` field which fills null fields and merges lists with data from another entry.

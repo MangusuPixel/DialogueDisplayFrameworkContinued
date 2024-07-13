@@ -2,7 +2,7 @@
 
 namespace DialogueDisplayFramework.Data
 {
-    public class DisplayDataHelper
+    public class DisplayDataUtils
     {
         public static readonly string MISSING_ID_STR = "MISSING_ID";
         public static readonly string TEXT_NAME_ID = "SPEAKER_NAME";

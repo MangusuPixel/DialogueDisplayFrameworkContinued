@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using DialogueDisplayFramework.Data;
+using DialogueDisplayFramework.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -6,15 +8,12 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DialogueDisplayFramework.Api;
-using DialogueDisplayFramework.Data;
 
 namespace DialogueDisplayFramework
 {
     /// <summary>The mod entry point.</summary>
     public partial class ModEntry : Mod
     {
-
         /*********
          * Public properties
          ********/
@@ -58,12 +57,14 @@ namespace DialogueDisplayFramework
             helper.Events.GameLoop.UpdateTicked += _OnContentPatcherReady_Handler;
 
             var harmony = new Harmony(ModManifest.UniqueID);
-            DialogueBoxPatches.Apply(harmony);
+            DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
         }
-        
-        public override object GetApi()
+
+        public override object GetApi(IModInfo mod)
         {
-            return DialogueDisplayApi.Instance;
+            var api = new DialogueDisplayApi(mod.Manifest);
+            ApiConsumerManager.RegisterApiConsumer(api);
+            return api;
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -75,7 +76,7 @@ namespace DialogueDisplayFramework
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
                 {
-                    { DefaultKey, DisplayDataHelper.DefaultValues }
+                    { DefaultKey, DisplayDataUtils.DefaultValues }
                 }, AssetLoadPriority.Exclusive);
             }
         }
@@ -143,15 +144,15 @@ namespace DialogueDisplayFramework
                             ImageDict[entry.Portrait.TexturePath] = Game1.content.Load<Texture2D>(entry.Portrait.TexturePath);
                         }
 
-                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (imagesWithMissingID > 0)
                             SMonitor.Log($"{key} : References {imagesWithMissingID} image{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (textsWithMissingID > 0)
                             SMonitor.Log($"{key} : References {textsWithMissingID} text{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataHelper.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (dividersWithMissingID > 0)
                             SMonitor.Log($"{key} : References {dividersWithMissingID} divider{(dividersWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
@@ -190,7 +191,7 @@ namespace DialogueDisplayFramework
 
         private void OnContentPatcherReady(object sender, UpdateTickedEventArgs e)
         {
-            if (validationDelay-- < 0)
+            if (validationDelay-- < 0)
             {
                 // Load our data to trigger validation
                 SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(DictAssetName);
