@@ -11,7 +11,7 @@
 
         public ImageData()
         {
-            ID = DisplayDataUtils.MISSING_ID_STR;
+            ID = DataHelpers.MISSING_ID_STR;
         }
     }
 }

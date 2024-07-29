@@ -2,7 +2,7 @@
 
 ## 0.7.0
 * Introduced an API that allows mods to access the framework's data and render methods.
-* Fixed a crash when the `dialogue` field was set to null, for good this time.
+* Fixed a crash when the `dialogue` field was set to null, again.
 * Fixed potential issues relating to Harmony on other OS.
 * Fixed a typo in a warning message.
 

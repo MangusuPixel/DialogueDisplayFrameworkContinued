@@ -1,4 +1,5 @@
 ﻿using DialogueDisplayFramework.Data;
+using DialogueDisplayFramework.Api;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -13,6 +14,8 @@ namespace DialogueDisplayFramework.Framework
     {
         public static void DrawDialogueBox(SpriteBatch b, DialogueBox dialogueBox, DialogueDisplayData data)
         {
+            ApiConsumerManager.RaiseRenderingDialogueBox(b, dialogueBox, data);
+
             if (data.Dividers != null)
                 foreach (var divider in data.Dividers)
                     DrawDivider(b, dialogueBox, divider);
@@ -35,18 +38,18 @@ namespace DialogueDisplayFramework.Framework
                 DrawJewel(b, dialogueBox, data.Jewel, friendship);
             }
 
-            var dialogue = (data.Dialogue != null && !data.Dialogue.Disabled) ? data.Dialogue : DisplayDataUtils.DefaultValues.Dialogue;
+            var dialogue = (data.Dialogue != null && !data.Dialogue.Disabled) ? data.Dialogue : DataHelpers.DefaultValues.Dialogue;
             DrawDialogueString(b, dialogueBox, dialogue);
 
             if (dialogueBox.dialogueIcon != null)
                 DrawButton(b, dialogueBox, data.Button);
 
-            ApiConsumerManager.InvokeRenderedDialogueBox(b, dialogueBox, data);
+            ApiConsumerManager.RaiseRenderedDialogueBox(b, dialogueBox, data.GetAdapter());
         }
 
         public static void DrawDivider(SpriteBatch b, DialogueBox dialogueBox, DividerData divider)
         {
-            ApiConsumerManager.InvokeRenderingDivider(b, dialogueBox, divider);
+            ApiConsumerManager.RaiseRenderingDivider(b, dialogueBox, divider);
 
             if (divider?.Disabled == false)
             {
@@ -64,20 +67,20 @@ namespace DialogueDisplayFramework.Framework
 
                     b.Draw(Game1.mouseCursors, new Rectangle((int)pos.X, (int)pos.Y, 36, divHeight), new Rectangle?(new Rectangle(278, 324, 9, 1)), color);
 
-                    if (divider.Connectors?.Top == true)
+                    if (divider.TopConnector == true)
                         b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y - 20), new Rectangle?(new Rectangle(278, 313, 10, 7)), color, 0f, Vector2.Zero, divider.Scale, SpriteEffects.None, divider.LayerDepth);
 
-                    if (divider.Connectors?.Bottom == true)
+                    if (divider.BottomConnector == true)
                         b.Draw(Game1.mouseCursors, new Vector2(pos.X, pos.Y + divHeight - 4), new Rectangle?(new Rectangle(278, 328, 10, 8)), color, 0f, Vector2.Zero, divider.Scale, SpriteEffects.None, divider.LayerDepth);
                 }
             }
 
-            ApiConsumerManager.InvokeRenderedDivider(b, dialogueBox, divider);
+            ApiConsumerManager.RaiseRenderedDivider(b, dialogueBox, divider);
         }
 
         public static void DrawImage(SpriteBatch b, DialogueBox dialogueBox, ImageData image)
         {
-            ApiConsumerManager.InvokeRenderingImage(b, dialogueBox, image);
+            ApiConsumerManager.RaiseRenderingImage(b, dialogueBox, image);
 
             if (image?.Disabled == false)
             {
@@ -87,12 +90,12 @@ namespace DialogueDisplayFramework.Framework
                 b.Draw(texture, pos, new Rectangle(image.X, image.Y, image.W, image.H), Color.White * image.Alpha, 0, Vector2.Zero, image.Scale, SpriteEffects.None, image.LayerDepth);
             }
 
-            ApiConsumerManager.InvokeRenderedImage(b, dialogueBox, image);
+            ApiConsumerManager.RaiseRenderedImage(b, dialogueBox, image);
         }
 
         public static void DrawPortrait(SpriteBatch b, DialogueBox dialogueBox, PortraitData portrait)
         {
-            ApiConsumerManager.InvokeRenderingPortrait(b, dialogueBox, portrait);
+            ApiConsumerManager.RaiseRenderingPortrait(b, dialogueBox, portrait);
 
             if (portrait?.Disabled == false)
             {
@@ -124,7 +127,7 @@ namespace DialogueDisplayFramework.Framework
                 b.Draw(portraitTexture, GetDataVector(dialogueBox, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.Alpha, 0f, Vector2.Zero, portrait.Scale, SpriteEffects.None, portrait.LayerDepth);
             }
 
-            ApiConsumerManager.InvokeRenderedPortrait(b, dialogueBox, portrait);
+            ApiConsumerManager.RaiseRenderedPortrait(b, dialogueBox, portrait);
         }
 
         public static void DrawName(SpriteBatch b, DialogueBox dialogueBox, TextData name)
@@ -132,14 +135,14 @@ namespace DialogueDisplayFramework.Framework
             if (name?.Disabled == false)
             {
                 name.Text = dialogueBox.characterDialogue.speaker.getName();
-                name.ID = DisplayDataUtils.TEXT_NAME_ID;
+                name.MarkAsSpeakerDisplayName();
                 DrawText(b, dialogueBox, name);
             }
         }
 
         public static void DrawText(SpriteBatch b, DialogueBox dialogueBox, TextData data)
         {
-            ApiConsumerManager.InvokeRenderingText(b, dialogueBox, data);
+            ApiConsumerManager.RaiseRenderingText(b, dialogueBox, data);
 
             if (data?.Disabled == false)
             {
@@ -153,12 +156,12 @@ namespace DialogueDisplayFramework.Framework
                 SpriteText.drawString(b, data.Text, (int)pos.X, (int)pos.Y, 999999, data.Width, 999999, data.Alpha, data.LayerDepth, data.Junimo, data.ScrollType, data.PlaceholderText ?? "", Utility.StringToColor(data.Color), data.Alignment);
             }
 
-            ApiConsumerManager.InvokeRenderedText(b, dialogueBox, data);
+            ApiConsumerManager.RaiseRenderedText(b, dialogueBox, data);
         }
 
         public static void DrawHearts(SpriteBatch b, DialogueBox dialogueBox, HeartsData hearts, Friendship friendship)
         {
-            ApiConsumerManager.InvokeRenderingHearts(b, dialogueBox, hearts);
+            ApiConsumerManager.RaiseRenderingHearts(b, dialogueBox, hearts);
 
             if (hearts?.Disabled == false)
             {
@@ -221,12 +224,12 @@ namespace DialogueDisplayFramework.Framework
                 }
             }
 
-            ApiConsumerManager.InvokeRenderedHearts(b, dialogueBox, hearts);
+            ApiConsumerManager.RaiseRenderedHearts(b, dialogueBox, hearts);
         }
 
         public static void DrawGifts(SpriteBatch b, DialogueBox dialogueBox, GiftsData gifts, Friendship friendship)
         {
-            ApiConsumerManager.InvokeRenderingGifts(b, dialogueBox, gifts);
+            ApiConsumerManager.RaiseRenderingGifts(b, dialogueBox, gifts);
 
             var speaker = dialogueBox.characterDialogue.speaker;
 
@@ -238,12 +241,12 @@ namespace DialogueDisplayFramework.Framework
                 b.Draw(Game1.mouseCursors, pos + (gifts.Inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
             }
 
-            ApiConsumerManager.InvokeRenderedGifts(b, dialogueBox, gifts);
+            ApiConsumerManager.RaiseRenderedGifts(b, dialogueBox, gifts);
         }
 
         public static void DrawJewel(SpriteBatch b, DialogueBox dialogueBox, BaseData jewel, Friendship friendship)
         {
-            ApiConsumerManager.InvokeRenderingJewel(b, dialogueBox, jewel);
+            ApiConsumerManager.RaiseRenderingJewel(b, dialogueBox, jewel);
 
             if (dialogueBox.shouldDrawFriendshipJewel() && jewel?.Disabled == false)
             {
@@ -261,12 +264,12 @@ namespace DialogueDisplayFramework.Framework
                 b.Draw(Game1.mouseCursors, GetDataVector(dialogueBox, jewel), sourceRect, Color.White * jewel.Alpha, 0f, Vector2.Zero, jewel.Scale, SpriteEffects.None, jewel.LayerDepth);
             }
 
-            ApiConsumerManager.InvokeRenderedJewel(b, dialogueBox, jewel);
+            ApiConsumerManager.RaiseRenderedJewel(b, dialogueBox, jewel);
         }
 
         public static void DrawDialogueString(SpriteBatch b, DialogueBox dialogueBox, DialogueStringData dialogue)
         {
-            ApiConsumerManager.InvokeRenderingDialogueString(b, dialogueBox, dialogue);
+            ApiConsumerManager.RaiseRenderingDialogueString(b, dialogueBox, dialogue);
 
             var dialoguePos = GetDataVector(dialogueBox, dialogue);
 
@@ -276,19 +279,19 @@ namespace DialogueDisplayFramework.Framework
 
             DialogueBoxInterface.preventGetCurrentString = true;
 
-            ApiConsumerManager.InvokeRenderedDialogueString(b, dialogueBox, dialogue);
+            ApiConsumerManager.RaiseRenderedDialogueString(b, dialogueBox, dialogue);
         }
 
         public static void DrawButton(SpriteBatch b, DialogueBox dialogueBox, BaseData button)
         {
-            ApiConsumerManager.InvokeRenderingButton(b, dialogueBox, button);
+            ApiConsumerManager.RaiseRenderingButton(b, dialogueBox, button);
 
             if (button?.Disabled == false)
             {
                 dialogueBox.dialogueIcon.position = GetDataVector(dialogueBox, button);
             }
 
-            ApiConsumerManager.InvokeRenderedButton(b, dialogueBox, button);
+            ApiConsumerManager.RaiseRenderedButton(b, dialogueBox, button);
         }
         public static Vector2 GetDataVector(DialogueBox box, BaseData data)
         {

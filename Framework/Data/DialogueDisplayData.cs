@@ -2,8 +2,15 @@
 
 namespace DialogueDisplayFramework.Data
 {
-    public class DialogueDisplayData : IDialogueDisplayData
+    public class DialogueDisplayData
     {
+        private readonly DialogueDisplayDataAdapter _adapter;
+
+        public DialogueDisplayData()
+        {
+            _adapter = new(this);
+        }
+
         public string CopyFrom { get; set; }
         public string PackName { get; set; }
         public int? XOffset { get; set; }
@@ -17,16 +24,18 @@ namespace DialogueDisplayFramework.Data
         public BaseData Button { get; set; }
         public GiftsData Gifts { get; set; }
         public HeartsData Hearts { get; set; }
-        public List<ImageData> Images { get; set; }
-        public List<TextData> Texts { get; set; }
-        public List<DividerData> Dividers { get; set; }
+        public List<ImageData> Images { get; set; } = new();
+        public List<TextData> Texts { get; set; } = new();
+        public List<DividerData> Dividers { get; set; } = new();
         public bool Disabled { get; set; }
 
-        public DialogueDisplayData()
+        /// <summary>
+        /// Fetches the adapter that can be used in other assemblies which map to the <see cref="IDialogueDisplayApi"/> interface.
+        /// </summary>
+        /// <returns>An adapter that implements <see cref="IDialogueDisplayData"/></returns>
+        public DialogueDisplayDataAdapter GetAdapter()
         {
-            Images = new();
-            Texts = new();
-            Dividers = new();
+            return _adapter;
         }
     }
 }

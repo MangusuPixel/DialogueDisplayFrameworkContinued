@@ -1,47 +1,177 @@
-﻿using DialogueDisplayFramework.Data;
+﻿using DialogueDisplayFramework.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley.Menus;
 using System;
 
-namespace DialogueDisplayFramework.Framework
+namespace DialogueDisplayFramework.Api
 {
     public class DialogueDisplayApi : IDialogueDisplayApi
     {
         public IManifest ModManifest;
-
-        public DialogueBoxRenderDelegate OnRenderingDialogueBox { get; set; }
-
-        public DialogueDisplayData CurrentDisplayData { get; set; }
-        //public Action<SpriteBatch, DialogueBox, IDialogueDisplayData> OnRenderingDialogueBox { get; set; }
-        public Action<SpriteBatch, DialogueBox, IDialogueDisplayData> OnRenderedDialogueBox { get; set; }
-        public Action<SpriteBatch, DialogueBox, IDialogueStringData> OnRenderingDialogueString { get; set; }
-        public Action<SpriteBatch, DialogueBox, IDialogueStringData> OnRenderedDialogueString { get; set; }
-        public Action<SpriteBatch, DialogueBox, IPortraitData> OnRenderingPortrait { get; set; }
-        public Action<SpriteBatch, DialogueBox, IPortraitData> OnRenderedPortrait { get; set; }
-        public Action<SpriteBatch, DialogueBox, IBaseData> OnRenderingJewel { get; set; }
-        public Action<SpriteBatch, DialogueBox, IBaseData> OnRenderedJewel { get; set; }
-        public Action<SpriteBatch, DialogueBox, IBaseData> OnRenderingButton { get; set; }
-        public Action<SpriteBatch, DialogueBox, IBaseData> OnRenderedButton { get; set; }
-        public Action<SpriteBatch, DialogueBox, IGiftsData> OnRenderingGifts { get; set; }
-        public Action<SpriteBatch, DialogueBox, IGiftsData> OnRenderedGifts { get; set; }
-        public Action<SpriteBatch, DialogueBox, IHeartsData> OnRenderingHearts { get; set; }
-        public Action<SpriteBatch, DialogueBox, IHeartsData> OnRenderedHearts { get; set; }
-        public Action<SpriteBatch, DialogueBox, IImageData> OnRenderingImage { get; set; }
-        public Action<SpriteBatch, DialogueBox, IImageData> OnRenderedImage { get; set; }
-        public Action<SpriteBatch, DialogueBox, ITextData> OnRenderingText { get; set; }
-        public Action<SpriteBatch, DialogueBox, ITextData> OnRenderedText { get; set; }
-        public Action<SpriteBatch, DialogueBox, IDividerData> OnRenderingDivider { get; set; }
-        public Action<SpriteBatch, DialogueBox, IDividerData> OnRenderedDivider { get; set; }
 
         public DialogueDisplayApi(IManifest mod)
         {
             ModManifest = mod;
         }
 
-        public static DialogueDisplayData GetCharacterDisplay(string name)
+        public event EventHandler<IRenderEventArgs<IDialogueDisplayData>> RenderingDialogueBox;
+
+        public event EventHandler<IRenderEventArgs<IDialogueDisplayData>> RenderedDialogueBox;
+
+        public event EventHandler<IRenderEventArgs<IDialogueStringData>> RenderingDialogueString;
+
+        public event EventHandler<IRenderEventArgs<IDialogueStringData>> RenderedDialogueString;
+
+        public event EventHandler<IRenderEventArgs<IPortraitData>> RenderingPortrait;
+
+        public event EventHandler<IRenderEventArgs<IPortraitData>> RenderedPortrait;
+
+        public event EventHandler<IRenderEventArgs<IBaseData>> RenderingJewel;
+
+        public event EventHandler<IRenderEventArgs<IBaseData>> RenderedJewel;
+
+        public event EventHandler<IRenderEventArgs<IBaseData>> RenderingButton;
+
+        public event EventHandler<IRenderEventArgs<IBaseData>> RenderedButton;
+
+        public event EventHandler<IRenderEventArgs<IGiftsData>> RenderingGifts;
+
+        public event EventHandler<IRenderEventArgs<IGiftsData>> RenderedGifts;
+
+        public event EventHandler<IRenderEventArgs<IHeartsData>> RenderingHearts;
+
+        public event EventHandler<IRenderEventArgs<IHeartsData>> RenderedHearts;
+
+        public event EventHandler<IRenderEventArgs<IImageData>> RenderingImage;
+
+        public event EventHandler<IRenderEventArgs<IImageData>> RenderedImage;
+
+        public event EventHandler<IRenderEventArgs<ITextData>> RenderingText;
+
+        public event EventHandler<IRenderEventArgs<ITextData>> RenderedText;
+
+        public event EventHandler<IRenderEventArgs<IDividerData>> RenderingDivider;
+
+        public event EventHandler<IRenderEventArgs<IDividerData>> RenderedDivider;
+
+        public IDialogueDisplayData GetSpeakerDisplayData(string key)
         {
-            return DialogueBoxInterface.GetSpecialDisplay(name);
+            return DialogueBoxInterface.GetSpecialDisplay(key).GetAdapter();
+        }
+        public void OnRaiseRenderingDialogueBox(IRenderEventArgs<IDialogueDisplayData> args)
+        {
+            OnRaiseEvent(RenderingDialogueBox, args);
+        }
+
+        public void OnRaiseRenderedDialogueBox(IRenderEventArgs<IDialogueDisplayData> args)
+        {
+            OnRaiseEvent(RenderedDialogueBox, args);
+        }
+
+        public void OnRaiseRenderingDialogueString(IRenderEventArgs<IDialogueStringData> args)
+        {
+            OnRaiseEvent(RenderingDialogueString, args);
+        }
+
+        public void OnRaiseRenderedDialogueString(IRenderEventArgs<IDialogueStringData> args)
+        {
+            OnRaiseEvent(RenderedDialogueString, args);
+        }
+
+        public void OnRaiseRenderingPortrait(IRenderEventArgs<IPortraitData> args)
+        {
+            OnRaiseEvent(RenderingPortrait, args);
+        }
+
+        public void OnRaiseRenderedPortrait(IRenderEventArgs<IPortraitData> args)
+        {
+            OnRaiseEvent(RenderedPortrait, args);
+        }
+
+        public void OnRaiseRenderingJewel(IRenderEventArgs<IBaseData> args)
+        {
+            OnRaiseEvent(RenderingJewel, args);
+        }
+
+        public void OnRaiseRenderedJewel(IRenderEventArgs<IBaseData> args)
+        {
+            OnRaiseEvent(RenderedJewel, args);
+        }
+
+        public void OnRaiseRenderingButton(IRenderEventArgs<IBaseData> args)
+        {
+            OnRaiseEvent(RenderingButton, args);
+        }
+
+        public void OnRaiseRenderedButton(IRenderEventArgs<IBaseData> args)
+        {
+            OnRaiseEvent(RenderedButton, args);
+        }
+
+        public void OnRaiseRenderingGifts(IRenderEventArgs<IGiftsData> args)
+        {
+            OnRaiseEvent(RenderingGifts, args);
+        }
+
+        public void OnRaiseRenderedGifts(IRenderEventArgs<IGiftsData> args)
+        {
+            OnRaiseEvent(RenderedGifts, args);
+        }
+
+        public void OnRaiseRenderingHearts(IRenderEventArgs<IHeartsData> args)
+        {
+            OnRaiseEvent(RenderingHearts, args);
+        }
+
+        public void OnRaiseRenderedHearts(IRenderEventArgs<IHeartsData> args)
+        {
+            OnRaiseEvent(RenderedHearts, args);
+        }
+
+        public void OnRaiseRenderingImage(IRenderEventArgs<IImageData> args)
+        {
+            OnRaiseEvent(RenderingImage, args);
+        }
+
+        public void OnRaiseRenderedImage(IRenderEventArgs<IImageData> args)
+        {
+            OnRaiseEvent(RenderedImage, args);
+        }
+
+        public void OnRaiseRenderingText(IRenderEventArgs<ITextData> args)
+        {
+            OnRaiseEvent(RenderingText, args);
+        }
+
+        public void OnRaiseRenderedText(IRenderEventArgs<ITextData> args)
+        {
+            OnRaiseEvent(RenderedText, args);
+        }
+
+        public void OnRaiseRenderingDivider(IRenderEventArgs<IDividerData> args)
+        {
+            OnRaiseEvent(RenderingDivider, args);
+        }
+
+        public void OnRaiseRenderedDivider(IRenderEventArgs<IDividerData> args)
+        {
+            OnRaiseEvent(RenderedDivider, args);
+        }
+
+        internal void OnRaiseEvent<T>(EventHandler<T> raiseEvent, T args)
+        {
+            if (raiseEvent is null)
+                return;
+
+            try
+            {
+                raiseEvent.DynamicInvoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                ModEntry.SMonitor.LogOnce($"{ModManifest.Name} is crashing, please report the following error to them:\n[{ModManifest.Name}] {ex}", LogLevel.Error);
+            }
         }
     }
 }

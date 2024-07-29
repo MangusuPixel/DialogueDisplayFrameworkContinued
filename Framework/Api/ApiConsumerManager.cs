@@ -1,11 +1,10 @@
 ﻿using DialogueDisplayFramework.Data;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 
-namespace DialogueDisplayFramework.Framework
+namespace DialogueDisplayFramework.Api
 {
     internal class ApiConsumerManager
     {
@@ -16,133 +15,124 @@ namespace DialogueDisplayFramework.Framework
             ApiConsumers.Add(api);
         }
 
-        internal static void SetCurrentData(DialogueDisplayData data)
+        internal static void RaiseRenderingDialogueBox(SpriteBatch b, DialogueBox box, DialogueDisplayData data)
         {
-            ApiConsumers.ForEach(c => c.CurrentDisplayData = data);
+            var args = new RenderEventArgs<IDialogueDisplayData>(b, box, data.GetAdapter());
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingDialogueBox(args));
         }
 
-        internal static void InvokeRenderingDialogueBox(SpriteBatch b, DialogueBox box, IDialogueDisplayData data)
+        internal static void RaiseRenderedDialogueBox(SpriteBatch b, DialogueBox box, IDialogueDisplayData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingDialogueBox, b, box, data));
+            var args = new RenderEventArgs<IDialogueDisplayData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedDialogueBox(args));
         }
 
-        internal static void InvokeRenderedDialogueBox(SpriteBatch b, DialogueBox box, IDialogueDisplayData data)
+        internal static void RaiseRenderingDialogueString(SpriteBatch b, DialogueBox box, IDialogueStringData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedDialogueBox, b, box, data));
+            var args = new RenderEventArgs<IDialogueStringData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingDialogueString(args));
         }
 
-        internal static void InvokeRenderingDialogueString(SpriteBatch b, DialogueBox box, IDialogueStringData data)
+        internal static void RaiseRenderedDialogueString(SpriteBatch b, DialogueBox box, IDialogueStringData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingDialogueString, b, box, data));
+            var args = new RenderEventArgs<IDialogueStringData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedDialogueString(args));
         }
 
-        internal static void InvokeRenderedDialogueString(SpriteBatch b, DialogueBox box, IDialogueStringData data)
+        internal static void RaiseRenderingPortrait(SpriteBatch b, DialogueBox box, IPortraitData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedDialogueString, b, box, data));
+            var args = new RenderEventArgs<IPortraitData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingPortrait(args));
         }
 
-        internal static void InvokeRenderingPortrait(SpriteBatch b, DialogueBox box, IPortraitData data)
+        internal static void RaiseRenderedPortrait(SpriteBatch b, DialogueBox box, IPortraitData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingPortrait, b, box, data));
+            var args = new RenderEventArgs<IPortraitData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedPortrait(args));
         }
 
-        internal static void InvokeRenderedPortrait(SpriteBatch b, DialogueBox box, IPortraitData data)
+        internal static void RaiseRenderingJewel(SpriteBatch b, DialogueBox box, IBaseData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedPortrait, b, box, data));
+            var args = new RenderEventArgs<IBaseData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingJewel(args));
         }
 
-        internal static void InvokeRenderingJewel(SpriteBatch b, DialogueBox box, IBaseData data)
+        internal static void RaiseRenderedJewel(SpriteBatch b, DialogueBox box, IBaseData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingJewel, b, box, data));
+            var args = new RenderEventArgs<IBaseData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedJewel(args));
         }
 
-        internal static void InvokeRenderedJewel(SpriteBatch b, DialogueBox box, IBaseData data)
+        internal static void RaiseRenderingButton(SpriteBatch b, DialogueBox box, IBaseData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedJewel, b, box, data));
+            var args = new RenderEventArgs<IBaseData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingButton(args));
         }
 
-        internal static void InvokeRenderingButton(SpriteBatch b, DialogueBox box, IBaseData data)
+        internal static void RaiseRenderedButton(SpriteBatch b, DialogueBox box, IBaseData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingButton, b, box, data));
+            var args = new RenderEventArgs<IBaseData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedButton(args));
         }
 
-        internal static void InvokeRenderedButton(SpriteBatch b, DialogueBox box, IBaseData data)
+        internal static void RaiseRenderingGifts(SpriteBatch b, DialogueBox box, IGiftsData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedButton, b, box, data));
+            var args = new RenderEventArgs<IGiftsData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingGifts(args));
         }
 
-        internal static void InvokeRenderingGifts(SpriteBatch b, DialogueBox box, IGiftsData data)
+        internal static void RaiseRenderedGifts(SpriteBatch b, DialogueBox box, IGiftsData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingGifts, b, box, data));
+            var args = new RenderEventArgs<IGiftsData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedGifts(args));
         }
 
-        internal static void InvokeRenderedGifts(SpriteBatch b, DialogueBox box, IGiftsData data)
+        internal static void RaiseRenderingHearts(SpriteBatch b, DialogueBox box, IHeartsData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedGifts, b, box, data));
+            var args = new RenderEventArgs<IHeartsData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingHearts(args));
         }
 
-        internal static void InvokeRenderingHearts(SpriteBatch b, DialogueBox box, IHeartsData data)
+        internal static void RaiseRenderedHearts(SpriteBatch b, DialogueBox box, IHeartsData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingHearts, b, box, data));
+            var args = new RenderEventArgs<IHeartsData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedHearts(args));
         }
 
-        internal static void InvokeRenderedHearts(SpriteBatch b, DialogueBox box, IHeartsData data)
+        internal static void RaiseRenderingImage(SpriteBatch b, DialogueBox box, IImageData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedHearts, b, box, data));
+            var args = new RenderEventArgs<IImageData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingImage(args));
         }
 
-        internal static void InvokeRenderingImage(SpriteBatch b, DialogueBox box, IImageData data)
+        internal static void RaiseRenderedImage(SpriteBatch b, DialogueBox box, IImageData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingImage, b, box, data));
+            var args = new RenderEventArgs<IImageData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedImage(args));
         }
 
-        internal static void InvokeRenderedImage(SpriteBatch b, DialogueBox box, IImageData data)
+        internal static void RaiseRenderingText(SpriteBatch b, DialogueBox box, ITextData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedImage, b, box, data));
+            var args = new RenderEventArgs<ITextData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingText(args));
         }
 
-        internal static void InvokeRenderingText(SpriteBatch b, DialogueBox box, ITextData data)
+        internal static void RaiseRenderedText(SpriteBatch b, DialogueBox box, ITextData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingText, b, box, data));
+            var args = new RenderEventArgs<ITextData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedText(args));
         }
 
-        internal static void InvokeRenderedText(SpriteBatch b, DialogueBox box, ITextData data)
+        internal static void RaiseRenderingDivider(SpriteBatch b, DialogueBox box, IDividerData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedText, b, box, data));
+            var args = new RenderEventArgs<IDividerData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderingDivider(args));
         }
 
-        internal static void InvokeRenderingDivider(SpriteBatch b, DialogueBox box, IDividerData data)
+        internal static void RaiseRenderedDivider(SpriteBatch b, DialogueBox box, IDividerData data)
         {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderingDivider, b, box, data));
-        }
-
-        internal static void InvokeRenderedDivider(SpriteBatch b, DialogueBox box, IDividerData data)
-        {
-            ApiConsumers.ForEach(c => InvokeCallback(c, c.OnRenderedDivider, b, box, data));
-        }
-
-        internal static void InvokeCallback<T>(DialogueDisplayApi consumer, Action<SpriteBatch, DialogueBox, T> callback, SpriteBatch b, DialogueBox box, T data)
-        {
-            try
-            {
-                callback(b, box, data);
-            }
-            catch (Exception ex)
-            {
-                ModEntry.SMonitor.LogOnce($"{consumer.ModManifest.Name} is crashing, please report the following error to them.\n[{consumer.ModManifest.Name}] {ex}", LogLevel.Error);
-            }
-        }
-
-        internal static void InvokeCallback<T>(DialogueDisplayApi consumer, Delegate callback, SpriteBatch b, DialogueBox box, T data)
-        {
-            try
-            {
-                callback.DynamicInvoke(b, box, data);
-            }
-            catch (Exception ex)
-            {
-                ModEntry.SMonitor.LogOnce($"{consumer.ModManifest.Name} is crashing, please report the following error to them.\n[{consumer.ModManifest.Name}] {ex}", LogLevel.Error);
-            }
+            var args = new RenderEventArgs<IDividerData>(b, box, data);
+            ApiConsumers.ForEach(c => c.OnRaiseRenderedDivider(args));
         }
     }
 }

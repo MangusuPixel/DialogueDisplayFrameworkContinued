@@ -10,7 +10,7 @@ namespace DialogueDisplayFramework.Framework
 {
     internal class DialogueBoxPatches
     {
-        public static DialogueDisplayData currentData;
+        public static DialogueDisplayData activeData;
 
         private static ModConfig Config { get; set; }
         private static IMonitor Monitor { get; set; }
@@ -57,18 +57,17 @@ namespace DialogueDisplayFramework.Framework
             {
                 DialogueBoxInterface.InvalidateCache();
 
-                currentData = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
-                ApiConsumerManager.SetCurrentData(currentData);
+                activeData = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
 
-                if (currentData == null)
+                if (activeData == null)
                     return;
 
-                __instance.x += currentData.XOffset ?? 0;
-                __instance.y += currentData.YOffset ?? 0;
-                if (currentData.Width > 0)
-                    __instance.width = (int)currentData.Width;
-                if (currentData.Height > 0)
-                    __instance.height = (int)currentData.Height;
+                __instance.x += activeData.XOffset ?? 0;
+                __instance.y += activeData.YOffset ?? 0;
+                if (activeData.Width > 0)
+                    __instance.width = (int)activeData.Width;
+                if (activeData.Height > 0)
+                    __instance.height = (int)activeData.Height;
 
                 DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
@@ -124,7 +123,7 @@ namespace DialogueDisplayFramework.Framework
                     }
                 }
 
-                DialogueBoxRenderer.DrawDialogueBox(b, __instance, currentData);
+                DialogueBoxRenderer.DrawDialogueBox(b, __instance, activeData);
 
                 return false;
             }

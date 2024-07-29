@@ -99,7 +99,7 @@ namespace DialogueDisplayFramework.Framework
             if (baseKey is null or "" || !dataDict.TryGetValue(baseKey, out var baseData))
                 return result;
 
-            result = DisplayDataUtils.MergeEntries(result, baseData);
+            result = DataHelpers.MergeEntries(result, baseData);
 
             return MergeResults(result, baseData.CopyFrom, dataDict);
         }

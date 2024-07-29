@@ -4,6 +4,15 @@ namespace DialogueDisplayFramework.Data
 {
     public class TextData : BaseData, ITextData
     {
+        private bool _isSpeakerDisplayName = false;
+
+        public TextData()
+        {
+            ID = DataHelpers.MISSING_ID_STR;
+            ScrollType = -1;
+            Alignment = SpriteText.ScrollTextAlignment.Center;
+        }
+
         public string ID { get; set; }
         public string Color { get; set; }
         public string Text { get; set; }
@@ -14,11 +23,14 @@ namespace DialogueDisplayFramework.Data
         public SpriteText.ScrollTextAlignment Alignment { get; set; }
         public bool Centered { get; set; } // Deprecated
 
-        public TextData()
+        public bool IsSpeakerDisplayName()
         {
-            ID = DisplayDataUtils.MISSING_ID_STR;
-            ScrollType = -1;
-            Alignment = SpriteText.ScrollTextAlignment.Center;
+            return _isSpeakerDisplayName;
+        }
+
+        internal void MarkAsSpeakerDisplayName()
+        {
+            _isSpeakerDisplayName = true;
         }
     }
 }

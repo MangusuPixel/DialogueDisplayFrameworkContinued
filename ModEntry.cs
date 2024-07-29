@@ -1,4 +1,5 @@
-﻿using DialogueDisplayFramework.Data;
+﻿using DialogueDisplayFramework.Api;
+using DialogueDisplayFramework.Data;
 using DialogueDisplayFramework.Framework;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
@@ -76,7 +77,7 @@ namespace DialogueDisplayFramework
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
                 {
-                    { DefaultKey, DisplayDataUtils.DefaultValues }
+                    { DefaultKey, DataHelpers.DefaultValues }
                 }, AssetLoadPriority.Exclusive);
             }
         }
@@ -144,15 +145,15 @@ namespace DialogueDisplayFramework
                             ImageDict[entry.Portrait.TexturePath] = Game1.content.Load<Texture2D>(entry.Portrait.TexturePath);
                         }
 
-                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (imagesWithMissingID > 0)
                             SMonitor.Log($"{key} : References {imagesWithMissingID} image{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (textsWithMissingID > 0)
                             SMonitor.Log($"{key} : References {textsWithMissingID} text{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DisplayDataUtils.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (dividersWithMissingID > 0)
                             SMonitor.Log($"{key} : References {dividersWithMissingID} divider{(dividersWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 

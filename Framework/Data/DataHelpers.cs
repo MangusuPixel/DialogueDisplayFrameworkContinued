@@ -2,10 +2,9 @@
 
 namespace DialogueDisplayFramework.Data
 {
-    public class DisplayDataUtils
+    public class DataHelpers
     {
         public static readonly string MISSING_ID_STR = "MISSING_ID";
-        public static readonly string TEXT_NAME_ID = "SPEAKER_NAME";
 
         public static DialogueDisplayData DefaultValues => new()
         {
