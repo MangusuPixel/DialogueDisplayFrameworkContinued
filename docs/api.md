@@ -101,7 +101,7 @@ When testing for changes in-game, you can use the following command to open unli
 debug dialogue <npcName> <dialogueString>
 ```
 
-See [debug commands](https://stardewcommunitywiki.com/Modding:Debug_commands#Dialogue) for more info.
+See [debug commands](https://stardewvalleywiki.com/Modding:Console_commands#Dialogue) for more info.
 
 To refresh any changes without re-opening the game (or dialogue), you can use the following command:
 
@@ -248,7 +248,7 @@ Dictionary entries have the following optional fields:
 | `dialogue` | [Dialogue](#dialogue-fields)        | Customizes the dialogue string display.
 | `portrait` | [Portrait](#portrait-fields)        | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
 | `name`     | [Text](#text-fields)                | Customizes the name display which normally appears under the portrait frame.
-| `jewel`    | [Commond data](#common-data-fields) | Customizes the friendship jewel display.
+| `jewel`    | [Common data](#common-data-fields)  | Customizes the friendship jewel display.
 | `button`   | [Common data](#common-data-fields)  | Customizes the action button display.
 | `gifts`    | [Gifts](#gifts-fields)              | Customizes a custom gift display.
 | `hearts`   | [Hearts](#hearts-fields)            | Customizes a friendship hearts display.
