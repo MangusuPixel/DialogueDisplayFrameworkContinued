@@ -78,7 +78,7 @@ In most cases, the only targetted entry will be `default`, which means the chang
 
 Each entry uses the same [data model](#data-fields), described in later sections, and can be modified using Content Patcher's `EditData` action. You can apply multiple patches to the same entries, and it's sometimes even encouraged (e.g. when using `TargetField` or `HasMod`). See Content Patcher's [`Action: EditData` documentation](https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/docs/author-guide/action-editdata.md) for more info. 
 
-When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/default.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
+When unmodified, the `default` entry contains values matching the normal appearance of dialogues without the framework (see [default data](/docs/defaults.json)). This lets you do single-value changes while leaving the rest of the dialogue box unchanged. This is not the case for other entry keys, which should use the `copyFrom` field for the same effect.
 
 For example, the following entry changes the jewel's position when talking to Emily while keeping the rest of the UI unchanged:
 
@@ -101,7 +101,7 @@ When testing for changes in-game, you can use the following command to open unli
 debug dialogue <npcName> <dialogueString>
 ```
 
-See [debug commands](https://stardewcommunitywiki.com/Modding:Debug_commands#Dialogue) for more info.
+See [debug commands](https://stardewvalleywiki.com/Modding:Console_commands#Dialogue) for more info.
 
 To refresh any changes without re-opening the game (or dialogue), you can use the following command:
 
@@ -245,23 +245,23 @@ Dictionary entries have the following optional fields:
 | `yOffset`  | integer | Y offset of the dialogue box relative to its normal position on the screen.
 | `width`    | integer | Width of the dialogue box, default 1200.
 | `height`   | integer | Height of the dialogue box, default 384.
-| `dialogue` | [Dialogue](#dialogue-fields)       | Customizes the dialogue string  display.
-| `portrait` | [Portrait](#portrait-fields)       | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
-| `name`     | [Text](#text-fields)               | Customizes the name display which normally appears under the portrait frame.
-| `jewel`    | [Commond data](#common-data-fields)               | Customizes the friendship jewel display.
-| `button`   | [Common data](#common-data-fields)               | Customizes the action button display.
-| `gifts`    | [Gifts](#gifts-fields)             | Customizes a custom gift display.
-| `hearts`   | [Hearts](#hearts-fields)           | Customizes a friendship hearts display.
+| `dialogue` | [Dialogue](#dialogue-fields)        | Customizes the dialogue string display.
+| `portrait` | [Portrait](#portrait-fields)        | Customizes the character's portrait image display.<br>Doesn't include the portrait frame background.
+| `name`     | [Text](#text-fields)                | Customizes the name display which normally appears under the portrait frame.
+| `jewel`    | [Common data](#common-data-fields)  | Customizes the friendship jewel display.
+| `button`   | [Common data](#common-data-fields)  | Customizes the action button display.
+| `gifts`    | [Gifts](#gifts-fields)              | Customizes a custom gift display.
+| `hearts`   | [Hearts](#hearts-fields)            | Customizes a friendship hearts display.
 | `images`   | List of [Images](#image-fields)     | Custom images to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `texts`    | List of [Texts](#text-fields)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `dividers` | List of [Dividers](#divider-fields) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
 
-If any of the above fields are missing, the value will be taken from the [defaults](/docs/default.json) preset matching the unmodded game's dialogue.
+If any of the above fields are missing, the value will be taken from the [defaults](/docs/defaults.json) preset matching the unmodded game's dialogue.
 
 ### Common data fields
 
-Most objects in the base fields also have the following common fields available (although, some objects might not use them all):
+All root entry objects also have the following common fields available (although, some objects might not use them all):
 
 | Key          | Type    | Description |
 | ------------ | ------- | ----------- |
@@ -280,8 +280,8 @@ Most objects in the base fields also have the following common fields available 
 
 Along the [common data fields](#common-data-fields), dialogue data includes the following fields:
 
-| Key         | Type    | Description |
-| ----------- | ------- | ----------- |
+| Key         | Type   | Description |
+| ----------- | ------ | ----------- |
 | `color`     | string | Supports color name, hex and RGB formats.<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.
 | `alignment` | enum   | Text alignment: 0 = left, 1 = center, 2 = right.
 
@@ -357,7 +357,7 @@ The `dividers` field is a list of objects with [common data fields](#common-data
 | ------------ | ------- | ----------- |
 | `id`         | string  | (Required) A [unique string ID](https://stardewvalleywiki.com/Modding:Common_data_field_types#Unique_string_ID) for inter-mod support, `MISSING_ID` by default.
 | `horizontal` | boolean | Horizontal, default false (i.e. vertical).
-| `connectors` | [Connectors](#connector-fields)  | Customize the connector image at the ends of the divider. When `horizontal` is false, both connectors are enabled by default.
+| `connectors` | [Connectors](#connector-fields) | Customize the connector image at the ends of the divider. When `horizontal` is false, both connectors are enabled by default.
 | `color`      | string  | Supports color name, hex and RGB formats<br>See [color formats](https://stardewvalleywiki.com/Modding:Common_data_field_types#Color) for more info.<br><br>**Note:** When specified, `Maps\MenuTilesUncolored` will be used instead of `Maps\MenuTiles`.
 
 ## `Connectors` fields
@@ -373,17 +373,13 @@ The `connectors` field refers to an object with the following fields:
 
 ### HD portraits
 
-Increases the portrait's resolution by 8x. 
-
+Increases the portrait's resolution by 8x. Note that the default scale is 4, so making it 8 times smaller would use a scale of 0.5.
 ```json
 {
     "Action": "EditData",
     "Target": "aedenthorn.DialogueDisplayFramework/dictionary",
-    "Fields": {
-        "default": {
-            "portrait": { "h": 512, "w": 512, "scale": 0.5 }
-        }
-    }
+    "TargetField": [ "default", "portrait" ],
+    "Entries": { "h": 512, "w": 512, "scale": 0.5 }
 }
 ```
 
