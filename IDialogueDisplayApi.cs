@@ -220,8 +220,8 @@ namespace DialogueDisplayFramework
 
     public interface IGiftsData : IBaseData
     {
-        /// <summary>Whether to display the gift icon.</summary>
-        public bool ShowGiftIcon { get; set; }
+        /// <summary>Scale of the gift icon (default 1).</summary>
+        public float IconScale { get; set; }
 
         /// <summary>Whether to place the check boxes next to eachother.</summary>
         public bool Inline { get; set; }

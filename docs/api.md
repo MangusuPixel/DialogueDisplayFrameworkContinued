@@ -316,6 +316,7 @@ Along the [common data fields](#common-data-fields), gift data includes the foll
 
 | Key            | Type    | Description |
 | -------------- | ------- | ----------- |
+| `iconScale`    | decimal | Scale specific to the gift icon, default 1. Set to 0 to hide. Multiplied by `scale`.
 | `inline`       | boolean | If true, the check boxes are placed to the right of the gift icon, otherwise it's placed underneath, default false.
 
 
