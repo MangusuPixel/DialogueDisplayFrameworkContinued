@@ -279,7 +279,7 @@ namespace DialogueDisplayFramework.Framework
                 Rectangle sourceRect;
 
                 if (friendshipHeartLevel >= 10)
-                    sourceRect = new Rectangle(269, 494, 11, 11);
+                    sourceRect = new Rectangle(269, 495, 11, 11);
                 else
                 {
                     var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
