@@ -28,11 +28,6 @@ namespace DialogueDisplayFramework.Framework
             );
 
             harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
-                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(GameWindowSizeChanged_Postfix))
-            );
-
-            harmony.Patch(
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawPortrait)),
                 prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawPortrait_Prefix))
             );
@@ -46,29 +41,29 @@ namespace DialogueDisplayFramework.Framework
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
                 postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Draw_Postfix))
             );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.gameWindowSizeChanged)),
+                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(GameWindowSizeChanged_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawBox)),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawBox_Prefix))
+            );
         }
 
         public static void Dialogue_Postfix(DialogueBox __instance, Dialogue dialogue)
         {
-            if (!Config.EnableMod || dialogue?.speaker == null)
+            if (!Config.EnableMod || dialogue?.speaker is null)
                 return;
 
             try
             {
                 DialogueBoxInterface.InvalidateCache();
+                DialogueBoxInterface.appliedBoxSize = false;
 
-                activeData = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
-
-                if (activeData == null)
-                    return;
-
-                __instance.x += activeData.XOffset ?? 0;
-                __instance.y += activeData.YOffset ?? 0;
-                if (activeData.Width > 0)
-                    __instance.width = (int)activeData.Width;
-                if (activeData.Height > 0)
-                    __instance.height = (int)activeData.Height;
-
+                // cache reflection calls
                 DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
             catch (Exception ex)
@@ -78,34 +73,9 @@ namespace DialogueDisplayFramework.Framework
             }
         }
 
-        public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
-        {
-            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
-                return;
-
-            try
-            {
-                var data = DialogueBoxInterface.GetCharacterDisplay(__instance.characterDialogue.speaker);
-                if (data == null)
-                    return;
-
-                __instance.x += data.XOffset ?? 0;
-                __instance.y += data.YOffset ?? 0;
-                if (data.Width > 0)
-                    __instance.width = (int)data.Width;
-                if (data.Height > 0)
-                    __instance.height = (int)data.Height;
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Failed in {nameof(GameWindowSizeChanged_Postfix)}:\n{ex}", LogLevel.Error);
-                return;
-            }
-        }
-
         public static bool DrawPortrait_Prefix(DialogueBox __instance, SpriteBatch b)
         {
-            if (!Config.EnableMod)
+            if (!Config.EnableMod || activeData is null)
                 return true;
 
             try
@@ -150,6 +120,59 @@ namespace DialogueDisplayFramework.Framework
                 return;
 
             DialogueBoxInterface.preventGetCurrentString = false;
+        }
+
+        public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
+        {
+            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
+                return;
+
+            try
+            {
+                UpdateDialogueBoxSize(__instance);
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(GameWindowSizeChanged_Postfix)}:\n{ex}", LogLevel.Error);
+                return;
+            }
+        }
+
+
+        public static void DrawBox_Prefix(DialogueBox __instance, SpriteBatch b, int xPos, int yPos, int boxWidth, int boxHeight)
+        {
+            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null || DialogueBoxInterface.appliedBoxSize)
+                return;
+
+            try
+            {
+                UpdateDialogueBoxSize(__instance);
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(DrawBox_Prefix)}:\n{ex}", LogLevel.Error);
+                return;
+            }
+        }
+
+        public static void UpdateDialogueBoxSize(DialogueBox dialogueBox)
+        {
+            if (!dialogueBox.isPortraitBox() || dialogueBox.isQuestion)
+                return;
+
+            activeData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
+
+            if (activeData == null)
+                return;
+
+            dialogueBox.x += activeData.XOffset ?? 0;
+            dialogueBox.y += activeData.YOffset ?? 0;
+            if (activeData.Width > 0)
+                dialogueBox.width = (int)activeData.Width;
+            if (activeData.Height > 0)
+                dialogueBox.height = (int)activeData.Height;
+
+            DialogueBoxInterface.appliedBoxSize = true;
         }
     }
 }
