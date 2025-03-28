@@ -5,6 +5,7 @@
  * Fixed scale not affecting gift components.
  * Fixed misaligned friendship jewel.
  * Fixed sized boxes also applying to question boxes.
+ * Fixed misplaced friendship jewel tooltip.
 
 ## 0.7.0
 * Introduced an API that allows mods to access the framework's data and render methods.

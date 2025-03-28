@@ -275,18 +275,26 @@ namespace DialogueDisplayFramework.Framework
 
             if (dialogueBox.shouldDrawFriendshipJewel() && jewel?.Disabled == false)
             {
+                var pos = GetDataVector(dialogueBox, jewel);
                 var friendshipHeartLevel = friendship.Points / 250;
                 Rectangle sourceRect;
 
                 if (friendshipHeartLevel >= 10)
+                {
                     sourceRect = new Rectangle(269, 495, 11, 11);
+                }
                 else
                 {
                     var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
                     sourceRect = new Rectangle(140 + animationFrame * 11, 532 + friendshipHeartLevel / 2 * 11, 11, 11);
                 }
 
-                b.Draw(Game1.mouseCursors, GetDataVector(dialogueBox, jewel), sourceRect, Color.White * jewel.Alpha, 0f, Vector2.Zero, jewel.Scale, SpriteEffects.None, jewel.LayerDepth);
+                b.Draw(Game1.mouseCursors, pos, sourceRect, Color.White * jewel.Alpha, 0f, Vector2.Zero, jewel.Scale, SpriteEffects.None, jewel.LayerDepth);
+
+                dialogueBox.friendshipJewel = new Rectangle((int)pos.X, (int)pos.Y, (int)(11 * jewel.Scale), (int)(11 * jewel.Scale));
+            } else
+            {
+                dialogueBox.friendshipJewel = Rectangle.Empty;
             }
 
             ApiConsumerManager.RaiseRenderedJewel(b, dialogueBox, jewel);
