@@ -12,6 +12,8 @@ namespace DialogueDisplayFramework.Framework
         public static bool preventGetCurrentString;
         private static Dictionary<string, DialogueDisplayData> cachedDialogueData = new();
 
+        public static bool appliedBoxSize = false;
+
         // Reflection
         public static IReflectedMethod shouldPortraitShake;
 

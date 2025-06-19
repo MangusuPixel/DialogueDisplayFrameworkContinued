@@ -1,5 +1,13 @@
 # Changelogs
 
+## 0.7.1
+ * Added an `iconScale` option to `gifts` to scale the icon independently of the checkmarks.
+ * Fixed scale not affecting gift components.
+ * Fixed misaligned friendship jewel.
+ * Fixed sized boxes also applying to question boxes.
+ * Fixed misplaced friendship jewel tooltip.
+ * Fixed an incompatible method missing from SMAPI for Android. Please report further issues.
+
 ## 0.7.0
 * Introduced an API that allows mods to access the framework's data and render methods.
 * Fixed a crash when the `dialogue` field was set to null, again.

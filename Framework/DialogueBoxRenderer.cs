@@ -236,9 +236,34 @@ namespace DialogueDisplayFramework.Framework
             if (gifts?.Disabled == false && !friendship.IsMarried() && speaker is not Child)
             {
                 var pos = GetDataVector(dialogueBox, gifts);
-                Utility.drawWithShadow(b, Game1.mouseCursors2, pos + new Vector2(6, 0), new Rectangle(166, 174, 14, 12), Color.White, 0f, Vector2.Zero, 4f, false, 0.88f, 0, -1, 0.2f);
-                b.Draw(Game1.mouseCursors, pos + (gifts.Inline ? new Vector2(64, 8) : new Vector2(0, 56)), new Rectangle?(new Rectangle(227 + ((Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 2) ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
-                b.Draw(Game1.mouseCursors, pos + (gifts.Inline ? new Vector2(96, 8) : new Vector2(32, 56)), new Rectangle?(new Rectangle(227 + (Game1.player.friendshipData[speaker.Name].GiftsThisWeek >= 1 ? 9 : 0), 425, 9, 9)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+
+                var giftsThisWeek = Game1.player.friendshipData[speaker.Name].GiftsThisWeek;
+                var iconRealScale = gifts.IconScale * gifts.Scale;
+
+                var iconRect = new Rectangle(166, 174, 14, 12);
+                var emptyBoxRect = new Rectangle(227, 425, 9, 9);
+                var checkmarkRect = new Rectangle(236, 425, 9, 9);
+
+                if (gifts.IconScale > 0)
+                {
+                    var offset = Vector2.Zero;
+                    if (gifts.Inline)
+                        offset.Y = (iconRect.Height - iconRect.Height * gifts.IconScale) / 2f * gifts.Scale;
+                    else
+                        offset.X = (checkmarkRect.Width * 2 - iconRect.Width * gifts.IconScale - 1) / 2f * gifts.Scale;
+
+                    Utility.drawWithShadow(b, Game1.mouseCursors2, pos + offset, iconRect, Color.White, 0f, Vector2.Zero, iconRealScale, false, 0.88f, 0, -1, 0.2f);
+                    pos += (gifts.Inline ? new Vector2(iconRect.Width, 0) : new Vector2(0, iconRect.Height)) * iconRealScale;
+                }
+
+                // TODO: add padding option?
+                pos += new Vector2(gifts.Inline ? 1 : 0, 2) * gifts.Scale;
+
+                for (var i = 1; i >= 0; i--) // First checkmark is placed to the right
+                {
+                    b.Draw(Game1.mouseCursors, pos, giftsThisWeek > i ? checkmarkRect : emptyBoxRect, Color.White, 0f, Vector2.Zero, gifts.Scale, SpriteEffects.None, 0.88f);
+                    pos.X += (checkmarkRect.Width - 1) * gifts.Scale;
+                }
             }
 
             ApiConsumerManager.RaiseRenderedGifts(b, dialogueBox, gifts);
@@ -248,20 +273,28 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingJewel(b, dialogueBox, jewel);
 
-            if (dialogueBox.shouldDrawFriendshipJewel() && jewel?.Disabled == false)
+            if (ShouldDrawFriendshipJewel(dialogueBox) && jewel?.Disabled == false)
             {
+                var pos = GetDataVector(dialogueBox, jewel);
                 var friendshipHeartLevel = friendship.Points / 250;
                 Rectangle sourceRect;
 
                 if (friendshipHeartLevel >= 10)
-                    sourceRect = new Rectangle(269, 494, 11, 11);
+                {
+                    sourceRect = new Rectangle(269, 495, 11, 11);
+                }
                 else
                 {
                     var animationFrame = (int)(Game1.currentGameTime.TotalGameTime.TotalMilliseconds % 1000.0 / 250.0);
                     sourceRect = new Rectangle(140 + animationFrame * 11, 532 + friendshipHeartLevel / 2 * 11, 11, 11);
                 }
 
-                b.Draw(Game1.mouseCursors, GetDataVector(dialogueBox, jewel), sourceRect, Color.White * jewel.Alpha, 0f, Vector2.Zero, jewel.Scale, SpriteEffects.None, jewel.LayerDepth);
+                b.Draw(Game1.mouseCursors, pos, sourceRect, Color.White * jewel.Alpha, 0f, Vector2.Zero, jewel.Scale, SpriteEffects.None, jewel.LayerDepth);
+
+                dialogueBox.friendshipJewel = new Rectangle((int)pos.X, (int)pos.Y, (int)(11 * jewel.Scale), (int)(11 * jewel.Scale));
+            } else
+            {
+                dialogueBox.friendshipJewel = Rectangle.Empty;
             }
 
             ApiConsumerManager.RaiseRenderedJewel(b, dialogueBox, jewel);
@@ -296,6 +329,13 @@ namespace DialogueDisplayFramework.Framework
         public static Vector2 GetDataVector(DialogueBox box, BaseData data)
         {
             return new Vector2(box.x + (data.Right ? box.width : 0) + data.XOffset, box.y + (data.Bottom ? box.height : 0) + data.YOffset);
+        }
+
+        // Extracted from StardewValley.Menus.DialogueBox.shouldDrawFriendshipJewel v1.6.15
+        // Support for SMAPI for Android
+        public static bool ShouldDrawFriendshipJewel(DialogueBox dlg)
+        {
+            return (dlg.width >= 642 && !Game1.eventUp && !dlg.isQuestion && dlg.isPortraitBox() && !dlg.friendshipJewel.Equals(Rectangle.Empty) && dlg.characterDialogue?.speaker != null && Game1.player.friendshipData.ContainsKey(dlg.characterDialogue.speaker.Name) && dlg.characterDialogue.speaker.Name != "Henchman");
         }
     }
 }
