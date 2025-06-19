@@ -273,7 +273,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingJewel(b, dialogueBox, jewel);
 
-            if (dialogueBox.shouldDrawFriendshipJewel() && jewel?.Disabled == false)
+            if (ShouldDrawFriendshipJewel(dialogueBox) && jewel?.Disabled == false)
             {
                 var pos = GetDataVector(dialogueBox, jewel);
                 var friendshipHeartLevel = friendship.Points / 250;
@@ -329,6 +329,13 @@ namespace DialogueDisplayFramework.Framework
         public static Vector2 GetDataVector(DialogueBox box, BaseData data)
         {
             return new Vector2(box.x + (data.Right ? box.width : 0) + data.XOffset, box.y + (data.Bottom ? box.height : 0) + data.YOffset);
+        }
+
+        // Extracted from StardewValley.Menus.DialogueBox.shouldDrawFriendshipJewel v1.6.15
+        // Support for SMAPI for Android
+        public static bool ShouldDrawFriendshipJewel(DialogueBox dlg)
+        {
+            return (dlg.width >= 642 && !Game1.eventUp && !dlg.isQuestion && dlg.isPortraitBox() && !dlg.friendshipJewel.Equals(Rectangle.Empty) && dlg.characterDialogue?.speaker != null && Game1.player.friendshipData.ContainsKey(dlg.characterDialogue.speaker.Name) && dlg.characterDialogue.speaker.Name != "Henchman");
         }
     }
 }
