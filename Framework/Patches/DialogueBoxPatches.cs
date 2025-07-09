@@ -1,5 +1,6 @@
 ﻿using DialogueDisplayFramework.Data;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
@@ -39,7 +40,13 @@ namespace DialogueDisplayFramework.Framework
 
             harmony.Patch(
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.draw), new Type[] { typeof(SpriteBatch) }),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Draw_Prefix)),
                 postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Draw_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.update), new Type[] { typeof(GameTime) }),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(Update_Prefix))
             );
 
             harmony.Patch(
@@ -114,7 +121,23 @@ namespace DialogueDisplayFramework.Framework
             return false;
         }
 
+        public static void Draw_Prefix(DialogueBox __instance, SpriteBatch b)
+        {
+            if (!Config.EnableMod)
+                return;
+
+            DialogueBoxInterface.preventGetCurrentString = false;
+        }
+
         public static void Draw_Postfix(DialogueBox __instance, SpriteBatch b)
+        {
+            if (!Config.EnableMod)
+                return;
+
+            DialogueBoxInterface.preventGetCurrentString = false;
+        }
+
+        public static void Update_Prefix(DialogueBox __instance, GameTime time)
         {
             if (!Config.EnableMod)
                 return;
@@ -137,7 +160,6 @@ namespace DialogueDisplayFramework.Framework
                 return;
             }
         }
-
 
         public static void DrawBox_Prefix(DialogueBox __instance, SpriteBatch b, int xPos, int yPos, int boxWidth, int boxHeight)
         {
