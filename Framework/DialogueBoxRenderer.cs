@@ -102,7 +102,7 @@ namespace DialogueDisplayFramework.Framework
                 Texture2D portraitTexture = dialogueBox.characterDialogue.overridePortrait ?? dialogueBox.characterDialogue.speaker.Portrait;
                 Rectangle portraitSource;
 
-                if (portrait.TexturePath != null)
+                if (portrait.TexturePath != null && !ModEntry.ImageDict[portrait.TexturePath].IsDisposed)
                 {
                     portraitTexture = ModEntry.ImageDict[portrait.TexturePath];
                 }
@@ -124,7 +124,10 @@ namespace DialogueDisplayFramework.Framework
 
                 var offset = new Vector2(DialogueBoxInterface.shouldPortraitShake.Invoke<bool>(dialogueBox.characterDialogue) ? Game1.random.Next(-1, 2) : 0, 0);
 
-                b.Draw(portraitTexture, GetDataVector(dialogueBox, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.Alpha, 0f, Vector2.Zero, portrait.Scale, SpriteEffects.None, portrait.LayerDepth);
+                if (!portraitTexture.IsDisposed)
+                {
+                    b.Draw(portraitTexture, GetDataVector(dialogueBox, portrait) + offset, new Rectangle?(portraitSource), Color.White * portrait.Alpha, 0f, Vector2.Zero, portrait.Scale, SpriteEffects.None, portrait.LayerDepth);
+                }
             }
 
             ApiConsumerManager.RaiseRenderedPortrait(b, dialogueBox, portrait);
