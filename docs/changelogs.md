@@ -1,7 +1,11 @@
 # Changelogs
 
+## 0.7.2
+ * Fixed incompatibility with MEEP farm animals.
+ * Fixed dialogue crash when other mods dispose of portrait textures.
+
 ## 0.7.1
- * Added an `iconScale` option to `gifts` to scale the icon independently of the checkmarks.
+ * Added an option to scale the gift icon independently of the checkmarks.
  * Fixed scale not affecting gift components.
  * Fixed misaligned friendship jewel.
  * Fixed sized boxes also applying to question boxes.
