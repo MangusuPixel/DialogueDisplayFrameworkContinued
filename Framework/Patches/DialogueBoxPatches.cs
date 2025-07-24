@@ -11,7 +11,7 @@ namespace DialogueDisplayFramework.Framework
 {
     internal class DialogueBoxPatches
     {
-        public static DialogueDisplayData activeData;
+        public static DialogueDisplayData ActiveData { get; set; }
 
         private static ModConfig Config { get; set; }
         private static IMonitor Monitor { get; set; }
@@ -68,7 +68,7 @@ namespace DialogueDisplayFramework.Framework
             try
             {
                 DialogueBoxInterface.InvalidateCache();
-                DialogueBoxInterface.appliedBoxSize = false;
+                DialogueBoxInterface.AppliedBoxPosition = null;
 
                 // cache reflection calls
                 DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
@@ -82,7 +82,7 @@ namespace DialogueDisplayFramework.Framework
 
         public static bool DrawPortrait_Prefix(DialogueBox __instance, SpriteBatch b)
         {
-            if (!Config.EnableMod || activeData is null)
+            if (!Config.EnableMod || ActiveData is null)
                 return true;
 
             try
@@ -100,7 +100,7 @@ namespace DialogueDisplayFramework.Framework
                     }
                 }
 
-                DialogueBoxRenderer.DrawDialogueBox(b, __instance, activeData);
+                DialogueBoxRenderer.DrawDialogueBox(b, __instance, ActiveData);
 
                 return false;
             }
@@ -163,7 +163,7 @@ namespace DialogueDisplayFramework.Framework
 
         public static void DrawBox_Prefix(DialogueBox __instance, SpriteBatch b, int xPos, int yPos, int boxWidth, int boxHeight)
         {
-            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null || DialogueBoxInterface.appliedBoxSize)
+            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
                 return;
 
             try
@@ -181,26 +181,33 @@ namespace DialogueDisplayFramework.Framework
         {
             if (dialogueBox.isPortraitBox() && !dialogueBox.isQuestion)
             {
-                activeData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
+                var boxPos = new Vector2(Config.DialogueXOffset, Config.DialogueYOffset);
 
-                if (activeData != null)
+                ActiveData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
+
+                if (ActiveData != null)
                 {
-                    dialogueBox.x += activeData.XOffset ?? 0;
-                    dialogueBox.y += activeData.YOffset ?? 0;
+                    if (ActiveData.Width > 0)
+                        dialogueBox.width = (int)ActiveData.Width;
+                    if (ActiveData.Height > 0)
+                        dialogueBox.height = (int)ActiveData.Height;
 
-                    if (activeData.Width > 0)
-                        dialogueBox.width = (int)activeData.Width;
-                    if (activeData.Height > 0)
-                        dialogueBox.height = (int)activeData.Height;
+                    boxPos += new Vector2(ActiveData.XOffset ?? 0, ActiveData.YOffset ?? 0);
+                }
+
+                dialogueBox.width += Config.DialogueWidthOffset;
+                dialogueBox.height += Config.DialogueHeightOffset;
+
+                if (boxPos != DialogueBoxInterface.AppliedBoxPosition)
+                {
+                    var corrections = boxPos - (DialogueBoxInterface.AppliedBoxPosition ?? Vector2.Zero);
+
+                    dialogueBox.x += (int)corrections.X;
+                    dialogueBox.y += (int)corrections.Y;
+
+                    DialogueBoxInterface.AppliedBoxPosition = boxPos;
                 }
             }
-
-            dialogueBox.width += Config.DialogueWidthOffset;
-            dialogueBox.height += Config.DialogueHeightOffset;
-            dialogueBox.x += Config.DialogueXOffset;
-            dialogueBox.y += Config.DialogueYOffset;
-
-            DialogueBoxInterface.appliedBoxSize = true;
         }
     }
 }

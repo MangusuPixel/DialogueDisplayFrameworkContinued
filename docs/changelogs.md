@@ -2,6 +2,8 @@
 
 ## 0.7.3
  * Added config settings to manually adjust the box's size and position.
+ * Fixed changes not updated after patch reload.
+ * Fixed box size and position not updated after patch reload.
 
 ## 0.7.2
  * Fixed incompatibility with MEEP farm animals.

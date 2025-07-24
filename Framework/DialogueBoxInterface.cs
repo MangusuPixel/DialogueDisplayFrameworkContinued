@@ -1,4 +1,5 @@
 ﻿using DialogueDisplayFramework.Data;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using System;
@@ -12,7 +13,7 @@ namespace DialogueDisplayFramework.Framework
         public static bool preventGetCurrentString;
         private static Dictionary<string, DialogueDisplayData> cachedDialogueData = new();
 
-        public static bool appliedBoxSize = false;
+        public static Vector2? AppliedBoxPosition { get; set; }
 
         // Reflection
         public static IReflectedMethod shouldPortraitShake;

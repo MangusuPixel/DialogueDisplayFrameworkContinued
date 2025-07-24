@@ -53,6 +53,7 @@ namespace DialogueDisplayFramework
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetRequested += OnAssetRequested_Post; // After CP edits
+            helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
 
             // Temp game event listeners
             helper.Events.GameLoop.UpdateTicked += _OnContentPatcherReady_Handler;
@@ -162,9 +163,18 @@ namespace DialogueDisplayFramework
 
                     if (hasModsWithMissingID)
                         SMonitor.Log($"Please make sure to include a unique ID on each image, text and divider entries for better support.", LogLevel.Warn);
-
-                    DialogueBoxInterface.InvalidateCache();
                 });
+            }
+        }
+
+        private void OnAssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
+        {
+            if (!Config.EnableMod)
+                return;
+
+            if (e.NamesWithoutLocale.Contains(DictAssetName))
+            {
+                DialogueBoxInterface.InvalidateCache();
             }
         }
 
