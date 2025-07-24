@@ -1,5 +1,8 @@
 # Changelogs
 
+## 0.7.3
+ * Added config settings to manually adjust the box's size and position.
+
 ## 0.7.2
  * Fixed incompatibility with MEEP farm animals.
  * Fixed dialogue crash when other mods dispose of portrait textures.

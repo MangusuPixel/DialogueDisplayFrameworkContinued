@@ -179,20 +179,26 @@ namespace DialogueDisplayFramework.Framework
 
         public static void UpdateDialogueBoxSize(DialogueBox dialogueBox)
         {
-            if (!dialogueBox.isPortraitBox() || dialogueBox.isQuestion)
-                return;
+            if (dialogueBox.isPortraitBox() && !dialogueBox.isQuestion)
+            {
+                activeData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
 
-            activeData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
+                if (activeData != null)
+                {
+                    dialogueBox.x += activeData.XOffset ?? 0;
+                    dialogueBox.y += activeData.YOffset ?? 0;
 
-            if (activeData == null)
-                return;
+                    if (activeData.Width > 0)
+                        dialogueBox.width = (int)activeData.Width;
+                    if (activeData.Height > 0)
+                        dialogueBox.height = (int)activeData.Height;
+                }
+            }
 
-            dialogueBox.x += activeData.XOffset ?? 0;
-            dialogueBox.y += activeData.YOffset ?? 0;
-            if (activeData.Width > 0)
-                dialogueBox.width = (int)activeData.Width;
-            if (activeData.Height > 0)
-                dialogueBox.height = (int)activeData.Height;
+            dialogueBox.width += Config.DialogueWidthOffset;
+            dialogueBox.height += Config.DialogueHeightOffset;
+            dialogueBox.x += Config.DialogueXOffset;
+            dialogueBox.y += Config.DialogueYOffset;
 
             DialogueBoxInterface.appliedBoxSize = true;
         }
