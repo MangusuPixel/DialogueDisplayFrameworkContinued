@@ -308,10 +308,11 @@ namespace DialogueDisplayFramework.Framework
             ApiConsumerManager.RaiseRenderingDialogueString(b, dialogueBox, dialogue);
 
             var dialoguePos = GetDataVector(dialogueBox, dialogue);
+            var width = (dialogue.Width >= 0 ? dialogue.Width : dialogueBox.width - 8) + ModEntry.Config.DialogueWidthOffset;
 
             DialogueBoxInterface.preventGetCurrentString = false;
 
-            SpriteText.drawString(b, dialogueBox.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, dialogueBox.characterIndexInDialogue, dialogue.Width >= 0 ? dialogue.Width : dialogueBox.width - 8, 999999, dialogue.Alpha, dialogue.LayerDepth, false, -1, "", Utility.StringToColor(dialogue.Color), dialogue.Alignment);
+            SpriteText.drawString(b, dialogueBox.getCurrentString(), (int)dialoguePos.X, (int)dialoguePos.Y, dialogueBox.characterIndexInDialogue, width, 999999, dialogue.Alpha, dialogue.LayerDepth, false, -1, "", Utility.StringToColor(dialogue.Color), dialogue.Alignment);
 
             DialogueBoxInterface.preventGetCurrentString = true;
 

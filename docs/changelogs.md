@@ -1,6 +1,7 @@
 # Changelogs
 
 ## 0.7.4
+ * Fixed dialogue text not adjusted to config.
  * Fixed box size re-applied every tick.
  * Fixed box config not applied on window resize.
 
