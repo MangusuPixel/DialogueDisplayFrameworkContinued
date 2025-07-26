@@ -2,6 +2,7 @@
 
 ## 0.7.4
  * Fixed box size re-applied every tick.
+ * Fixed box config not applied on window resize.
 
 ## 0.7.3
  * Added config settings to manually adjust the box's size and position.

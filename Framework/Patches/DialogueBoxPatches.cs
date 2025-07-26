@@ -152,6 +152,7 @@ namespace DialogueDisplayFramework.Framework
 
             try
             {
+                DialogueBoxInterface.AppliedBoxPosition = null;
                 UpdateDialogueBoxSize(__instance);
             }
             catch (Exception ex)
