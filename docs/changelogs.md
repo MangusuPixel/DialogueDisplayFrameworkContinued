@@ -1,6 +1,7 @@
 # Changelogs
 
 ## 0.7.4
+ * Fixed box size re-applied every tick.
 
 ## 0.7.3
  * Added config settings to manually adjust the box's size and position.
