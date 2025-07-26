@@ -58,19 +58,20 @@ namespace DialogueDisplayFramework.Framework
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawBox)),
                 prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawBox_Prefix))
             );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.closeDialogue)),
+                postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(CloseDialogue_Postfix))
+            );
         }
 
         public static void Dialogue_Postfix(DialogueBox __instance, Dialogue dialogue)
         {
-            if (!Config.EnableMod || dialogue?.speaker is null)
+            if (!Config.EnableMod)
                 return;
 
             try
             {
-                DialogueBoxInterface.InvalidateCache();
-                DialogueBoxInterface.AppliedBoxPosition = null;
-
-                // cache reflection calls
                 DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
             catch (Exception ex)
@@ -177,6 +178,20 @@ namespace DialogueDisplayFramework.Framework
             catch (Exception ex)
             {
                 Monitor.Log($"Failed in {nameof(DrawBox_Prefix)}:\n{ex}", LogLevel.Error);
+                return;
+            }
+        }
+
+        public static void CloseDialogue_Postfix(DialogueBox __instance)
+        {
+            try
+            {
+                DialogueBoxInterface.InvalidateCache();
+                DialogueBoxInterface.AppliedBoxPosition = null;
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(CloseDialogue_Postfix)}:\n{ex}", LogLevel.Error);
                 return;
             }
         }

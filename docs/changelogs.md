@@ -4,6 +4,7 @@
  * Fixed dialogue text not adjusted to config.
  * Fixed box size re-applied every tick.
  * Fixed box config not applied on window resize.
+ * Potentially fixed position reset between dialogues.
 
 ## 0.7.3
  * Added config settings to manually adjust the box's size and position.
