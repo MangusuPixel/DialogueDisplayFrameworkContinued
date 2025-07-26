@@ -1,5 +1,7 @@
 # Changelogs
 
+## 0.7.4
+
 ## 0.7.3
  * Added config settings to manually adjust the box's size and position.
  * Fixed changes not updated after patch reload.
