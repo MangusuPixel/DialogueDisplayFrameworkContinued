@@ -24,6 +24,7 @@ namespace DialogueDisplayFramework.Framework
         public static void InvalidateCache()
         {
             cachedDialogueData.Clear();
+            AppliedBoxPosition = null;
         }
 
         /// <summary>

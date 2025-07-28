@@ -1,5 +1,8 @@
 # Changelogs
 
+## 0.7.5
+ * Fixed position reset between dialogues on Android.
+
 ## 0.7.4
  * Fixed dialogue text not adjusted to config.
  * Fixed box size re-applied every tick.

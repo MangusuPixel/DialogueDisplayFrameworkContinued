@@ -55,13 +55,21 @@ namespace DialogueDisplayFramework.Framework
             );
 
             harmony.Patch(
-                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawBox)),
-                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawBox_Prefix))
-            );
-
-            harmony.Patch(
                 original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.closeDialogue)),
                 postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(CloseDialogue_Postfix))
+            );
+
+            if (Constants.TargetPlatform == GamePlatform.Android)
+            {
+                harmony.Patch(
+                    original: AccessTools.Method(typeof(DialogueBox), "checkDialogue"),
+                    postfix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(CheckDialogue_Postfix))
+                );
+            }
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawBox)),
+                prefix: new HarmonyMethod(typeof(DialogueBoxPatches), nameof(DrawBox_Prefix))
             );
         }
 
@@ -163,9 +171,38 @@ namespace DialogueDisplayFramework.Framework
             }
         }
 
+        public static void CloseDialogue_Postfix(DialogueBox __instance)
+        {
+            try
+            {
+                DialogueBoxInterface.InvalidateCache();
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(CloseDialogue_Postfix)}:\n{ex}", LogLevel.Error);
+                return;
+            }
+        }
+
+        // Android-only!!
+        public static void CheckDialogue_Postfix(DialogueBox __instance, Dialogue d)
+        {
+            try
+            {
+                // Android version sets box dimensions on left click so we need to re-apply configs
+                DialogueBoxInterface.AppliedBoxPosition = null;
+                UpdateDialogueBoxSize(__instance);
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(CloseDialogue_Postfix)}:\n{ex}", LogLevel.Error);
+                return;
+            }
+        }
+
         public static void DrawBox_Prefix(DialogueBox __instance, SpriteBatch b, int xPos, int yPos, int boxWidth, int boxHeight)
         {
-            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
+            if (!Config.EnableMod && __instance.characterDialogue?.speaker != null)
                 return;
 
             try
@@ -182,21 +219,7 @@ namespace DialogueDisplayFramework.Framework
             }
         }
 
-        public static void CloseDialogue_Postfix(DialogueBox __instance)
-        {
-            try
-            {
-                DialogueBoxInterface.InvalidateCache();
-                DialogueBoxInterface.AppliedBoxPosition = null;
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Failed in {nameof(CloseDialogue_Postfix)}:\n{ex}", LogLevel.Error);
-                return;
-            }
-        }
-
-        public static void UpdateDialogueBoxSize(DialogueBox dialogueBox)
+        private static void UpdateDialogueBoxSize(DialogueBox dialogueBox)
         {
             if (dialogueBox.isPortraitBox() && !dialogueBox.isQuestion)
             {
