@@ -1,7 +1,7 @@
 # Changelogs
 
 ## 0.7.5
- * Fixed position reset between dialogues on Android.
+ * Fixed incorrect placement after dialogue transition on Android.
 
 ## 0.7.4
  * Fixed dialogue text not adjusted to config.
