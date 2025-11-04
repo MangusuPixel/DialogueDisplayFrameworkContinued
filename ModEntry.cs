@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,11 +56,91 @@ namespace DialogueDisplayFramework
             helper.Events.Content.AssetRequested += OnAssetRequested_Post; // After CP edits
             helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
 
-            // Temp game event listeners
-            helper.Events.GameLoop.UpdateTicked += _OnContentPatcherReady_Handler;
+        // Temp game event listeners
+        helper.Events.GameLoop.UpdateTicked += _OnContentPatcherReady_Handler;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_GENDER", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!ArgUtility.TryGet(query, 1, out string gender, out string error))
+                {
+                return GameStateQuery.Helpers.ErrorResult(query, error);
+                }
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                NPC talkedNPC = Game1.getCharacterFromName(npcName);
+                return talkedNPC.Gender.ToString().ToLower() == gender.ToLower();
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_NAME", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!ArgUtility.TryGet(query, 1, out string name, out string error))
+                {
+                    return GameStateQuery.Helpers.ErrorResult(query, error);
+                }
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                NPC talkedNPC = Game1.getCharacterFromName(npcName);
+                return talkedNPC.Name.ToString().ToLower() == name.ToLower();
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_DATABLE", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                NPC talkedNPC = Game1.getCharacterFromName(npcName);
+                return talkedNPC.datable.Value == true;
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_CAN_SOCIALIZE", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                NPC talkedNPC = Game1.getCharacterFromName(npcName);
+                return talkedNPC.CanSocialize == true;
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_CAN_RECEIVE_GIFT", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                NPC talkedNPC = Game1.getCharacterFromName(npcName);
+                return talkedNPC.CanReceiveGifts() == true;
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_FRIENDSHIP_POINT", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!ArgUtility.TryGetInt(query, 1, out var minPoints, out string error, "int minPoints") || !ArgUtility.TryGetOptionalInt(query, 2, out var maxPoints, out error, int.MaxValue, "int maxPoints"))
+                {
+                    return GameStateQuery.Helpers.ErrorResult(query, error);
+                }
+                if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
+                    return false;
+
+                int friendshipLevelForNPC = Game1.player.getFriendshipLevelForNPC(npcName);
+                return friendshipLevelForNPC >= minPoints && friendshipLevelForNPC <= maxPoints;
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_IS_IN_EVENT", (string[] query, GameStateQueryContext context) =>
+            {
+                return Game1.CurrentEvent != null;
+            });
+
+            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_CURRENT_EVENT_ID", (string[] query, GameStateQueryContext context) =>
+            {
+                if (!ArgUtility.TryGet(query, 1, out string eventid, out string error))
+                {
+                    return GameStateQuery.Helpers.ErrorResult(query, error);
+                }
+                return Game1.CurrentEvent.id.ToString() == eventid;
+            });
         }
 
         public override object GetApi(IModInfo mod)

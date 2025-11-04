@@ -1,0 +1,10 @@
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\bin\Debug\net6.0\manifest.json
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\bin\Debug\net6.0\DialogueDisplayFramework.deps.json
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\bin\Debug\net6.0\DialogueDisplayFramework.dll
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.csproj.AssemblyReference.cache
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.GeneratedMSBuildEditorConfig.editorconfig
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.AssemblyInfoInputs.cache
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.AssemblyInfo.cs
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.csproj.CoreCompileInputs.cache
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.sourcelink.json
+D:\Stardew Valley Projects\DialogueDisplayFrameworkContinued\obj\Debug\net6.0\DialogueDisplayFramework.dll

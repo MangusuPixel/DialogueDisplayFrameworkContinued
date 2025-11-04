@@ -16,6 +16,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingDialogueBox(b, dialogueBox, data);
 
+            Game1.player.modData["Mangupix.DialogueDisplayFrameworkContinued_NPCTalked"] = dialogueBox.characterDialogue.speaker.Name;
             if (data.Dividers != null)
                 foreach (var divider in data.Dividers)
                     DrawDivider(b, dialogueBox, divider);
@@ -38,7 +39,7 @@ namespace DialogueDisplayFramework.Framework
                 DrawJewel(b, dialogueBox, data.Jewel, friendship);
             }
 
-            var dialogue = (data.Dialogue != null && !data.Dialogue.Disabled) ? data.Dialogue : DataHelpers.DefaultValues.Dialogue;
+            var dialogue = (data.Dialogue != null && !data.Dialogue.Disabled) && GameStateQuery.CheckConditions(data.Dialogue?.Condition) == true ? data.Dialogue : DataHelpers.DefaultValues.Dialogue;
             DrawDialogueString(b, dialogueBox, dialogue);
 
             if (dialogueBox.dialogueIcon != null)
@@ -51,7 +52,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingDivider(b, dialogueBox, divider);
 
-            if (divider?.Disabled == false)
+            if (divider?.Disabled == false && GameStateQuery.CheckConditions(divider?.Condition) == true)
             {
                 var pos = GetDataVector(dialogueBox, divider);
                 var color = Utility.StringToColor(divider.Color) ?? Color.White;
@@ -82,7 +83,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingImage(b, dialogueBox, image);
 
-            if (image?.Disabled == false)
+            if (image?.Disabled == false && GameStateQuery.CheckConditions(image?.Condition) == true )
             {
                 var texture = ModEntry.ImageDict[image.TexturePath];
                 var pos = GetDataVector(dialogueBox, image);
@@ -97,7 +98,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingPortrait(b, dialogueBox, portrait);
 
-            if (portrait?.Disabled == false)
+            if (portrait?.Disabled == false && GameStateQuery.CheckConditions(portrait?.Condition) == true )
             {
                 Texture2D portraitTexture = dialogueBox.characterDialogue.overridePortrait ?? dialogueBox.characterDialogue.speaker.Portrait;
                 Rectangle portraitSource;
@@ -135,7 +136,7 @@ namespace DialogueDisplayFramework.Framework
 
         public static void DrawName(SpriteBatch b, DialogueBox dialogueBox, TextData name)
         {
-            if (name?.Disabled == false)
+            if (name?.Disabled == false && GameStateQuery.CheckConditions(name?.Condition) == true )
             {
                 name.Text = dialogueBox.characterDialogue.speaker.getName();
                 name.MarkAsSpeakerDisplayName();
@@ -147,7 +148,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingText(b, dialogueBox, data);
 
-            if (data?.Disabled == false)
+            if (data?.Disabled == false && GameStateQuery.CheckConditions(data?.Condition) == true )
             {
                 var pos = GetDataVector(dialogueBox, data);
 
@@ -166,7 +167,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingHearts(b, dialogueBox, hearts);
 
-            if (hearts?.Disabled == false)
+            if (hearts?.Disabled == false && GameStateQuery.CheckConditions(hearts?.Condition) == true )
             {
                 var speaker = dialogueBox.characterDialogue.speaker;
                 int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
@@ -236,7 +237,7 @@ namespace DialogueDisplayFramework.Framework
 
             var speaker = dialogueBox.characterDialogue.speaker;
 
-            if (gifts?.Disabled == false && !friendship.IsMarried() && speaker is not Child)
+            if (gifts?.Disabled == false && !friendship.IsMarried() && speaker is not Child && GameStateQuery.CheckConditions(gifts?.Condition) == true )
             {
                 var pos = GetDataVector(dialogueBox, gifts);
 
@@ -276,7 +277,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingJewel(b, dialogueBox, jewel);
 
-            if (ShouldDrawFriendshipJewel(dialogueBox) && jewel?.Disabled == false)
+            if (ShouldDrawFriendshipJewel(dialogueBox) && jewel?.Disabled == false && GameStateQuery.CheckConditions(jewel?.Condition) == true )
             {
                 var pos = GetDataVector(dialogueBox, jewel);
                 var friendshipHeartLevel = friendship.Points / 250;
@@ -323,7 +324,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingButton(b, dialogueBox, button);
 
-            if (button?.Disabled == false)
+            if (button?.Disabled == false && GameStateQuery.CheckConditions(button?.Condition) == true )
             {
                 dialogueBox.dialogueIcon.position = GetDataVector(dialogueBox, button);
             }
