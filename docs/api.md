@@ -25,6 +25,7 @@ This document is intended to help mod authors create content packs using Dialogu
   - [Divider fields](#divider-fields)
   - [Connectors fields](#connectors-fields)
 - [Examples](#examples)
+- [Game state query](##game-state-query)
 - [Advanced examples](#advanced-examples)
 
 ## Intro
@@ -256,6 +257,7 @@ Dictionary entries have the following optional fields:
 | `texts`    | List of [Texts](#text-fields)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `dividers` | List of [Dividers](#divider-fields) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
+| `condition`| string  | Check for [Game State Query](https://wiki.stardewvalley.net/Modding:Game_state_queries).
 
 If any of the above fields are missing, the value will be taken from the [defaults](/docs/defaults.json) preset matching the unmodded game's dialogue.
 
@@ -448,6 +450,23 @@ Adds a speech bubble above Abigail's portrait.
     }
 }
 ```
+
+## Game State Query
+
+This mod provides some GSQ to for modder. Keep in mind that these should be prefixed with this mod id (Mangupix.DialogueDisplayFrameworkContinued) followed by _ and then the GSQ itself. For example NPC_TALKED_DATABLE should be written as Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_DATABLE on the condition field followed by the argument.
+NPC_TALKED is meant to be used on GSQ check that correspond to a dialogue box appearing. Otherwise it'll use last NPC talked with.
+
+| Condition                                                  | Effect                     |
+| ---------------------------------------------------------- | ---------------------------|
+| `NPC_TALKED_NAME <npc internal name>`                      | Name of the NPC talked.
+| `NPC_TALKED_GENDER <male or female or undefined>`          | Gender of the NPC talked.
+| `NPC_TALKED_APPEARANCE_ID <appeaarance id>`                | Appearance ID of the NPC talked.
+| `NPC_TALKED_FRIENDSHIP_POINTS <min points> [max points]`   | Whether NPC talked has friendship points between <min points> and [max points] (default unlimited) with current player.
+| `NPC_TALKED_CAN_RECEIVE_GIFT`                              | Whether NPC talked can be given gift.
+| `NPC_TALKED_CAN_SOCIALIZE`                                 | Whether NPC talked can be socialized or befriended.
+| `NPC_TALKED_CAN_DATABLE`                                   | Whether NPC talked can date with player.
+| `IS_IN_EVENT`                                              | Whether currently in an event.
+| `CURRENT_EVENT_ID <event id>`                              | Whether currently in specified event id.
 
 ## Advanced examples
 

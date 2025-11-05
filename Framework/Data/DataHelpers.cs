@@ -81,6 +81,7 @@ namespace DialogueDisplayFramework.Data
                 Gifts = entry.Gifts ?? filler.Gifts,
                 Hearts = entry.Hearts ?? filler.Hearts,
                 Disabled = entry.Disabled,
+                Condition = entry.Condition,
                 Images = (entry.Images is null || filler.Images is null) ? entry.Images ?? filler.Images : filler.Images.Concat(entry.Images).ToList(),
                 Texts = (entry.Texts is null || filler.Texts is null) ? entry.Texts ?? filler.Texts : filler.Texts.Concat(entry.Texts).ToList(),
                 Dividers = (entry.Dividers is null || filler.Dividers is null) ? entry.Dividers ?? filler.Dividers : filler.Dividers.Concat(entry.Dividers).ToList(),
