@@ -92,5 +92,11 @@
             get => _data.Disabled;
             set => _data.Disabled = value;
         }
+
+        public string Condition
+        {
+            get => _data.Condition;
+            set => _data.Condition = value;
+        }
     }
 }
