@@ -1,11 +1,6 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/3d1f0cc2-42a8-4942-b5ff-0a318ce0d4d3.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/6a15fb5b-c2f3-4726-b6c8-2e67e37002bd.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/7ae566a2-7944-44f7-bc96-220c040dfb49.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/0450b9ba-1faa-4753-94bd-5c228bc8e48c.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/3e85db3b-f319-4cee-a350-940a44347d36.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/d1098873-43b1-4f6f-86ca-12d10d814c71.vsidx
-/.vs/DialogueDisplayFrameworkContinued/FileContentIndex/c43fe6a5-8ff7-4540-8ba3-6bfa52408c13.vsidx
+.vs/
+obj/
+bin/
+packages/
+*.sln
+.config
