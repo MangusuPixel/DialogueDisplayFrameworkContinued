@@ -453,18 +453,18 @@ Adds a speech bubble above Abigail's portrait.
 
 ## Game State Query
 
-This mod provides some GSQ to for modder. Keep in mind that these should be prefixed with this mod id (Mangupix.DialogueDisplayFrameworkContinued) followed by _ and then the GSQ itself. For example NPC_TALKED_DATABLE should be written as Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_DATABLE on the condition field followed by the argument.
-NPC_TALKED is meant to be used on GSQ check that correspond to a dialogue box appearing. Otherwise it'll use last NPC talked with.
+This mod provides some GSQ to for modder. Keep in mind that these should be prefixed with this mod id (Mangupix.DialogueDisplayFrameworkContinued) followed by _ and then the GSQ itself. For example SPEAKER_CAN_BE_ROMANCED should be written as Mangupix.DialogueDisplayFrameworkContinued_SPEAKER_CAN_BE_ROMANCED on the condition field followed by the argument.
+SPEAKER is meant to be used on GSQ check that correspond to a dialogue box appearing. Otherwise it'll use last NPC talked with.
 
-| Condition                                                  | Effect                     |
-| ---------------------------------------------------------- | ---------------------------|
-| `NPC_TALKED_NAME <npc internal name>`                      | Name of the NPC talked.
-| `NPC_TALKED_GENDER <male or female or undefined>`          | Gender of the NPC talked.
-| `NPC_TALKED_APPEARANCE_ID <appeaarance id>`                | Appearance ID of the NPC talked.
-| `NPC_TALKED_FRIENDSHIP_POINTS <min points> [max points]`   | Whether NPC talked has friendship points between <min points> and [max points] (default unlimited) with current player.
-| `NPC_TALKED_CAN_RECEIVE_GIFT`                              | Whether NPC talked can be given gift.
-| `NPC_TALKED_CAN_SOCIALIZE`                                 | Whether NPC talked can be socialized or befriended.
-| `NPC_TALKED_CAN_DATABLE`                                   | Whether NPC talked can date with player.
+| Condition                                               | Effect                     |
+| ------------------------------------------------------- | ---------------------------|
+| `SPEAKER_NAME <npc internal name>`                      | Name of the NPC talked.
+| `SPEAKER_GENDER <male or female or undefined>`          | Gender of the NPC talked.
+| `SPEAKER_APPEARANCE_ID <appeaarance id>`                | Appearance ID of the NPC talked.
+| `SPEAKER_FRIENDSHIP_POINTS <min points> [max points]`   | Whether NPC talked has friendship points between <min points> and [max points] (default unlimited) with current player.
+| `SPEAKER_CAN_RECEIVE_GIFTS`                             | Whether NPC talked can be given gift.
+| `SPEAKER_CAN_SOCIALIZE`                                 | Whether NPC talked can be socialized or befriended.
+| `SPEAKER_CAN_BE_ROMANCED `                              | Whether NPC talked can date with player.
 
 ## Advanced examples
 
