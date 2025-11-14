@@ -12,7 +12,6 @@
         public float Scale { get; set; }
         public float LayerDepth { get; set; }
         public bool Disabled { get; set; }
-        public string Condition { get; set; }
 
         public BaseData()
         {

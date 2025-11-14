@@ -140,20 +140,6 @@ namespace DialogueDisplayFramework
                 int friendshipLevelForNPC = Game1.player.getFriendshipLevelForNPC(npcName);
                 return friendshipLevelForNPC >= minPoints && friendshipLevelForNPC <= maxPoints;
             });
-
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_IS_IN_EVENT", (string[] query, GameStateQueryContext context) =>
-            {
-                return Game1.CurrentEvent != null;
-            });
-
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_CURRENT_EVENT_ID", (string[] query, GameStateQueryContext context) =>
-            {
-                if (!ArgUtility.TryGet(query, 1, out string eventid, out string error))
-                {
-                    return GameStateQuery.Helpers.ErrorResult(query, error);
-                }
-                return Game1.CurrentEvent.id.ToString() == eventid;
-            });
         }
 
         public override object GetApi(IModInfo mod)
