@@ -80,6 +80,7 @@ namespace DialogueDisplayFramework.Framework
 
             try
             {
+                DialogueBoxInterface.AppliedBoxPosition = null;
                 DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
             }
             catch (Exception ex)
