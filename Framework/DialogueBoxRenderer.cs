@@ -170,7 +170,7 @@ namespace DialogueDisplayFramework.Framework
             {
                 var speaker = dialogueBox.characterDialogue.speaker;
                 int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
-                bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried();
+                bool isRomanceLocked = speaker.datable.Value && !friendship.IsDating() && !friendship.IsMarried() && !ModEntry.SHelper.ModRegistry.IsLoaded("Cherry.PlatonicRelationships");
                 int heartLevel = friendshipLevel / 250;
                 int maxHearts = Utility.GetMaximumHeartsForCharacter(speaker);
                 int heartsToDisplay = hearts.ShowEmptyHearts ? maxHearts + (isRomanceLocked ? 2 : 0) : heartLevel + (hearts.ShowPartialhearts && heartLevel < maxHearts ? 1 : 0);

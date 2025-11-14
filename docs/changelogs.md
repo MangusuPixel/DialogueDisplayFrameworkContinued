@@ -2,6 +2,7 @@
 
 ## 0.7.6
  * Fixed dialogue box size and offset not being applied when using some dialogue-altering mods or when repeating the debug command.
+ * Fixed incompatible display with Platonic Relationships mod.
 
 ## 0.7.5
  * Fixed incorrect placement after dialogue transition on Android.
