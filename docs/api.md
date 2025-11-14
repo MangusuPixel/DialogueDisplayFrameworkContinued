@@ -465,8 +465,6 @@ NPC_TALKED is meant to be used on GSQ check that correspond to a dialogue box ap
 | `NPC_TALKED_CAN_RECEIVE_GIFT`                              | Whether NPC talked can be given gift.
 | `NPC_TALKED_CAN_SOCIALIZE`                                 | Whether NPC talked can be socialized or befriended.
 | `NPC_TALKED_CAN_DATABLE`                                   | Whether NPC talked can date with player.
-| `IS_IN_EVENT`                                              | Whether currently in an event.
-| `CURRENT_EVENT_ID <event id>`                              | Whether currently in specified event id.
 
 ## Advanced examples
 
