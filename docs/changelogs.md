@@ -1,5 +1,6 @@
 # Changelogs
 
+## 0.7.6
 ## 0.7.5
  * Fixed incorrect placement after dialogue transition on Android.
 
