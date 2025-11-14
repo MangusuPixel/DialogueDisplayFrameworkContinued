@@ -62,7 +62,7 @@ namespace DialogueDisplayFramework
             var harmony = new Harmony(ModManifest.UniqueID);
             DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_GENDER", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_GENDER", (string[] query, GameStateQueryContext context) =>
             {
                 if (!ArgUtility.TryGet(query, 1, out string gender, out string error))
                 {
@@ -75,7 +75,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.Gender.ToString().ToLower() == gender.ToLower();
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_NAME", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_NAME", (string[] query, GameStateQueryContext context) =>
             {
                 if (!ArgUtility.TryGet(query, 1, out string name, out string error))
                 {
@@ -88,7 +88,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.Name.ToString().ToLower() == name.ToLower();
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_DATABLE", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_CAN_BE_ROMANCED", (string[] query, GameStateQueryContext context) =>
             {
                 if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
                     return false;
@@ -97,7 +97,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.datable.Value == true;
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_CAN_SOCIALIZE", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_CAN_SOCIALIZE", (string[] query, GameStateQueryContext context) =>
             {
                 if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
                     return false;
@@ -106,7 +106,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.CanSocialize == true;
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_CAN_RECEIVE_GIFT", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_CAN_RECEIVE_GIFTS", (string[] query, GameStateQueryContext context) =>
             {
                 if (!Game1.player.modData.TryGetValue("Mangupix.DialogueDisplayFrameworkContinued_NPCTalked", out string npcName))
                     return false;
@@ -115,7 +115,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.CanReceiveGifts() == true;
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_APPEARANCE_ID", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_APPEARANCE_ID", (string[] query, GameStateQueryContext context) =>
             {
                 if (!ArgUtility.TryGet(query, 1, out string appearanceid, out string error))
                 {
@@ -128,7 +128,7 @@ namespace DialogueDisplayFramework
                 return talkedNPC?.LastAppearanceId?.ToLower() == appearanceid.ToLower();
             });
 
-            GameStateQuery.Register("Mangupix.DialogueDisplayFrameworkContinued_NPC_TALKED_FRIENDSHIP_POINT", (string[] query, GameStateQueryContext context) =>
+            GameStateQuery.Register("Mangupix.DDFC_SPEAKER_FRIENDSHIP_POINTS", (string[] query, GameStateQueryContext context) =>
             {
                 if (!ArgUtility.TryGetInt(query, 1, out var minPoints, out string error, "int minPoints") || !ArgUtility.TryGetOptionalInt(query, 2, out var maxPoints, out error, int.MaxValue, "int maxPoints"))
                 {
