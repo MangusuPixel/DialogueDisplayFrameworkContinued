@@ -24,8 +24,8 @@ This document is intended to help mod authors create content packs using Dialogu
   - [Text fields](#text-fields)
   - [Divider fields](#divider-fields)
   - [Connectors fields](#connectors-fields)
-- [Examples](#examples)
 - [Game state queries](#game-state-queries)
+- [Examples](#examples)
 - [Advanced examples](#advanced-examples)
 
 ## Intro
@@ -382,7 +382,7 @@ The following game state queries (GSQ) are provided for use in the `condition` f
 | `Mangupix.DDFC_SPEAKER_GENDER <gender>`                | Whether the supplied gender identity matches the speaker's. Options are `female`, `male` or `undefined`. Case insensitive.
 | `Mangupix.DDFC_SPEAKER_APPEARANCE_ID <id>`             | Whether the supplied appearance ID matches the speaker's current appearance. Case insensitive.
 | `Mangupix.DDFC_SPEAKER_FRIENDSHIP_POINTS <min> <max>`  | Whether the speaker's friendship points is between `<min>` and `<max>`, inclusively.
-| `Mangupix.DDFC_SPEAKER_CAN_RECEIVE_GIFTS`              | Whether the speaker can be given gift.
+| `Mangupix.DDFC_SPEAKER_CAN_RECEIVE_GIFTS`              | Whether the speaker can be given gifts.
 | `Mangupix.DDFC_SPEAKER_CAN_SOCIALIZE`                  | Whether the speaker can be befriended.
 | `Mangupix.DDFC_SPEAKER_CAN_BE_ROMANCED `               | Whether the speaker can be romanced.
 
