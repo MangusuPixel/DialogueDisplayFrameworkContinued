@@ -25,7 +25,7 @@ This document is intended to help mod authors create content packs using Dialogu
   - [Divider fields](#divider-fields)
   - [Connectors fields](#connectors-fields)
 - [Examples](#examples)
-- [Game state query](##game-state-query)
+- [Game state queries](#game-state-queries)
 - [Advanced examples](#advanced-examples)
 
 ## Intro
@@ -372,6 +372,20 @@ The `connectors` field refers to an object with the following fields:
 | `top`    | boolean | Whether or not to display the top connector, default true.
 | `bottom` | boolean | Whether or not to display the bottom connector, default true.
 
+## Game state queries
+
+The following game state queries (GSQ) are provided for use in the `condition` field of entries. They won't have any effect elsewhere, including in Content Patcher's query conditions.
+
+| Condition                                              | Effect                     |
+| ------------------------------------------------------ | ---------------------------|
+| `Mangupix.DDFC_SPEAKER_NAME <name>`                    | Whether the supplied argument matches the speaker's name. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_GENDER <gender>`                | Whether the supplied gender identity matches the speaker's. Options are `female`, `male` or `undefined`. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_APPEARANCE_ID <id>`             | Whether the supplied appearance ID matches the speaker's current appearance. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_FRIENDSHIP_POINTS <min> <max>`  | Whether the speaker's friendship points is between `<min>` and `<max>`, inclusively.
+| `Mangupix.DDFC_SPEAKER_CAN_RECEIVE_GIFTS`              | Whether the speaker can be given gift.
+| `Mangupix.DDFC_SPEAKER_CAN_SOCIALIZE`                  | Whether the speaker can be befriended.
+| `Mangupix.DDFC_SPEAKER_CAN_BE_ROMANCED `               | Whether the speaker can be romanced.
+
 ## Examples
 
 ### HD portraits
@@ -450,21 +464,6 @@ Adds a speech bubble above Abigail's portrait.
     }
 }
 ```
-
-## Game State Query
-
-This mod provides some GSQ to for modder. Keep in mind that these should be prefixed with this mod id (Mangupix.DialogueDisplayFrameworkContinued) followed by _ and then the GSQ itself. For example SPEAKER_CAN_BE_ROMANCED should be written as Mangupix.DialogueDisplayFrameworkContinued_SPEAKER_CAN_BE_ROMANCED on the condition field followed by the argument.
-SPEAKER is meant to be used on GSQ check that correspond to a dialogue box appearing. Otherwise it'll use last NPC talked with.
-
-| Condition                                               | Effect                     |
-| ------------------------------------------------------- | ---------------------------|
-| `SPEAKER_NAME <npc internal name>`                      | Name of the NPC talked.
-| `SPEAKER_GENDER <male or female or undefined>`          | Gender of the NPC talked.
-| `SPEAKER_APPEARANCE_ID <appeaarance id>`                | Appearance ID of the NPC talked.
-| `SPEAKER_FRIENDSHIP_POINTS <min points> [max points]`   | Whether NPC talked has friendship points between <min points> and [max points] (default unlimited) with current player.
-| `SPEAKER_CAN_RECEIVE_GIFTS`                             | Whether NPC talked can be given gift.
-| `SPEAKER_CAN_SOCIALIZE`                                 | Whether NPC talked can be socialized or befriended.
-| `SPEAKER_CAN_BE_ROMANCED `                              | Whether NPC talked can date with player.
 
 ## Advanced examples
 
