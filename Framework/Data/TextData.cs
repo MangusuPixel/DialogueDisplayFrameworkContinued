@@ -1,4 +1,5 @@
 ﻿using StardewValley.BellsAndWhistles;
+using System;
 
 namespace DialogueDisplayFramework.Data
 {
@@ -21,7 +22,9 @@ namespace DialogueDisplayFramework.Data
         public string PlaceholderText { get; set; }
         public int ScrollType { get; set; }
         public SpriteText.ScrollTextAlignment Alignment { get; set; }
-        public bool Centered { get; set; } // Deprecated
+
+        [Obsolete("Use Alignment property instead.")]
+        public bool Centered { get; set; }
 
         public bool IsSpeakerDisplayName()
         {
