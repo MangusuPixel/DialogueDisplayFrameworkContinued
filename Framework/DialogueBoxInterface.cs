@@ -40,28 +40,41 @@ namespace DialogueDisplayFramework.Framework
                 return cachedResult;
 
             DialogueDisplayData result = null;
+            bool queryResult = false;
 
             var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
 
             // Location-specific attire key, for legacy support
             var location = npc.currentLocation;
             if (location != null && location.TryGetMapProperty("UniquePortrait", out string uniquePortraitsProperty) && ArgUtility.SplitBySpace(uniquePortraitsProperty).Contains(npc.Name))
+            {
                 dataDict.TryGetValue(npc.Name + "_" + location.Name, out result);
+                queryResult = GameStateQuery.CheckConditions(result?.Condition);
+            }
 
             // KeyCharacter appearance key
-            if ((result == null || result.Disabled) && npc.LastAppearanceId != null)
+            if ((result == null || result.Disabled || !queryResult) && npc.LastAppearanceId != null)
+            {
                 dataDict.TryGetValue(npc.Name + "_" + npc.LastAppearanceId, out result);
+                queryResult = GameStateQuery.CheckConditions(result?.Condition);
+            }
 
             // Beach attire key
-            if ((result == null || result.Disabled) && ModEntry.SHelper.Reflection.GetField<bool>(npc, "isWearingIslandAttire").GetValue())
+            if ((result == null || result.Disabled || !queryResult) && ModEntry.SHelper.Reflection.GetField<bool>(npc, "isWearingIslandAttire").GetValue())
+            {
                 dataDict.TryGetValue(npc.Name + "_Beach", out result);
+                queryResult = GameStateQuery.CheckConditions(result?.Condition);
+            }
 
             // Regular character key
-            if (result == null || result.Disabled)
+            if (result == null || result.Disabled || !queryResult)
+            {
                 dataDict.TryGetValue(npc.Name, out result);
+                queryResult = GameStateQuery.CheckConditions(result?.Condition);
+            }
 
             // Default key
-            if (result == null || result.Disabled)
+            if (result == null || result.Disabled || !queryResult)
                 dataDict.TryGetValue(ModEntry.DefaultKey, out result);
 
             // Fill empty values from the copy
