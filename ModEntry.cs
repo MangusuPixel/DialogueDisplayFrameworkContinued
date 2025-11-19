@@ -34,8 +34,7 @@ namespace DialogueDisplayFramework
 
         private static readonly string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
 
-        private static EventHandler<UpdateTickedEventArgs> _OnContentPatcherReady_Handler;
-        private static int validationDelay = 5;
+        private static int _validationDelayCounter = 5;
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -48,8 +47,6 @@ namespace DialogueDisplayFramework
 
             DictAssetName = helper.GameContent.ParseAssetName(dictPath);
 
-            _OnContentPatcherReady_Handler = OnContentPatcherReady;
-
             // Game event listeners
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Content.AssetRequested += OnAssetRequested;
@@ -57,7 +54,7 @@ namespace DialogueDisplayFramework
             helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
 
             // Temp game event listeners
-            helper.Events.GameLoop.UpdateTicked += _OnContentPatcherReady_Handler;
+            helper.Events.GameLoop.UpdateTicked += OnWaitForContentPatcher;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
@@ -182,13 +179,13 @@ namespace DialogueDisplayFramework
                 ModConfigMenu.Register();
         }
 
-        private void OnContentPatcherReady(object sender, UpdateTickedEventArgs e)
+        private void OnWaitForContentPatcher(object sender, UpdateTickedEventArgs e)
         {
-            if (validationDelay-- < 0)
+            if (_validationDelayCounter-- < 0)
             {
                 // Load our data to trigger validation
                 SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(DictAssetName);
-                SHelper.Events.GameLoop.UpdateTicked -= _OnContentPatcherReady_Handler;
+                SHelper.Events.GameLoop.UpdateTicked -= OnWaitForContentPatcher;
             }
         }
     }
