@@ -71,9 +71,6 @@ namespace DialogueDisplayFramework
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            if (!Config.EnableMod)
-                return;
-
             if (e.NameWithoutLocale.IsEquivalentTo(DictAssetName))
             {
                 e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
