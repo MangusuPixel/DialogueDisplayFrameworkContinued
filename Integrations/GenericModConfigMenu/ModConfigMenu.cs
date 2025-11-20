@@ -26,6 +26,14 @@ namespace DialogueDisplayFramework.Integrations.GenericModConfigMenu
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                name: () => "Allow Legacy Data",
+                tooltip: () => "If enabled, will attempt to migrate data from the legacy dialogue display framework mod.",
+                getValue: () => Config.UseLegacyData,
+                setValue: value => Config.UseLegacyData = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 name: () => "Mod Enabled",
                 getValue: () => Config.EnableMod,
                 setValue: value => Config.EnableMod = value
