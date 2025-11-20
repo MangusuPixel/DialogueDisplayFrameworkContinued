@@ -1,5 +1,13 @@
 # Changelogs
 
+## 1.0.0
+ * Reworked the data entry for patches. The old data asset will be supported as legacy content. See the [migration guide](/docs/1.0-migration-guide.md) for more details.
+ * Entry keys are now expected to be unique patch IDs instead of the target speaker.
+ * Added a mandatory `ID` field for all patches.
+ * Added `When` field for more performance-friendly conditions.
+ * Added a config option to toggle legacy support.
+ * Removed `PackName` and `CopyFrom` fields.
+
 ## 0.7.6
  * Fixed dialogue box size and offset not being applied when using some dialogue-altering mods or when repeating the debug command.
  * Fixed incompatible display with Platonic Relationships mod.
