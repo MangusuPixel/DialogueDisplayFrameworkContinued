@@ -8,6 +8,7 @@ namespace DialogueDisplayFramework.Data
 
         public static DialogueDisplayData DefaultValues => new()
         {
+            Id = "DialogueDisplayFramework.Defaults",
             Width = 1200,
             Height = 384,
             Dialogue = new()
@@ -80,7 +81,6 @@ namespace DialogueDisplayFramework.Data
                 Button = entry.Button ?? filler.Button,
                 Gifts = entry.Gifts ?? filler.Gifts,
                 Hearts = entry.Hearts ?? filler.Hearts,
-                Disabled = entry.Disabled,
                 Images = (entry.Images is null || filler.Images is null) ? entry.Images ?? filler.Images : filler.Images.Concat(entry.Images).ToList(),
                 Texts = (entry.Texts is null || filler.Texts is null) ? entry.Texts ?? filler.Texts : filler.Texts.Concat(entry.Texts).ToList(),
                 Dividers = (entry.Dividers is null || filler.Dividers is null) ? entry.Dividers ?? filler.Dividers : filler.Dividers.Concat(entry.Dividers).ToList(),

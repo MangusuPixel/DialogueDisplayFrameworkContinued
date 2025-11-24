@@ -9,16 +9,16 @@
             _data = data;
         }
 
+        public string Id
+        {
+            get => _data.Id;
+            set => _data.Id = value;
+        }
+
         public string CopyFrom
         {
             get => _data.CopyFrom;
             set => _data.CopyFrom = value;
-        }
-
-        public string PackName
-        {
-            get => _data.PackName;
-            set => _data.PackName = value;
         }
 
         public int? XOffset
@@ -85,12 +85,6 @@
         {
             get => _data.Hearts;
             set => _data.Hearts = (HeartsData)value;
-        }
-
-        public bool Disabled
-        {
-            get => _data.Disabled;
-            set => _data.Disabled = value;
         }
     }
 }

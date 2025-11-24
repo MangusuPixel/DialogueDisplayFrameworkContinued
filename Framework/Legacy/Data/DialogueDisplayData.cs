@@ -1,19 +1,12 @@
-﻿using DialogueDisplayFramework.Framework.Data;
+﻿using DialogueDisplayFramework.Data;
 using System.Collections.Generic;
 
-namespace DialogueDisplayFramework.Data
+namespace DialogueDisplayFramework.Legacy.Data
 {
     public class DialogueDisplayData
     {
-        private readonly DialogueDisplayDataAdapter _adapter;
-
-        public DialogueDisplayData()
-        {
-            _adapter = new(this);
-        }
-
-        public string Id { get; set; }
         public string CopyFrom { get; set; }
+        public string PackName { get; set; }
         public int? XOffset { get; set; }
         public int? YOffset { get; set; }
         public int? Width { get; set; }
@@ -28,15 +21,6 @@ namespace DialogueDisplayFramework.Data
         public List<ImageData> Images { get; set; } = new();
         public List<TextData> Texts { get; set; } = new();
         public List<DividerData> Dividers { get; set; } = new();
-        public DisplayConditionData DisplayCondition { get; set; } = new();
-
-        /// <summary>
-        /// Fetches the adapter that can be used in other assemblies which map to the <see cref="IDialogueDisplayApi"/> interface.
-        /// </summary>
-        /// <returns>An adapter that implements <see cref="IDialogueDisplayData"/></returns>
-        public DialogueDisplayDataAdapter GetAdapter()
-        {
-            return _adapter;
-        }
+        public bool Disabled { get; set; }
     }
 }

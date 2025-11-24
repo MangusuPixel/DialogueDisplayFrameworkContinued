@@ -7,32 +7,28 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using LegacyDisplayData = DialogueDisplayFramework.Legacy.Data.DialogueDisplayData;
 
 namespace DialogueDisplayFramework
 {
     /// <summary>The mod entry point.</summary>
     public partial class ModEntry : Mod
     {
-        /*********
-         * Public properties
-         ********/
-
         public static IManifest SModManifest { get; private set; }
         public static IMonitor SMonitor { get; private set; }
         public static IModHelper SHelper { get; private set; }
         public static ModConfig Config { get; private set; }
-        public static IAssetName DictAssetName { get; private set; }
+        public static IAssetName DataAssetName { get; private set; }
+        public static IAssetName LegacyDataAssetName { get; private set; }
         public static Dictionary<string, Texture2D> ImageDict { get; } = new Dictionary<string, Texture2D>();
         public static string DefaultKey { get; } = "default";
 
-        /*********
-         * Private fields
-         ********/
+        private static readonly string _dataPath = "Mangupix.DialogueDisplayFramework/Data";
+        private static readonly string _legacyDataPath = "aedenthorn.DialogueDisplayFramework/dictionary";
 
-        private static readonly string dictPath = "aedenthorn.DialogueDisplayFramework/dictionary";
+        private static readonly List<DialogueDisplayData> _preloadedData = new() { DataHelpers.DefaultValues };
 
         private static int _validationDelayCounter = 5;
 
@@ -45,12 +41,14 @@ namespace DialogueDisplayFramework
             SHelper = helper;
             Config = Helper.ReadConfig<ModConfig>();
 
-            DictAssetName = helper.GameContent.ParseAssetName(dictPath);
+            DataAssetName = helper.GameContent.ParseAssetName(_dataPath);
+            LegacyDataAssetName = helper.GameContent.ParseAssetName(_legacyDataPath);
 
             // Game event listeners
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetRequested += OnAssetRequested_Post; // After CP edits
+            helper.Events.Content.AssetReady += OnAssetReady;
             helper.Events.Content.AssetsInvalidated += OnAssetInvalidated;
 
             // Temp game event listeners
@@ -69,12 +67,13 @@ namespace DialogueDisplayFramework
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            if (e.NameWithoutLocale.IsEquivalentTo(DictAssetName))
+            if (e.NameWithoutLocale.IsEquivalentTo(DataAssetName))
             {
-                e.LoadFrom(() => new Dictionary<string, DialogueDisplayData>
-                {
-                    { DefaultKey, DataHelpers.DefaultValues }
-                }, AssetLoadPriority.Exclusive);
+                e.LoadFrom(() => _preloadedData, AssetLoadPriority.Exclusive);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo(LegacyDataAssetName))
+            {
+                e.LoadFrom(() => new Dictionary<string, LegacyDisplayData>(), AssetLoadPriority.Exclusive);
             }
         }
 
@@ -84,11 +83,11 @@ namespace DialogueDisplayFramework
             if (!Config.EnableMod)
                 return;
 
-            if (e.NameWithoutLocale.IsEquivalentTo(DictAssetName))
+            if (e.NameWithoutLocale.IsEquivalentTo(LegacyDataAssetName))
             {
                 e.Edit(asset =>
                 {
-                    var data = asset.AsDictionary<string, DialogueDisplayData>().Data;
+                    var data = asset.AsDictionary<string, LegacyDisplayData>().Data;
                     var hasModsWithMissingID = false;
 
                     ImageDict.Clear();
@@ -103,7 +102,7 @@ namespace DialogueDisplayFramework
                         if (entry.CopyFrom != null)
                         {
                             var target = entry;
-                            var traceStack = new List<DialogueDisplayData>() { entry };
+                            var traceStack = new List<LegacyDisplayData>() { entry };
                             var cyclicRef = false;
 
                             while (!cyclicRef && target.CopyFrom != null && data.TryGetValue(target.CopyFrom, out target))
@@ -162,12 +161,23 @@ namespace DialogueDisplayFramework
             }
         }
 
+        private void OnAssetReady(object sender, AssetReadyEventArgs e)
+        {
+            if (!Config.EnableMod)
+                return;
+
+            if (e.NameWithoutLocale.IsEquivalentTo(DataAssetName))
+            {
+                Monitor.Log("TODO: Validate data asset", LogLevel.Warn);
+            }
+        }
+
         private void OnAssetInvalidated(object sender, AssetsInvalidatedEventArgs e)
         {
             if (!Config.EnableMod)
                 return;
 
-            if (e.NamesWithoutLocale.Contains(DictAssetName))
+            if (e.NamesWithoutLocale.Contains(DataAssetName))
             {
                 DialogueBoxInterface.InvalidateCache();
             }
@@ -183,8 +193,15 @@ namespace DialogueDisplayFramework
         {
             if (_validationDelayCounter-- < 0)
             {
+                if (Config.UseLegacyData)
+                {
+                    var legacyData = SHelper.GameContent.Load<Dictionary<string, LegacyDisplayData>>(LegacyDataAssetName);
+                    var migratedData = DataMigration.MigrateFromLegacy(legacyData);
+                    _preloadedData.AddRange(migratedData);
+                }
+
                 // Load our data to trigger validation
-                SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(DictAssetName);
+                SHelper.GameContent.Load<List<DialogueDisplayData>>(DataAssetName);
                 SHelper.Events.GameLoop.UpdateTicked -= OnWaitForContentPatcher;
             }
         }

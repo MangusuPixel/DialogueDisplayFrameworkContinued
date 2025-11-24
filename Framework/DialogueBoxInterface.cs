@@ -41,7 +41,7 @@ namespace DialogueDisplayFramework.Framework
 
             DialogueDisplayData result = null;
 
-            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
+            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DataAssetName);
 
             // Location-specific attire key, for legacy support
             var location = npc.currentLocation;
@@ -49,19 +49,19 @@ namespace DialogueDisplayFramework.Framework
                 dataDict.TryGetValue(npc.Name + "_" + location.Name, out result);
 
             // KeyCharacter appearance key
-            if ((result == null || result.Disabled) && npc.LastAppearanceId != null)
+            if ((result == null || result.DisplayCondition.Disabled) && npc.LastAppearanceId != null)
                 dataDict.TryGetValue(npc.Name + "_" + npc.LastAppearanceId, out result);
 
             // Beach attire key
-            if ((result == null || result.Disabled) && ModEntry.SHelper.Reflection.GetField<bool>(npc, "isWearingIslandAttire").GetValue())
+            if ((result == null || result.DisplayCondition.Disabled) && ModEntry.SHelper.Reflection.GetField<bool>(npc, "isWearingIslandAttire").GetValue())
                 dataDict.TryGetValue(npc.Name + "_Beach", out result);
 
             // Regular character key
-            if (result == null || result.Disabled)
+            if (result == null || result.DisplayCondition.Disabled)
                 dataDict.TryGetValue(npc.Name, out result);
 
             // Default key
-            if (result == null || result.Disabled)
+            if (result == null || result.DisplayCondition.Disabled)
                 dataDict.TryGetValue(ModEntry.DefaultKey, out result);
 
             // Fill empty values from the copy
@@ -84,10 +84,10 @@ namespace DialogueDisplayFramework.Framework
             if (cachedDialogueData.TryGetValue(name, out var cachedResult))
                 return cachedResult;
 
-            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DictAssetName);
+            var dataDict = ModEntry.SHelper.GameContent.Load<Dictionary<string, DialogueDisplayData>>(ModEntry.DataAssetName);
             dataDict.TryGetValue(name, out var result);
 
-            if (result == null || result.Disabled)
+            if (result == null || result.DisplayCondition.Disabled)
                 dataDict.TryGetValue(ModEntry.DefaultKey, out result);
 
             // Fill empty values from the copy

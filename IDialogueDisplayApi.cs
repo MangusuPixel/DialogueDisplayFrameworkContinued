@@ -97,6 +97,8 @@ namespace DialogueDisplayFramework
 
     public interface IDialogueDisplayData
     {
+        public string Id { get; set; }
+
         /// <summary>Key to a data entry used to fill in empty field values.</summary>
         public string CopyFrom { get; set; }
 
@@ -145,9 +147,6 @@ namespace DialogueDisplayFramework
 
         // /// <summary>Dividers to be displayed.</summary>
         // public List<DividerData> Dividers { get; set; }
-
-        /// <summary>Prevents any of the customizations to be rendered.</summary>
-        public bool Disabled { get; set; }
     }
 
     public interface IBaseData
