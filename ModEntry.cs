@@ -28,7 +28,7 @@ namespace DialogueDisplayFramework
         private static readonly string _dataPath = "Mangupix.DialogueDisplayFramework/Data";
         private static readonly string _legacyDataPath = "aedenthorn.DialogueDisplayFramework/dictionary";
 
-        private static readonly List<DialogueDisplayData> _preloadedData = new() { DataHelpers.DefaultValues };
+        private static readonly List<DialogueDisplayData> _preloadedData = new();
 
         private static int _validationDelayCounter = 5;
 
@@ -69,6 +69,7 @@ namespace DialogueDisplayFramework
         {
             if (e.NameWithoutLocale.IsEquivalentTo(DataAssetName))
             {
+                Monitor.Log("TODO: Only display portrait over 642px width", LogLevel.Warn);
                 e.LoadFrom(() => _preloadedData, AssetLoadPriority.Exclusive);
             }
             else if (e.NameWithoutLocale.IsEquivalentTo(LegacyDataAssetName))
@@ -140,15 +141,15 @@ namespace DialogueDisplayFramework
                             ImageDict[entry.Portrait.TexturePath] = Game1.content.Load<Texture2D>(entry.Portrait.TexturePath);
                         }
 
-                        var imagesWithMissingID = entry.Images.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var imagesWithMissingID = entry.Images.Select(i => (i.Disabled != true && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (imagesWithMissingID > 0)
                             SMonitor.Log($"{key} : References {imagesWithMissingID} image{(imagesWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var textsWithMissingID = entry.Texts.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var textsWithMissingID = entry.Texts.Select(i => (i.Disabled != true && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (textsWithMissingID > 0)
                             SMonitor.Log($"{key} : References {textsWithMissingID} text{(textsWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
-                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
+                        var dividersWithMissingID = entry.Dividers.Select(i => (!i.Disabled != true && (i.ID == null || i.ID == DataHelpers.MISSING_ID_STR)) ? 1 : 0).Sum();
                         if (dividersWithMissingID > 0)
                             SMonitor.Log($"{key} : References {dividersWithMissingID} divider{(dividersWithMissingID > 1 ? "s" : "")} with missing ID.", LogLevel.Warn);
 
@@ -179,7 +180,7 @@ namespace DialogueDisplayFramework
 
             if (e.NamesWithoutLocale.Contains(DataAssetName))
             {
-                DialogueBoxInterface.InvalidateCache();
+                DialogueDisplayPatcher.ClearCurrentDisplay();
             }
         }
 

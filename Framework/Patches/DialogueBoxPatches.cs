@@ -80,8 +80,8 @@ namespace DialogueDisplayFramework.Framework
 
             try
             {
-                DialogueBoxInterface.AppliedBoxPosition = null;
-                DialogueBoxInterface.shouldPortraitShake = Helper.Reflection.GetMethod(__instance, "shouldPortraitShake");
+                DialogueDisplayPatcher.MarkDisplayPositionDirty();
+                DialogueDisplayPatcher.SetupNewDisplay(__instance);
             }
             catch (Exception ex)
             {
@@ -92,26 +92,12 @@ namespace DialogueDisplayFramework.Framework
 
         public static bool DrawPortrait_Prefix(DialogueBox __instance, SpriteBatch b)
         {
-            if (!Config.EnableMod || ActiveData is null)
+            if (!Config.EnableMod || DialogueDisplayPatcher.CurrentDisplay is null)
                 return true;
 
             try
             {
-                NPC speaker = __instance.characterDialogue.speaker;
-
-                if (!Game1.IsMasterGame && !speaker.EventActor)
-                {
-                    var currentLocation = speaker.currentLocation;
-                    if (currentLocation == null || !currentLocation.IsActiveLocation())
-                    {
-                        NPC actualSpeaker = Game1.getCharacterFromName(speaker.Name, true, false);
-                        if (actualSpeaker != null && actualSpeaker.currentLocation.IsActiveLocation())
-                            speaker = actualSpeaker;
-                    }
-                }
-
-                DialogueBoxRenderer.DrawDialogueBox(b, __instance, ActiveData);
-
+                DialogueDisplayPatcher.DrawDialogueDisplay(b);
                 return false;
             }
             catch (Exception ex)
@@ -119,56 +105,71 @@ namespace DialogueDisplayFramework.Framework
                 Monitor.Log($"Failed in {nameof(DrawPortrait_Prefix)}:\n{ex}", LogLevel.Error);
             }
 
-            DialogueBoxInterface.preventGetCurrentString = false;
+            DialogueDisplayPatcher.SetDialogueStringBypass(false);
+
             return true;
         }
 
         public static bool GetCurrentString_Prefix(DialogueBox __instance, ref string __result)
         {
-            if (!Config.EnableMod || !DialogueBoxInterface.preventGetCurrentString)
-                return true;
-            __result = "";
-            return false;
+            try
+            {
+                if (Config.EnableMod && DialogueDisplayPatcher.GetDialogueStringBypass())
+                {
+                    __result = "";
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(GetCurrentString_Prefix)}:\n{ex}", LogLevel.Error);
+            }
+
+            return true;
         }
 
         public static void Draw_Prefix(DialogueBox __instance, SpriteBatch b)
         {
-            if (!Config.EnableMod)
-                return;
-
-            DialogueBoxInterface.preventGetCurrentString = false;
+            try
+            {
+                if (Config.EnableMod)
+                {
+                    DialogueDisplayPatcher.SetDialogueStringBypass(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(Draw_Prefix)}:\n{ex}", LogLevel.Error);
+            }
         }
 
         public static void Draw_Postfix(DialogueBox __instance, SpriteBatch b)
         {
-            if (!Config.EnableMod)
-                return;
-
-            DialogueBoxInterface.preventGetCurrentString = false;
+            try
+            {
+                if (Config.EnableMod)
+                {
+                    DialogueDisplayPatcher.SetDialogueStringBypass(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{ex}", LogLevel.Error);
+            }
         }
 
         public static void Update_Prefix(DialogueBox __instance, GameTime time)
         {
-            if (!Config.EnableMod)
-                return;
-
-            DialogueBoxInterface.preventGetCurrentString = false;
-        }
-
-        public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
-        {
-            if (!Config.EnableMod || __instance.characterDialogue?.speaker is null)
-                return;
-
             try
             {
-                DialogueBoxInterface.AppliedBoxPosition = null;
-                UpdateDialogueBoxSize(__instance);
+                if (Config.EnableMod)
+                {
+                    DialogueDisplayPatcher.SetDialogueStringBypass(false);
+                }
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Failed in {nameof(GameWindowSizeChanged_Postfix)}:\n{ex}", LogLevel.Error);
-                return;
+                Monitor.Log($"Failed in {nameof(Update_Prefix)}:\n{ex}", LogLevel.Error);
             }
         }
 
@@ -176,12 +177,32 @@ namespace DialogueDisplayFramework.Framework
         {
             try
             {
-                DialogueBoxInterface.InvalidateCache();
+                if (Config.EnableMod)
+                {
+                    DialogueDisplayPatcher.ClearCurrentDisplay();
+                }
             }
             catch (Exception ex)
             {
                 Monitor.Log($"Failed in {nameof(CloseDialogue_Postfix)}:\n{ex}", LogLevel.Error);
                 return;
+            }
+        }
+
+        public static void GameWindowSizeChanged_Postfix(DialogueBox __instance)
+        {
+            try
+            {
+                if (Config.EnableMod && __instance.characterDialogue?.speaker is not null)
+                {
+                    // force update position on the same frame
+                    DialogueDisplayPatcher.MarkDisplayPositionDirty();
+                    DialogueDisplayPatcher.UpdateDisplayPositionAndSize();
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Failed in {nameof(GameWindowSizeChanged_Postfix)}:\n{ex}", LogLevel.Error);
             }
         }
 
@@ -191,8 +212,12 @@ namespace DialogueDisplayFramework.Framework
             try
             {
                 // Android version sets box dimensions on left click so we need to re-apply configs
-                DialogueBoxInterface.AppliedBoxPosition = null;
-                UpdateDialogueBoxSize(__instance);
+                if (Config.EnableMod && __instance.characterDialogue?.speaker is not null)
+                {
+                    // force update position on the same frame
+                    DialogueDisplayPatcher.MarkDisplayPositionDirty();
+                    DialogueDisplayPatcher.UpdateDisplayPositionAndSize();
+                }
             }
             catch (Exception ex)
             {
@@ -208,48 +233,12 @@ namespace DialogueDisplayFramework.Framework
 
             try
             {
-                if (DialogueBoxInterface.AppliedBoxPosition == null)
-                {
-                    UpdateDialogueBoxSize(__instance);
-                }
+                DialogueDisplayPatcher.UpdateDisplayPositionAndSize();
             }
             catch (Exception ex)
             {
                 Monitor.Log($"Failed in {nameof(DrawBox_Prefix)}:\n{ex}", LogLevel.Error);
                 return;
-            }
-        }
-
-        private static void UpdateDialogueBoxSize(DialogueBox dialogueBox)
-        {
-            if (dialogueBox.isPortraitBox() && !dialogueBox.isQuestion)
-            {
-                var boxPos = new Vector2(Config.DialogueXOffset, Config.DialogueYOffset);
-
-                ActiveData = DialogueBoxInterface.GetCharacterDisplay(dialogueBox.characterDialogue.speaker);
-
-                if (ActiveData != null)
-                {
-                    if (ActiveData.Width > 0)
-                        dialogueBox.width = (int)ActiveData.Width;
-                    if (ActiveData.Height > 0)
-                        dialogueBox.height = (int)ActiveData.Height;
-
-                    boxPos += new Vector2(ActiveData.XOffset ?? 0, ActiveData.YOffset ?? 0);
-                }
-
-                dialogueBox.width += Config.DialogueWidthOffset;
-                dialogueBox.height += Config.DialogueHeightOffset;
-
-                if (boxPos != DialogueBoxInterface.AppliedBoxPosition)
-                {
-                    var corrections = boxPos - (DialogueBoxInterface.AppliedBoxPosition ?? Vector2.Zero);
-
-                    dialogueBox.x += (int)corrections.X;
-                    dialogueBox.y += (int)corrections.Y;
-
-                    DialogueBoxInterface.AppliedBoxPosition = boxPos;
-                }
             }
         }
     }

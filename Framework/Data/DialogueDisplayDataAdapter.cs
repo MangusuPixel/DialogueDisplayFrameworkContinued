@@ -15,12 +15,6 @@
             set => _data.Id = value;
         }
 
-        public string CopyFrom
-        {
-            get => _data.CopyFrom;
-            set => _data.CopyFrom = value;
-        }
-
         public int? XOffset
         {
             get => _data.XOffset;

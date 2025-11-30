@@ -2,16 +2,21 @@
 {
     public class HeartsData : BaseData, IHeartsData
     {
-        public int HeartsPerRow { get; set; }
-        public bool ShowEmptyHearts { get; set; }
-        public bool ShowPartialhearts { get; set; }
-        public bool Centered { get; set; }
+        public int? HeartsPerRow { get; set; }
+        public bool? ShowEmptyHearts { get; set; }
+        public bool? ShowPartialhearts { get; set; }
+        public bool? Centered { get; set; }
 
-        public HeartsData()
+        public void MergeFrom(HeartsData other)
         {
-            HeartsPerRow = 14;
-            ShowEmptyHearts = true;
-            ShowPartialhearts = true;
+            if (other == null || other == this)
+                return;
+
+            base.MergeFrom(other);
+            HeartsPerRow ??= other.HeartsPerRow;
+            ShowEmptyHearts ??= other.ShowEmptyHearts;
+            ShowPartialhearts ??= other.ShowPartialhearts;
+            Centered ??= other.Centered;
         }
     }
 }

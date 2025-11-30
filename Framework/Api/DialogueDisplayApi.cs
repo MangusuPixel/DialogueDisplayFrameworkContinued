@@ -55,10 +55,6 @@ namespace DialogueDisplayFramework.Api
 
         public event EventHandler<IRenderEventArgs<IDividerData>> RenderedDivider;
 
-        public IDialogueDisplayData GetSpeakerDisplayData(string key)
-        {
-            return DialogueBoxInterface.GetSpecialDisplay(key).GetAdapter();
-        }
         public void OnRaiseRenderingDialogueBox(IRenderEventArgs<IDialogueDisplayData> args)
         {
             OnRaiseEvent(RenderingDialogueBox, args);
