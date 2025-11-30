@@ -24,6 +24,7 @@ This document is intended to help mod authors create content packs using Dialogu
   - [Text fields](#text-fields)
   - [Divider fields](#divider-fields)
   - [Connectors fields](#connectors-fields)
+- [Game state queries](#game-state-queries)
 - [Examples](#examples)
 - [Advanced examples](#advanced-examples)
 
@@ -256,6 +257,7 @@ Dictionary entries have the following optional fields:
 | `texts`    | List of [Texts](#text-fields)       | Custom texts to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `dividers` | List of [Dividers](#divider-fields) | Custom dividers to draw. Assigning a value of `null` will erase pre-existing entries, otherwise it will merge the lists.
 | `disabled` | boolean | Whether to disable the entry entirely, default false.<br>Similar to setting the entry to `null` but with the option of enabling it in later patches.
+| `condition`| string  | Check for [Game State Query](https://wiki.stardewvalley.net/Modding:Game_state_queries).
 
 If any of the above fields are missing, the value will be taken from the [defaults](/docs/defaults.json) preset matching the unmodded game's dialogue.
 
@@ -369,6 +371,20 @@ The `connectors` field refers to an object with the following fields:
 | ---------| ------- | ----------- |
 | `top`    | boolean | Whether or not to display the top connector, default true.
 | `bottom` | boolean | Whether or not to display the bottom connector, default true.
+
+## Game state queries
+
+The following game state queries (GSQ) are provided for use in the `condition` field of entries. They won't have any effect elsewhere, including in Content Patcher's query conditions.
+
+| Condition                                              | Effect                     |
+| ------------------------------------------------------ | ---------------------------|
+| `Mangupix.DDFC_SPEAKER_NAME <name>`                    | Whether the supplied argument matches the speaker's name. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_GENDER <gender>`                | Whether the supplied gender identity matches the speaker's. Options are `female`, `male` or `undefined`. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_APPEARANCE_ID <id>`             | Whether the supplied appearance ID matches the speaker's current appearance. Case insensitive.
+| `Mangupix.DDFC_SPEAKER_FRIENDSHIP_POINTS <min> <max>`  | Whether the speaker's friendship points is between `<min>` and `<max>`, inclusively.
+| `Mangupix.DDFC_SPEAKER_CAN_RECEIVE_GIFTS`              | Whether the speaker can be given gifts.
+| `Mangupix.DDFC_SPEAKER_CAN_SOCIALIZE`                  | Whether the speaker can be befriended.
+| `Mangupix.DDFC_SPEAKER_CAN_BE_ROMANCED `               | Whether the speaker can be romanced.
 
 ## Examples
 
