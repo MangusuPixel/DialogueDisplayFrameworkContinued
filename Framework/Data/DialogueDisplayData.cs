@@ -28,6 +28,7 @@ namespace DialogueDisplayFramework.Data
         public List<TextData> Texts { get; set; } = new();
         public List<DividerData> Dividers { get; set; } = new();
         public bool Disabled { get; set; }
+        public string Condition { get; set; }
 
         /// <summary>
         /// Fetches the adapter that can be used in other assemblies which map to the <see cref="IDialogueDisplayApi"/> interface.

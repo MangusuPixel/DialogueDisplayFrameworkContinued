@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +61,8 @@ namespace DialogueDisplayFramework
 
             var harmony = new Harmony(ModManifest.UniqueID);
             DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
+
+            DialogueGameStateQueries.Register();
         }
 
         public override object GetApi(IModInfo mod)

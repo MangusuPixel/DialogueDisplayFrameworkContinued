@@ -148,6 +148,9 @@ namespace DialogueDisplayFramework
 
         /// <summary>Prevents any of the customizations to be rendered.</summary>
         public bool Disabled { get; set; }
+
+        /// <summary>GSQ condition to toggle the patch.</summary>
+        public string Condition { get; set; }
     }
 
     public interface IBaseData
