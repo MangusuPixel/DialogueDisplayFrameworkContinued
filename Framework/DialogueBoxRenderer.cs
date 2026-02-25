@@ -1,5 +1,5 @@
-﻿using DialogueDisplayFramework.Data;
-using DialogueDisplayFramework.Api;
+﻿using DialogueDisplayFramework.Api;
+using DialogueDisplayFramework.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -52,7 +52,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingDivider(b, display, data);
 
-            if (data.Disabled.GetValueOrDefault() == false)
+            if (data?.Disabled.GetValueOrDefault() == false)
             {
                 var pos = GetDataVector(display.Box, data);
                 var color = Utility.StringToColor(data.Color) ?? Color.White;
@@ -67,9 +67,9 @@ namespace DialogueDisplayFramework.Framework
                         color
                     );
                 }
-                else if (data.Height.HasValue)
+                else
                 {
-                    var divHeight = (data.Height < 1) ? display.Box.height + 4 : data.Height.Value;
+                    var divHeight = (data.Height.GetValueOrDefault() < 1) ? display.Box.height + 4 : data.Height.Value;
 
                     b.Draw(
                         Game1.mouseCursors,
@@ -92,7 +92,6 @@ namespace DialogueDisplayFramework.Framework
                             data.LayerDepth ?? 0.88f
                         );
                     }
-
                     if (data.BottomConnector == true)
                     {
                         b.Draw(
@@ -117,8 +116,9 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingImage(b, display, data);
 
-            if (data.Disabled.GetValueOrDefault() == false &&
-                data.W > 0 && data.H > 0 && data.TryGetTexture(out var texture)
+            if (data?.Disabled.GetValueOrDefault() == false &&
+                data.W.GetValueOrDefault() > 0 && data.H.GetValueOrDefault() > 0 && 
+                display.TryGetImageTexture(data, out var texture)
             )
             {
                 b.Draw(
@@ -141,16 +141,11 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingPortrait(b, display, data);
 
-            if (data.Disabled.GetValueOrDefault() == false && data.W > 0 && data.H > 0)
+            if (data?.Disabled.GetValueOrDefault() == false && 
+                data.W.GetValueOrDefault() > 0 && data.H.GetValueOrDefault() > 0)
             {
-                Texture2D portraitTexture = display.Box.characterDialogue.overridePortrait ??
-                    display.Box.characterDialogue.speaker.Portrait;
                 Rectangle portraitSource;
-
-                if (data.TexturePath != null && !ModEntry.ImageDict[data.TexturePath].IsDisposed)
-                {
-                    portraitTexture = ModEntry.ImageDict[data.TexturePath];
-                }
+                var portraitTexture = display.GetPortraitTexture();
 
                 if (data.X >= 0 && data.Y >= 0)
                 {
@@ -191,7 +186,7 @@ namespace DialogueDisplayFramework.Framework
 
         public static void DrawName(SpriteBatch b, DialogueDisplay display, TextData data)
         {
-            if (data.Disabled.GetValueOrDefault() == false)
+            if (data?.Disabled.GetValueOrDefault() == false)
             {
                 data.Text = display.Box.characterDialogue.speaker.getName();
                 data.MarkAsSpeakerDisplayName();
@@ -203,7 +198,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingText(b, display, data);
 
-            if (data.Disabled.GetValueOrDefault() == false && data.Width > 0)
+            if (data?.Disabled.GetValueOrDefault() == false)
             {
                 var pos = GetDataVector(display.Box, data);
 
@@ -216,7 +211,7 @@ namespace DialogueDisplayFramework.Framework
                     data.Text,
                     (int)pos.X,
                     (int)pos.Y,
-                    width: data.Width.Value,
+                    width: data.Width ?? -1,
                     alpha: data.Alpha ?? default,
                     layerDepth: data.LayerDepth ?? 0.88f,
                     junimoText: data.Junimo.GetValueOrDefault(),
@@ -234,7 +229,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingHearts(b, display, data);
 
-            if (data.Disabled.GetValueOrDefault() == false && data.HeartsPerRow > 0)
+            if (data?.Disabled.GetValueOrDefault() == false && data.HeartsPerRow.GetValueOrDefault() > 0)
             {
                 var speaker = display.Box.characterDialogue.speaker;
                 int friendshipLevel = Game1.player.getFriendshipLevelForNPC(speaker.Name);
@@ -331,7 +326,7 @@ namespace DialogueDisplayFramework.Framework
 
             var speaker = display.Box.characterDialogue.speaker;
 
-            if (data.Disabled.GetValueOrDefault() == false && !friendship.IsMarried() && speaker is not Child)
+            if (data?.Disabled.GetValueOrDefault() == false && !friendship.IsMarried() && speaker is not Child)
             {
                 var pos = GetDataVector(display.Box, data);
 
@@ -382,7 +377,7 @@ namespace DialogueDisplayFramework.Framework
         {
             ApiConsumerManager.RaiseRenderingJewel(b, display, data);
 
-            if (ShouldDrawFriendshipJewel(display.Box) && data.Disabled.GetValueOrDefault() == false)
+            if (ShouldDrawFriendshipJewel(display.Box) && data?.Disabled.GetValueOrDefault() == false)
             {
                 var pos = GetDataVector(display.Box, data);
                 var friendshipHeartLevel = friendship.Points / 250;
