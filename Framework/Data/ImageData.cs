@@ -6,7 +6,8 @@ namespace DialogueDisplayFramework.Data
     public class ImageData : BaseData, IImageData, IMergeableEntry<ImageData>
     {
         public Texture2D _texture;
-        public bool? _isTextureValid;
+        public bool? _isTextureReady;
+        public bool? _isTokenizedPath;
 
         public string ID { get; set; }
         public string TexturePath { get; private set; }
@@ -37,14 +38,17 @@ namespace DialogueDisplayFramework.Data
         {
             texture = null;
 
-            if (!_isTextureValid.HasValue)
-                _isTextureValid = Game1.content.DoesAssetExist<Texture2D>(TexturePath);
+            if (!_isTextureReady.HasValue)
+            {
+                _isTextureReady = !HasTokenizedPath() && Game1.content.DoesAssetExist<Texture2D>(TexturePath);
+            }
 
-            if (_isTextureValid.Value)
+            if (_isTextureReady.Value)
             {
                 texture = _texture ??= Game1.content.Load<Texture2D>(TexturePath);
                 return true;
             }
+
             return false;
         }
 
@@ -53,13 +57,19 @@ namespace DialogueDisplayFramework.Data
             TexturePath = path;
             _texture = null;
 
-            if (string.IsNullOrEmpty(TexturePath))
+            if (string.IsNullOrEmpty(TexturePath) || HasTokenizedPath())
             {
-                _isTextureValid = false;
+                _isTextureReady = false;
             } else
             {
-                _isTextureValid = Game1.content.DoesAssetExist<Texture2D>(TexturePath);
+                _isTextureReady = Game1.content.DoesAssetExist<Texture2D>(TexturePath);
             }
+        }
+
+        public bool HasTokenizedPath()
+        {
+            _isTokenizedPath ??= TexturePath.Contains('[');
+            return _isTokenizedPath.Value;
         }
     }
 }
