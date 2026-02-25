@@ -59,7 +59,7 @@ namespace DialogueDisplayFramework
             var harmony = new Harmony(ModManifest.UniqueID);
             DialogueBoxPatches.Apply(harmony, Config, Monitor, Helper);
 
-            DialogueGameStateQueries.Register();
+            GameStateQueries.Register();
         }
 
         public override object GetApi(IModInfo mod)
