@@ -102,26 +102,5 @@ namespace DialogueDisplayFramework.Data
             entry.Hearts?.MergeFrom(DefaultHeartsData);
             entry.MergeFrom(DefaultDisplayData);
         }
-
-        public static DialogueDisplayData MergeEntries(DialogueDisplayData entry, DialogueDisplayData filler)
-        {
-            return new DialogueDisplayData()
-            {
-                XOffset = entry.XOffset ?? filler.XOffset,
-                YOffset = entry.YOffset ?? filler.YOffset,
-                Width = entry.Width ?? filler.Width,
-                Height = entry.Height ?? filler.Height,
-                Dialogue = entry.Dialogue ?? filler.Dialogue,
-                Portrait = entry.Portrait ?? filler.Portrait,
-                Name = entry.Name ?? filler.Name,
-                Jewel = entry.Jewel ?? filler.Jewel,
-                Button = entry.Button ?? filler.Button,
-                Gifts = entry.Gifts ?? filler.Gifts,
-                Hearts = entry.Hearts ?? filler.Hearts,
-                Images = (entry.Images is null || filler.Images is null) ? entry.Images ?? filler.Images : filler.Images.Concat(entry.Images).ToList(),
-                Texts = (entry.Texts is null || filler.Texts is null) ? entry.Texts ?? filler.Texts : filler.Texts.Concat(entry.Texts).ToList(),
-                Dividers = (entry.Dividers is null || filler.Dividers is null) ? entry.Dividers ?? filler.Dividers : filler.Dividers.Concat(entry.Dividers).ToList(),
-            };
-        }
     }
 }
