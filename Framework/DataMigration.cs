@@ -58,6 +58,7 @@ namespace DialogueDisplayFramework.Framework
             target.Jewel ??= source.Jewel;
             target.Button ??= source.Button;
             target.Gifts ??= source.Gifts;
+            target.Hearts ??= source.Hearts;
             target.Images = (target.Images is null || source.Images is null) ? target.Images ?? source.Images : source.Images.Concat(target.Images).ToList();
             target.Texts = (target.Texts is null || source.Texts is null) ? target.Texts ?? source.Texts : source.Texts.Concat(target.Texts).ToList();
             target.Dividers = (target.Dividers is null || source.Dividers is null) ? target.Dividers ?? source.Dividers : source.Dividers.Concat(target.Dividers).ToList();

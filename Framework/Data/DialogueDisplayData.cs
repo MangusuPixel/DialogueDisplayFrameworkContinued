@@ -45,8 +45,8 @@ namespace DialogueDisplayFramework.Data
 
             XOffset ??= other.XOffset;
             YOffset ??= other.YOffset;
-            Width = other.Width;
-            Height = other.Height;
+            Width ??= other.Width;
+            Height ??= other.Height;
             Dialogue ??= other.Dialogue;
             Portrait ??= other.Portrait;
             Name ??= other.Name;
