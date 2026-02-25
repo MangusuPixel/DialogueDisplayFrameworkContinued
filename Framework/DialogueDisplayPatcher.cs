@@ -126,6 +126,7 @@ namespace DialogueDisplayFramework.Framework
         public static void ClearCurrentDisplay()
         {
             _currentDisplay = null;
+            _currentDisplayPosition = null;
         }
     }
 }
